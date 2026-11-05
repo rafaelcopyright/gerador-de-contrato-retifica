@@ -39,6 +39,10 @@
     #status { min-height: 1.5em; }
     #error { color: #9d2020; font-weight: 650; }
     #documento { display: none; }
+    .description-field { position: relative; }
+    .suggestions { position: absolute; top: 100%; left: 0; right: 0; z-index: 5; max-height: 280px; overflow-y: auto; margin: 4px 0; padding: 4px; list-style: none; background: white; border: 2px solid #526b7e; border-radius: 6px; box-shadow: 0 6px 18px #182b3b26; }
+    .suggestions li { padding: 12px; cursor: pointer; border-radius: 4px; }
+    .suggestions li[aria-selected="true"], .suggestions li:hover { background: #dcece5; color: #123e31; }
     .skip-link { position: absolute; top: -100px; left: 12px; background: white; padding: 10px; z-index: 10; }
     .skip-link:focus { top: 12px; }
     @media (max-width: 650px) {
@@ -90,7 +94,7 @@
       </section>
       <section aria-labelledby="pecasTitulo">
         <div class="section-heading"><h2 id="pecasTitulo">2. Peças e serviços</h2><button id="adicionarItem" type="button">+ Adicionar item</button></div>
-        <p class="hint">Informe o valor de cada unidade. O total é calculado automaticamente.</p>
+        <p id="ajudaPecas" class="hint">Digite uma peça para ver sugestões, mesmo com pequenos erros de escrita. Use as setas e Enter para escolher ou escreva um serviço livremente. Informe o valor de cada unidade.</p>
         <div id="listaItens"></div>
       </section>
       <section aria-labelledby="clausulasTitulo">
@@ -112,7 +116,78 @@
     <div id="pdfTermos"><h2>Cláusulas e condições</h2><div id="pdfClausulas"></div></div>
     <div class="signature"><p>Assinatura da oficina</p><p>Assinatura do cliente</p></div>
   </article>
+  <!-- Catálogo embutido para funcionar também ao abrir o HTML sem servidor. -->
+  <script id="catalogoPecas" type="application/json">
+    [
+      {"nome":"Anel de pistão","apelidos":["anéis","segmento do pistão"]},
+      {"nome":"Biela","apelidos":[]},
+      {"nome":"Bloco do motor","apelidos":[]},
+      {"nome":"Bomba de água","apelidos":[]},
+      {"nome":"Bomba de combustível","apelidos":["bomba de gasolina"]},
+      {"nome":"Bomba de óleo","apelidos":[]},
+      {"nome":"Bronzina de biela","apelidos":["casquilho de biela"]},
+      {"nome":"Bronzina de mancal","apelidos":["casquilho de mancal"]},
+      {"nome":"Cabeçote do motor","apelidos":[]},
+      {"nome":"Camisa de cilindro","apelidos":["camisa do motor"]},
+      {"nome":"Cárter do motor","apelidos":[]},
+      {"nome":"Comando de válvulas","apelidos":["árvore de comando"]},
+      {"nome":"Correia dentada","apelidos":["correia de distribuição"]},
+      {"nome":"Correia do alternador","apelidos":["correia de acessórios","correia poly v"]},
+      {"nome":"Corrente de comando","apelidos":["corrente de distribuição"]},
+      {"nome":"Junta do cabeçote","apelidos":[]},
+      {"nome":"Junta da tampa de válvulas","apelidos":[]},
+      {"nome":"Junta do cárter","apelidos":[]},
+      {"nome":"Kit de juntas do motor","apelidos":["jogo de juntas"]},
+      {"nome":"Pistão do motor","apelidos":["êmbolo"]},
+      {"nome":"Pino do pistão","apelidos":[]},
+      {"nome":"Retentor do virabrequim","apelidos":[]},
+      {"nome":"Retentor de válvula","apelidos":[]},
+      {"nome":"Tucho de válvula","apelidos":["tucho hidráulico"]},
+      {"nome":"Válvula de admissão","apelidos":[]},
+      {"nome":"Válvula de escape","apelidos":[]},
+      {"nome":"Virabrequim","apelidos":["eixo de manivelas"]},
+      {"nome":"Volante do motor","apelidos":[]},
+      {"nome":"Vela de ignição","apelidos":[]},
+      {"nome":"Cabo de vela","apelidos":[]},
+      {"nome":"Bobina de ignição","apelidos":[]},
+      {"nome":"Bico injetor","apelidos":["injetor de combustível"]},
+      {"nome":"Filtro de ar","apelidos":[]},
+      {"nome":"Filtro de óleo","apelidos":[]},
+      {"nome":"Filtro de combustível","apelidos":[]},
+      {"nome":"Filtro de cabine","apelidos":["filtro do ar condicionado"]},
+      {"nome":"Óleo do motor","apelidos":["lubrificante"]},
+      {"nome":"Radiador","apelidos":[]},
+      {"nome":"Mangueira do radiador","apelidos":[]},
+      {"nome":"Válvula termostática","apelidos":[]},
+      {"nome":"Reservatório de expansão","apelidos":["reservatório de água"]},
+      {"nome":"Aditivo do radiador","apelidos":["líquido de arrefecimento"]},
+      {"nome":"Alternador","apelidos":[]},
+      {"nome":"Motor de partida","apelidos":["motor de arranque"]},
+      {"nome":"Bateria","apelidos":[]},
+      {"nome":"Kit de embreagem","apelidos":["disco de embreagem","platô"]},
+      {"nome":"Coxim do motor","apelidos":["suporte do motor"]},
+      {"nome":"Coxim do câmbio","apelidos":[]},
+      {"nome":"Amortecedor dianteiro","apelidos":[]},
+      {"nome":"Amortecedor traseiro","apelidos":[]},
+      {"nome":"Bandeja de suspensão","apelidos":["balança"]},
+      {"nome":"Bieleta","apelidos":[]},
+      {"nome":"Pivô de suspensão","apelidos":[]},
+      {"nome":"Terminal de direção","apelidos":[]},
+      {"nome":"Rolamento de roda","apelidos":[]},
+      {"nome":"Cubo de roda","apelidos":[]},
+      {"nome":"Pastilha de freio","apelidos":[]},
+      {"nome":"Disco de freio","apelidos":[]},
+      {"nome":"Tambor de freio","apelidos":[]},
+      {"nome":"Sapata de freio","apelidos":["lona de freio"]},
+      {"nome":"Cilindro mestre de freio","apelidos":[]},
+      {"nome":"Fluido de freio","apelidos":[]},
+      {"nome":"Sensor de rotação","apelidos":[]},
+      {"nome":"Sonda lambda","apelidos":["sensor de oxigênio"]},
+      {"nome":"Tensor da correia dentada","apelidos":["tensionador"]}
+    ]
+  </script>
   <script>
+    const catalogoPecas = JSON.parse(document.getElementById('catalogoPecas').textContent);
     const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
     const listaItens = document.getElementById('listaItens');
     const listaClausulas = document.getElementById('listaClausulas');
@@ -135,7 +210,113 @@
       });
       linha.addEventListener('input', atualizarTotais);
       listaItens.append(linha);
+      configurarSugestoes(linha.querySelector('.descricao'));
       return linha;
+    }
+
+    function normalizarBusca(texto) {
+      return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    // Distância de edição: uma inserção, remoção ou troca de letra custa um ponto.
+    function distanciaEdicao(origem, destino) {
+      let anterior = Array.from({ length: destino.length + 1 }, (_, indice) => indice);
+      for (let i = 1; i <= origem.length; i++) {
+        const atual = [i];
+        for (let j = 1; j <= destino.length; j++) {
+          atual[j] = Math.min(atual[j - 1] + 1, anterior[j] + 1, anterior[j - 1] + (origem[i - 1] === destino[j - 1] ? 0 : 1));
+        }
+        anterior = atual;
+      }
+      return anterior[destino.length];
+    }
+
+    function pontuarTermo(consulta, termo) {
+      if (termo === consulta) return 0;
+      if (termo.startsWith(consulta)) return 1;
+      if (termo.includes(consulta)) return 2;
+      const palavrasConsulta = consulta.split(/\s+/);
+      const palavrasTermo = termo.split(/\s+/);
+      const distancias = palavrasConsulta.map(palavra => Math.min(...palavrasTermo.map(candidata => distanciaEdicao(palavra, candidata))));
+      return distancias.every((distancia, indice) => distancia <= (palavrasConsulta[indice].length >= 6 ? 2 : palavrasConsulta[indice].length >= 3 ? 1 : 0))
+        ? 3 + distancias.reduce((total, distancia) => total + distancia, 0) : Infinity;
+    }
+
+    function buscarPecas(texto) {
+      const consulta = normalizarBusca(texto);
+      if (consulta.length < 2) return [];
+      return catalogoPecas.map(peca => ({
+        nome: peca.nome,
+        pontuacao: Math.min(...[peca.nome, ...peca.apelidos].map(termo => pontuarTermo(consulta, normalizarBusca(termo))))
+      })).filter(peca => Number.isFinite(peca.pontuacao))
+        .sort((a, b) => a.pontuacao - b.pontuacao || a.nome.localeCompare(b.nome, 'pt-BR'))
+        .slice(0, 6).map(peca => peca.nome);
+    }
+
+    function configurarSugestoes(campo) {
+      const lista = document.createElement('ul');
+      lista.id = campo.id + '-sugestoes';
+      lista.className = 'suggestions';
+      lista.setAttribute('role', 'listbox');
+      lista.setAttribute('aria-label', 'Peças sugeridas');
+      lista.hidden = true;
+      campo.after(lista);
+      campo.setAttribute('role', 'combobox');
+      campo.setAttribute('aria-autocomplete', 'list');
+      campo.setAttribute('aria-controls', lista.id);
+      campo.setAttribute('aria-expanded', 'false');
+      campo.setAttribute('aria-describedby', 'ajudaPecas');
+      campo.autocomplete = 'off';
+      let indiceAtivo = -1;
+
+      function fechar() {
+        lista.hidden = true;
+        indiceAtivo = -1;
+        campo.setAttribute('aria-expanded', 'false');
+        campo.removeAttribute('aria-activedescendant');
+      }
+
+      function escolher(opcao) {
+        campo.value = opcao.textContent;
+        fechar();
+        anunciar('Peça selecionada: ' + campo.value);
+      }
+
+      function mostrar() {
+        fechar();
+        const resultados = buscarPecas(campo.value);
+        lista.replaceChildren(...resultados.map((nome, indice) => {
+          const opcao = document.createElement('li');
+          opcao.id = `${lista.id}-${indice}`;
+          opcao.setAttribute('role', 'option');
+          opcao.setAttribute('aria-selected', 'false');
+          opcao.textContent = nome;
+          opcao.addEventListener('pointerdown', evento => evento.preventDefault());
+          opcao.addEventListener('click', () => escolher(opcao));
+          return opcao;
+        }));
+        lista.hidden = resultados.length === 0;
+        campo.setAttribute('aria-expanded', String(resultados.length > 0));
+        if (normalizarBusca(campo.value).length >= 2) anunciar(resultados.length ? `${resultados.length} sugestões disponíveis. Use as setas para navegar.` : 'Nenhuma sugestão. Você pode usar o texto digitado.');
+      }
+
+      campo.addEventListener('input', mostrar);
+      campo.addEventListener('focus', mostrar);
+      campo.addEventListener('blur', fechar);
+      campo.addEventListener('keydown', evento => {
+        if (evento.key === 'Escape') { fechar(); return; }
+        if (lista.hidden) return;
+        if (evento.key === 'Enter' && indiceAtivo >= 0) {
+          evento.preventDefault(); escolher(lista.children[indiceAtivo]);
+        }
+        if (evento.key !== 'ArrowDown' && evento.key !== 'ArrowUp') return;
+        evento.preventDefault();
+        indiceAtivo = (indiceAtivo + (evento.key === 'ArrowDown' ? 1 : -1) + lista.children.length) % lista.children.length;
+        Array.from(lista.children).forEach((opcao, indice) => opcao.setAttribute('aria-selected', String(indice === indiceAtivo)));
+        const opcao = lista.children[indiceAtivo];
+        campo.setAttribute('aria-activedescendant', opcao.id);
+        opcao.scrollIntoView({ block: 'nearest' });
+      });
     }
 
     function coletarItens() {
