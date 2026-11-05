@@ -73,3 +73,16 @@ tests/            Testes de fluxo no navegador
 - O catálogo é inicial e pode ser ampliado manualmente; a busca aproximada pode sugerir peças diferentes da desejada.
 - A quantidade aceita apenas unidades inteiras. Valores unitários aceitam duas casas decimais, inclusive zero para itens sem cobrança.
 - A paginação e o destino do PDF dependem das opções de impressão do navegador.
+
+## Navegação e acessibilidade
+
+- Menu lateral fixo em telas de computador, com links âncora para dados, peças, cláusulas e impressão. Em telas menores, o menu passa para o topo para não encobrir os campos.
+- Três tamanhos de fonte: **Normal**, **Grande** e **Extra grande**. A preferência de fonte é mantida neste navegador quando o armazenamento local está disponível; ela não altera o tamanho da fonte do contrato impresso.
+- Uma seção de preenchimento aberta por vez. Peças e cláusulas mostram resumos recolhíveis, com apenas um editor aberto em cada lista.
+- Listas divididas em páginas de cinco registros. Todos os registros continuam no contrato, inclusive os de outras páginas ou seções fechadas.
+- Botões de adicionar em barras que acompanham a seção durante a rolagem. Um novo registro abre automaticamente na última página, com foco no campo de preenchimento.
+- Ao gerar o contrato, um campo inválido abre sua seção, página e editor automaticamente.
+
+## Entrega ao cliente
+
+Envie somente `index.html`. O cliente abre o arquivo no navegador e usa o aplicativo sem instalar Node.js, npm ou qualquer outro programa. `package.json`, `package-lock.json`, `tests/` e `.agents/` são arquivos de desenvolvimento e não precisam acompanhar a entrega.

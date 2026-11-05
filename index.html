@@ -6,17 +6,39 @@
   <meta name="description" content="Preencha peças e serviços da oficina e imprima seu contrato ou salve em PDF.">
   <title>Contrato Fácil | Oficina</title>
   <style>
-    :root { font-family: system-ui, sans-serif; color: #182b3b; background: #f1f5f8; font-size: 18px; line-height: 1.5; }
+    :root { font-family: system-ui, sans-serif; color: #182b3b; background: #f1f5f8; font-size: var(--fonte-tela, 18px); line-height: 1.5; }
     * { box-sizing: border-box; }
     body { margin: 0; }
-    main { max-width: 1000px; margin: auto; padding: 32px 24px 64px; }
+    main { max-width: 1120px; margin-left: 280px; padding: 32px 32px 64px; }
     h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 8px 0; line-height: 1.2; }
     h2 { font-size: 1.25rem; margin: 0 0 8px; }
     p { margin: 8px 0 20px; }
     .eyebrow { color: #265a57; font-weight: 750; letter-spacing: .08em; font-size: .8rem; }
     .muted, .hint { color: #465b6b; }
     .hint { font-size: .88rem; margin: 8px 0; }
-    section { background: white; border: 1px solid #cad5df; border-radius: 12px; margin-top: 24px; padding: 24px; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; padding: 28px 20px; overflow-y: auto; background: #183e38; color: white; }
+    .brand { display: block; font-size: 1.3rem; margin-bottom: 28px; }
+    .sidebar nav { display: grid; gap: 10px; }
+    .sidebar a { display: block; padding: 12px; color: white; text-decoration: none; border: 1px solid transparent; border-radius: 6px; }
+    .sidebar a:hover, .sidebar a[aria-current="location"] { background: #2c5a52; border-color: #b5d8cc; }
+    .sidebar fieldset { border-color: #80a79b; margin-top: 32px; padding: 12px; }
+    .font-controls { display: grid; gap: 8px; }
+    .font-controls button { text-align: left; }
+    .font-controls [aria-pressed="true"] { background: #dcf0e5; border: 2px solid #145a48; }
+    .sidebar .hint { color: #dbe9e4; }
+    .form-section { background: white; border: 1px solid #cad5df; border-radius: 12px; margin-top: 24px; scroll-margin-top: 20px; }
+    summary { cursor: pointer; padding: 18px; font-weight: 650; overflow-wrap: anywhere; }
+    .form-section > summary { padding: 24px; }
+    summary h2 { display: inline; font-size: 1.2rem; }
+    .section-content { padding: 0 24px 24px; }
+    .section-toolbar { position: sticky; top: 0; z-index: 6; background: white; padding: 12px 0; border-bottom: 1px solid #cad5df; }
+    .count { font-weight: 650; }
+    .entry { border: 1px solid #cad5df; border-radius: 8px; margin-top: 14px; scroll-margin-top: 100px; }
+    .entry[open] { border-color: #526b7e; }
+    .entry > fieldset { margin: 0; border: 0; }
+    .entry-summary { display: inline; }
+    .pagination { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding-top: 20px; }
+    button:disabled { cursor: default; opacity: .55; }
     .section-heading, .summary { display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     label { display: block; font-weight: 650; margin-bottom: 6px; }
     input, textarea, button { font: inherit; }
@@ -34,7 +56,7 @@
     legend { font-weight: 700; padding: 0 6px; }
     .item-fields { display: grid; grid-template-columns: minmax(0, 1fr) 95px 155px; gap: 14px; }
     .item-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; }
-    .summary { margin-top: 24px; background: #e8f1ed; border-radius: 8px; padding: 20px; }
+    .summary { position: sticky; bottom: 0; z-index: 7; margin-top: 24px; background: #e8f1ed; border: 1px solid #aac3b7; border-radius: 8px; padding: 16px; }
     .total { font-size: 1.5rem; font-weight: 750; }
     #status { min-height: 1.5em; }
     #error { color: #9d2020; font-weight: 650; }
@@ -45,12 +67,28 @@
     .suggestions li[aria-selected="true"], .suggestions li:hover { background: #dcece5; color: #123e31; }
     .skip-link { position: absolute; top: -100px; left: 12px; background: white; padding: 10px; z-index: 10; }
     .skip-link:focus { top: 12px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 1100px) {
+      .sidebar { position: static; width: auto; padding: 18px 24px; }
+      .brand { margin-bottom: 12px; }
+      .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
+      .sidebar fieldset { margin-top: 12px; }
+      .font-controls { display: flex; flex-wrap: wrap; }
+      main { margin: auto; }
+    }
     @media (max-width: 650px) {
-      main { padding: 24px 14px; } section { padding: 18px; }
+      main { padding: 24px 14px; }
+      .sidebar { padding: 18px 14px; }
+      .form-section > summary { padding: 18px; }
+      .section-content { padding: 0 14px 18px; }
       .fields { grid-template-columns: 1fr; }
       .item-fields { grid-template-columns: 1fr 1fr; }
       .description-field { grid-column: 1 / -1; }
       .summary .primary { width: 100%; }
+      .summary { position: static; }
+      .section-toolbar { align-items: stretch; }
+      .section-toolbar button { width: 100%; }
+      .item-footer { flex-wrap: wrap; }
     }
     @media print {
       @page { size: A4; margin: 15mm; }
@@ -73,15 +111,31 @@
 <body>
   <a class="skip-link" href="#formulario">Ir para o formulário</a>
   <!-- TELA DO SISTEMA -->
+  <aside class="sidebar screen" aria-label="Navegação e acessibilidade">
+    <strong class="brand">Contrato Fácil</strong>
+    <nav aria-label="Seções do contrato">
+      <a href="#dados" aria-current="location">1. Oficina e cliente</a>
+      <a href="#pecas">2. Peças e serviços</a>
+      <a href="#clausulas">3. Cláusulas</a>
+      <a href="#finalizar">4. Imprimir contrato</a>
+    </nav>
+    <fieldset><legend>Tamanho da fonte</legend><div class="font-controls" role="group" aria-label="Tamanho da fonte">
+      <button type="button" data-font="18" aria-pressed="true">Normal</button>
+      <button type="button" data-font="21" aria-pressed="false">Grande</button>
+      <button type="button" data-font="24" aria-pressed="false">Extra grande</button>
+    </div></fieldset>
+    <p class="hint">Funciona sem internet e sem instalação.</p>
+  </aside>
   <main class="screen">
     <header>
       <span class="eyebrow">PARA O DIA A DIA DA OFICINA</span>
       <h1>Contrato Fácil</h1>
       <p class="muted">Preencha os dados, confira o total e gere seu contrato para imprimir.</p>
     </header>
-    <form id="formulario">
-      <section aria-labelledby="dadosTitulo">
-        <h2 id="dadosTitulo">1. Oficina e cliente</h2>
+    <form id="formulario" novalidate>
+      <details id="dados" class="form-section" open>
+        <summary><h2 id="dadosTitulo">1. Oficina e cliente</h2></summary>
+        <div class="section-content">
         <p class="hint">Os campos marcados com * são obrigatórios.</p>
         <div class="fields">
           <div><label for="oficina">Nome da oficina *</label><input id="oficina" required maxlength="150" autocomplete="organization"></div>
@@ -91,20 +145,30 @@
           <div><label for="veiculo">Veículo e placa (opcional)</label><input id="veiculo" maxlength="150" placeholder="Ex.: Onix • ABC1D23"></div>
           <div><label for="data">Data do contrato *</label><input id="data" type="date" required></div>
         </div>
-      </section>
-      <section aria-labelledby="pecasTitulo">
-        <div class="section-heading"><h2 id="pecasTitulo">2. Peças e serviços</h2><button id="adicionarItem" type="button">+ Adicionar item</button></div>
+        </div>
+      </details>
+      <details id="pecas" class="form-section">
+        <summary><h2 id="pecasTitulo">2. Peças e serviços</h2></summary>
+        <div class="section-content">
+        <div class="section-heading section-toolbar"><span id="contagemItens" class="count"></span><button id="adicionarItem" type="button">+ Adicionar item</button></div>
         <p id="ajudaPecas" class="hint">Digite uma peça para ver sugestões, mesmo com pequenos erros de escrita. Use as setas e Enter para escolher ou escreva um serviço livremente. Informe o valor de cada unidade.</p>
         <div id="listaItens"></div>
-      </section>
-      <section aria-labelledby="clausulasTitulo">
-        <div class="section-heading"><h2 id="clausulasTitulo">3. Cláusulas do contrato</h2><button id="adicionarClausula" type="button">+ Adicionar cláusula</button></div>
+        <nav id="paginasItens" class="pagination" aria-label="Páginas de peças"></nav>
+        </div>
+      </details>
+      <details id="clausulas" class="form-section">
+        <summary><h2 id="clausulasTitulo">3. Cláusulas do contrato</h2></summary>
+        <div class="section-content">
+        <div class="section-heading section-toolbar"><span id="contagemClausulas" class="count"></span><button id="adicionarClausula" type="button">+ Adicionar cláusula</button></div>
         <p class="hint">Edite os textos conforme as condições combinadas com o cliente. Confira as cláusulas antes de imprimir.</p>
         <div id="listaClausulas"></div>
-      </section>
-      <div class="summary"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><button class="primary" type="submit">Imprimir / salvar PDF</button></div>
+        <nav id="paginasClausulas" class="pagination" aria-label="Páginas de cláusulas"></nav>
+        </div>
+      </details>
+      <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><button class="primary" type="submit">Imprimir / salvar PDF</button></div>
       <p class="hint">Na janela de impressão, escolha sua impressora ou “Salvar como PDF”. Use papel A4 e desative os cabeçalhos e rodapés do navegador.</p>
       <p id="error" role="alert"></p><p id="status" class="hint" role="status"></p>
+      <p class="hint">Salve seu PDF antes de fechar. Os dados preenchidos não ficam salvos ao recarregar a página.</p>
     </form>
   </main>
   <!-- MODELO DO CONTRATO -->
@@ -193,24 +257,122 @@
     const listaClausulas = document.getElementById('listaClausulas');
     let proximoItem = 0;
     let proximaClausula = 0;
+    const itensPorPagina = 5;
+    const configuracoesListas = new Map();
 
     function anunciar(mensagem) { document.getElementById('status').textContent = mensagem; }
 
+    function configurarPaginacao(lista, idNavegacao, idContagem, nome) {
+      const navegacao = document.getElementById(idNavegacao);
+      navegacao.innerHTML = '<button type="button" class="previous">Anterior</button><span class="page-label" role="status"></span><button type="button" class="next">Próxima</button>';
+      configuracoesListas.set(lista, { navegacao, contagem: document.getElementById(idContagem), nome });
+      lista.dataset.pagina = '1';
+      for (const [seletor, deslocamento] of [['.previous', -1], ['.next', 1]]) {
+        navegacao.querySelector(seletor).addEventListener('click', () => {
+          lista.dataset.pagina = Number(lista.dataset.pagina) + deslocamento;
+          atualizarPaginacao(lista);
+          const primeiro = Array.from(lista.children).find(cartao => !cartao.hidden);
+          primeiro?.querySelector('summary').focus();
+          primeiro?.scrollIntoView({ block: 'start' });
+        });
+      }
+    }
+
+    function atualizarPaginacao(lista, paginaDesejada = Number(lista.dataset.pagina)) {
+      const { navegacao, contagem, nome } = configuracoesListas.get(lista);
+      const total = lista.children.length;
+      const paginas = Math.max(1, Math.ceil(total / itensPorPagina));
+      const pagina = Math.max(1, Math.min(paginaDesejada, paginas));
+      lista.dataset.pagina = pagina;
+      Array.from(lista.children).forEach((cartao, indice) => {
+        cartao.hidden = Math.floor(indice / itensPorPagina) !== pagina - 1;
+      });
+      navegacao.hidden = total <= itensPorPagina;
+      navegacao.querySelector('.previous').disabled = pagina === 1;
+      navegacao.querySelector('.next').disabled = pagina === paginas;
+      navegacao.querySelector('.page-label').textContent = `Página ${pagina} de ${paginas}`;
+      contagem.textContent = `${total} ${nome} no contrato`;
+    }
+
+    function revelarCampo(campo) {
+      const secao = campo.closest('.form-section');
+      if (secao) secao.open = true;
+      const cartao = campo.closest('.entry');
+      if (cartao) {
+        const lista = cartao.parentElement;
+        const indice = Array.from(lista.children).indexOf(cartao);
+        atualizarPaginacao(lista, Math.floor(indice / itensPorPagina) + 1);
+        cartao.open = true;
+      }
+      campo.focus();
+      campo.scrollIntoView({ block: 'center' });
+    }
+
+    function configurarNavegacao() {
+      const secoes = document.querySelectorAll('.form-section');
+      function atualizarLinkAtivo(id) {
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+          if (link.hash === '#' + id) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }
+      for (const secao of secoes) {
+        secao.name = 'secoesContrato';
+        secao.addEventListener('toggle', () => {
+          if (secao.open) atualizarLinkAtivo(secao.id);
+        });
+      }
+      function navegar(hash, focar = true) {
+        const alvo = document.getElementById(hash.slice(1));
+        if (!alvo || (!alvo.classList.contains('form-section') && alvo.id !== 'finalizar')) return;
+        if (alvo.classList.contains('form-section')) alvo.open = true;
+        atualizarLinkAtivo(alvo.id);
+        if (focar) {
+          (alvo.querySelector('summary') || alvo).focus();
+          alvo.scrollIntoView({ block: 'start' });
+        }
+      }
+      document.querySelectorAll('.sidebar nav a').forEach(link => {
+        link.addEventListener('click', () => navegar(link.hash));
+      });
+      window.addEventListener('hashchange', () => navegar(location.hash));
+      if (location.hash) navegar(location.hash);
+    }
+
+    function configurarFonte() {
+      const botoes = document.querySelectorAll('[data-font]');
+      function aplicar(tamanho) {
+        if (!['18', '21', '24'].includes(tamanho)) return;
+        document.documentElement.style.setProperty('--fonte-tela', tamanho + 'px');
+        botoes.forEach(botao => botao.setAttribute('aria-pressed', String(botao.dataset.font === tamanho)));
+      }
+      try { aplicar(localStorage.getItem('contrato-facil-fonte')); } catch { /* Armazenamento pode estar bloqueado. */ }
+      botoes.forEach(botao => botao.addEventListener('click', () => {
+        aplicar(botao.dataset.font);
+        try { localStorage.setItem('contrato-facil-fonte', botao.dataset.font); } catch { /* O controle funciona sem persistência. */ }
+        anunciar('Tamanho da fonte: ' + botao.textContent + '.');
+      }));
+    }
+
     function adicionarLinhaPeca() {
       const id = ++proximoItem;
-      const linha = document.createElement('fieldset');
-      linha.className = 'item';
-      linha.innerHTML = `<legend>Item ${id}</legend><div class="item-fields">
+      const linha = document.createElement('details');
+      linha.className = 'item entry';
+      linha.name = 'editorPecas';
+      linha.open = true;
+      linha.innerHTML = `<summary><span class="entry-summary">Novo item</span></summary><fieldset><legend>Editar item ${id}</legend><div class="item-fields">
         <div class="description-field"><label for="descricao-${id}">Peça ou serviço *</label><input id="descricao-${id}" class="descricao" required maxlength="250" placeholder="Ex.: Pistão do motor"></div>
         <div><label for="quantidade-${id}">Qtd. *</label><input id="quantidade-${id}" class="quantidade" type="number" required min="1" max="9999" step="1" value="1"></div>
         <div><label for="preco-${id}">Valor unit. (R$) *</label><input id="preco-${id}" class="preco" type="number" inputmode="decimal" required min="0" max="9999999.99" step="0.01" placeholder="0,00"></div>
-        </div><div class="item-footer"><span>Subtotal: <strong class="subtotal">R$ 0,00</strong></span><button type="button" class="danger" aria-label="Remover item ${id}">Remover item</button></div>`;
+        </div><div class="item-footer"><span>Subtotal: <strong class="subtotal">R$ 0,00</strong></span><button type="button" class="danger" aria-label="Remover item ${id}">Remover item</button></div></fieldset>`;
       linha.querySelector('button').addEventListener('click', () => {
-        linha.remove(); atualizarTotais(); document.getElementById('adicionarItem').focus(); anunciar('Item removido.');
+        linha.remove(); atualizarTotais(); atualizarPaginacao(listaItens); document.getElementById('adicionarItem').focus(); anunciar('Item removido.');
       });
       linha.addEventListener('input', atualizarTotais);
       listaItens.append(linha);
       configurarSugestoes(linha.querySelector('.descricao'));
+      atualizarPaginacao(listaItens, Math.ceil(listaItens.children.length / itensPorPagina));
+      atualizarTotais();
       return linha;
     }
 
@@ -278,6 +440,7 @@
 
       function escolher(opcao) {
         campo.value = opcao.textContent;
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
         fechar();
         anunciar('Peça selecionada: ' + campo.value);
       }
@@ -336,20 +499,34 @@
       const itens = coletarItens();
       Array.from(listaItens.children).forEach((linha, indice) => {
         linha.querySelector('.subtotal').textContent = moeda.format(itens[indice].quantidade * itens[indice].centavos / 100);
+        linha.querySelector('.entry-summary').textContent = `Item ${indice + 1} · ${itens[indice].descricao || 'Descreva a peça ou serviço'} · ${itens[indice].quantidade} un. · ${moeda.format(itens[indice].quantidade * itens[indice].centavos / 100)}`;
       });
       document.getElementById('totalGeral').textContent = moeda.format(calcularTotalCentavos(itens) / 100);
     }
 
     function adicionarClausula(texto = '') {
       const id = ++proximaClausula;
-      const grupo = document.createElement('fieldset');
-      grupo.innerHTML = `<legend>Cláusula</legend><label for="clausula-${id}">Texto da cláusula *</label><textarea id="clausula-${id}" required maxlength="5000"></textarea><button type="button" class="danger" aria-label="Remover cláusula ${id}">Remover cláusula</button>`;
+      const grupo = document.createElement('details');
+      grupo.className = 'entry';
+      grupo.name = 'editorClausulas';
+      grupo.open = true;
+      grupo.innerHTML = `<summary><span class="entry-summary"></span></summary><fieldset><legend>Editar cláusula</legend><label for="clausula-${id}">Texto da cláusula *</label><textarea id="clausula-${id}" required maxlength="5000"></textarea><button type="button" class="danger" aria-label="Remover cláusula ${id}">Remover cláusula</button></fieldset>`;
       grupo.querySelector('textarea').value = texto;
       grupo.querySelector('button').addEventListener('click', () => {
-        grupo.remove(); document.getElementById('adicionarClausula').focus(); anunciar('Cláusula removida.');
+        grupo.remove(); atualizarResumoClausulas(); atualizarPaginacao(listaClausulas); document.getElementById('adicionarClausula').focus(); anunciar('Cláusula removida.');
       });
       listaClausulas.append(grupo);
+      grupo.addEventListener('input', atualizarResumoClausulas);
+      atualizarResumoClausulas();
+      atualizarPaginacao(listaClausulas, Math.ceil(listaClausulas.children.length / itensPorPagina));
       return grupo;
+    }
+
+    function atualizarResumoClausulas() {
+      Array.from(listaClausulas.children).forEach((cartao, indice) => {
+        const texto = cartao.querySelector('textarea').value.trim();
+        cartao.querySelector('.entry-summary').textContent = `Cláusula ${indice + 1} · ${texto ? texto.slice(0, 90) + (texto.length > 90 ? '…' : '') : 'Escreva as condições combinadas'}`;
+      });
     }
 
     function preencherDocumento(itens) {
@@ -387,27 +564,40 @@
       const itens = coletarItens();
       const erro = document.getElementById('error');
       erro.textContent = '';
+      // Abre a seção e a página do primeiro erro antes de pedir foco ao navegador.
+      const campoInvalido = Array.from(document.querySelectorAll('#formulario input, #formulario textarea')).find(campo => !campo.validity.valid);
+      if (campoInvalido) {
+        erro.textContent = `${campoInvalido.labels[0].textContent}: ${campoInvalido.validationMessage}`;
+        revelarCampo(campoInvalido);
+        campoInvalido.reportValidity();
+        return;
+      }
       if (!itens.length) {
         erro.textContent = 'Adicione pelo menos uma peça ou serviço antes de gerar o contrato.';
+        document.getElementById('pecas').open = true;
         document.getElementById('adicionarItem').focus(); return;
       }
       const camposTexto = document.querySelectorAll('#oficina, #cliente, .descricao, #listaClausulas textarea');
       const campoVazio = Array.from(camposTexto).find(campo => !campo.value.trim());
       if (campoVazio) {
         erro.textContent = 'Preencha os campos obrigatórios. Espaços em branco não são válidos.';
-        campoVazio.focus(); return;
+        revelarCampo(campoVazio); return;
       }
       preencherDocumento(itens);
       window.print();
     }
 
     document.getElementById('adicionarItem').addEventListener('click', () => {
-      adicionarLinhaPeca().querySelector('input').focus(); anunciar('Item adicionado.');
+      revelarCampo(adicionarLinhaPeca().querySelector('input')); anunciar('Item adicionado.');
     });
     document.getElementById('adicionarClausula').addEventListener('click', () => {
-      adicionarClausula().querySelector('textarea').focus(); anunciar('Cláusula adicionada.');
+      revelarCampo(adicionarClausula().querySelector('textarea')); anunciar('Cláusula adicionada.');
     });
     document.getElementById('formulario').addEventListener('submit', gerarPDF);
+    configurarPaginacao(listaItens, 'paginasItens', 'contagemItens', 'itens');
+    configurarPaginacao(listaClausulas, 'paginasClausulas', 'contagemClausulas', 'cláusulas');
+    configurarNavegacao();
+    configurarFonte();
     // Usa a data local: UTC pode mudar o dia do contrato à noite no Brasil.
     const hoje = new Date();
     document.getElementById('data').value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
@@ -418,3 +608,4 @@
   </script>
 </body>
 </html>
+

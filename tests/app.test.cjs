@@ -15,7 +15,11 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     await page.evaluate(() => { window.print = () => { window.impressoes = (window.impressoes || 0) + 1; }; });
     assert.equal(await page.locator('.item').count(), 1);
     assert.equal(await page.locator('#listaClausulas textarea').count(), 2);
+    await page.locator('a[href="#clausulas"]').click();
     while (await page.locator('#listaClausulas button').count()) {
+      if (!await page.locator('#listaClausulas > details').first().evaluate(cartao => cartao.open)) {
+        await page.locator('#listaClausulas > details > summary').first().click();
+      }
       await page.locator('#listaClausulas button').first().click();
     }
     const catalogo = await page.evaluate(() => JSON.parse(document.getElementById('catalogoPecas').textContent));
@@ -24,6 +28,7 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
       assert.ok((await page.evaluate(texto => buscarPecas(texto), consulta)).includes(esperado), consulta);
     }
     assert.deepEqual(await page.evaluate(() => buscarPecas('zzzzzzzzzz')), []);
+    await page.locator('a[href="#pecas"]').click();
     await page.locator('.descricao').fill('pistao');
     assert.equal(await page.locator('.descricao').getAttribute('aria-expanded'), 'true');
     await page.locator('.descricao').press('ArrowDown');
@@ -37,8 +42,10 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     assert.equal(await page.locator('.descricao').getAttribute('aria-expanded'), 'false');
     await page.locator('.descricao').fill('pistao');
     await page.getByRole('option', { name: 'Pistão do motor', exact: true }).click();
+    await page.locator('a[href="#dados"]').click();
     await page.locator('#oficina').fill('Oficina Exemplo');
     await page.locator('#cliente').fill('Maria da Silva');
+    await page.locator('a[href="#pecas"]').click();
     await page.locator('.quantidade').fill('3');
     await page.locator('.preco').fill('10.10');
     assert.match(await page.locator('#totalGeral').innerText(), /30,30/);
@@ -46,6 +53,7 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     const segundo = page.locator('.item').nth(1);
     await segundo.locator('.descricao').fill('<img src=x onerror=alert(1)>');
     await segundo.locator('.preco').fill('0.20');
+    await page.locator('a[href="#clausulas"]').click();
     await page.locator('#adicionarClausula').click();
     await page.locator('textarea').fill('Pagamento na entrega.\nCondição combinada com o cliente.');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
@@ -63,7 +71,9 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     const pdf = await page.pdf({ preferCSSPageSize: true });
     assert.ok(pdf.length > 10000);
     await page.emulateMedia({ media: 'screen' });
+    await page.locator('a[href="#pecas"]').click();
     await segundo.locator('button').click();
+    await page.locator('.item > summary').click();
     await page.locator('.quantidade').fill('-1');
     assert.equal(await page.locator('.quantidade').evaluate(campo => campo.checkValidity()), false);
     await page.locator('.quantidade').fill('1.5');
@@ -75,7 +85,9 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     await page.locator('.descricao').fill('   ');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
     assert.match(await page.locator('#error').innerText(), /Espaços em branco/);
+    await page.locator('a[href="#clausulas"]').click();
     await page.locator('#listaClausulas button').click();
+    await page.locator('a[href="#pecas"]').click();
     await page.locator('.descricao').fill('Serviço livre');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
     assert.equal(await page.locator('#pdfTermos').evaluate(elemento => elemento.hidden), true);
