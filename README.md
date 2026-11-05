@@ -34,3 +34,5 @@ O catálogo local contém 65 peças e insumos comuns, com nomes alternativos. Di
 Selecione com o mouse ou com **↑ / ↓ e Enter**. **Esc** fecha a lista e **Tab** segue para o próximo campo. O texto digitado permanece livre: peças fora do catálogo e serviços também podem ser usados.
 
 Para ampliar o catálogo, edite o bloco JSON identificado por `catalogoPecas` em `index.html`. Cada entrada tem `nome` e uma lista de `apelidos`. Ele fica embutido no HTML para funcionar offline, inclusive abrindo o arquivo diretamente, sem servidor ou requisições de rede. O catálogo sugere nomes; não define preços nem confirma compatibilidade com veículos.
+
+As duas cláusulas da versão original são carregadas como ponto de partida editável. Revise, altere ou remova esses textos conforme as condições da oficina antes de gerar cada contrato.

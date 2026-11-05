@@ -311,7 +311,8 @@
         }
         if (evento.key !== 'ArrowDown' && evento.key !== 'ArrowUp') return;
         evento.preventDefault();
-        indiceAtivo = (indiceAtivo + (evento.key === 'ArrowDown' ? 1 : -1) + lista.children.length) % lista.children.length;
+        if (indiceAtivo === -1) indiceAtivo = evento.key === 'ArrowDown' ? 0 : lista.children.length - 1;
+        else indiceAtivo = (indiceAtivo + (evento.key === 'ArrowDown' ? 1 : -1) + lista.children.length) % lista.children.length;
         Array.from(lista.children).forEach((opcao, indice) => opcao.setAttribute('aria-selected', String(indice === indiceAtivo)));
         const opcao = lista.children[indiceAtivo];
         campo.setAttribute('aria-activedescendant', opcao.id);
@@ -411,6 +412,9 @@
     const hoje = new Date();
     document.getElementById('data').value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
     adicionarLinhaPeca();
+    // Mantém os textos da versão original como ponto de partida editável.
+    adicionarClausula('O prazo de garantia das peças aplicadas e dos serviços de retífica de motor é de 90 (noventa) dias ou 10.000 km rodados, o que ocorrer primeiro.');
+    adicionarClausula('A garantia cobre exclusivamente defeitos de usinagem e montagem realizados por esta empresa, isentando-se de danos por mau uso ou superaquecimento.');
   </script>
 </body>
 </html>
