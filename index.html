@@ -91,7 +91,18 @@
       .item-footer { flex-wrap: wrap; }
     }
     @media print {
-      @page { size: A4; margin: 15mm; }
+      /* Caixas vazias substituem cabeçalho e rodapé automáticos no Chromium,
+         preservando margens de impressão em todas as páginas. */
+      @page {
+        size: A4;
+        margin: 15mm;
+        @top-left { content: ""; }
+        @top-center { content: ""; }
+        @top-right { content: ""; }
+        @bottom-left { content: ""; }
+        @bottom-center { content: ""; }
+        @bottom-right { content: ""; }
+      }
       :root { font-size: 11pt; color: black; background: white; }
       .screen, .skip-link { display: none !important; }
       #documento { display: block; }
@@ -102,7 +113,9 @@
       th, td { border: 1px solid #555; padding: 8px; text-align: left; overflow-wrap: anywhere; }
       th:first-child { width: 10%; } th:nth-child(3), th:nth-child(4) { width: 22%; }
       .number { text-align: right; } thead { display: table-header-group; } tfoot { display: table-row-group; }
-      tr, .signature, #pdfClausulas p { break-inside: avoid; }
+      tr, .signature { break-inside: avoid; }
+      #pdfClausulas p { orphans: 3; widows: 3; }
+      #documento h2 { break-after: avoid; }
       .signature { display: flex; gap: 40px; margin-top: 65px; }
       .signature p { width: 50%; border-top: 1px solid black; padding-top: 8px; text-align: center; }
     }
@@ -166,7 +179,7 @@
         </div>
       </details>
       <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><button class="primary" type="submit">Imprimir / salvar PDF</button></div>
-      <p class="hint">Na janela de impressão, escolha sua impressora ou “Salvar como PDF”. Use papel A4 e desative os cabeçalhos e rodapés do navegador.</p>
+      <p class="hint">Na janela de impressão, escolha sua impressora ou “Salvar como PDF” e papel A4. Se o navegador ainda mostrar data, endereço ou número de página nas bordas, desmarque “Cabeçalhos e rodapés” em Mais configurações.</p>
       <p id="error" role="alert"></p><p id="status" class="hint" role="status"></p>
       <p class="hint">Salve seu PDF antes de fechar. Os dados preenchidos não ficam salvos ao recarregar a página.</p>
     </form>
@@ -536,7 +549,7 @@
       const veiculo = document.getElementById('veiculo').value.trim();
       document.getElementById('pdfVeiculo').textContent = veiculo ? 'Veículo e placa: ' + veiculo : '';
       const [ano, mes, dia] = document.getElementById('data').value.split('-');
-      document.getElementById('pdfData').textContent = `${dia}/${mes}/${ano}`;
+      document.getElementById('pdfData').textContent = ano ? `${dia}/${mes}/${ano}` : '';
       const tabela = document.getElementById('pdfTabelaItens');
       tabela.replaceChildren();
       for (const item of itens) {
@@ -594,6 +607,8 @@
       revelarCampo(adicionarClausula().querySelector('textarea')); anunciar('Cláusula adicionada.');
     });
     document.getElementById('formulario').addEventListener('submit', gerarPDF);
+    // Atualiza o contrato também quando a impressão é aberta pelo atalho do navegador.
+    window.addEventListener('beforeprint', () => preencherDocumento(coletarItens()));
     configurarPaginacao(listaItens, 'paginasItens', 'contagemItens', 'itens');
     configurarPaginacao(listaClausulas, 'paginasClausulas', 'contagemClausulas', 'cláusulas');
     configurarNavegacao();
@@ -608,4 +623,3 @@
   </script>
 </body>
 </html>
-
