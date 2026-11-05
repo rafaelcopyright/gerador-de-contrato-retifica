@@ -1,0 +1,8 @@
+{
+  "name": "contrato-facil",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gerador local de contratos de peças e serviços para oficinas",
+  "scripts": { "test": "node --test tests/app.test.cjs" },
+  "devDependencies": { "playwright": "^1.56.0" }
+}

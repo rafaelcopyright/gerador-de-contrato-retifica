@@ -36,3 +36,40 @@ Selecione com o mouse ou com **↑ / ↓ e Enter**. **Esc** fecha a lista e **Ta
 Para ampliar o catálogo, edite o bloco JSON identificado por `catalogoPecas` em `index.html`. Cada entrada tem `nome` e uma lista de `apelidos`. Ele fica embutido no HTML para funcionar offline, inclusive abrindo o arquivo diretamente, sem servidor ou requisições de rede. O catálogo sugere nomes; não define preços nem confirma compatibilidade com veículos.
 
 As duas cláusulas da versão original são carregadas como ponto de partida editável. Revise, altere ou remova esses textos conforme as condições da oficina antes de gerar cada contrato.
+
+## Testes
+
+Para usar o aplicativo, basta abrir `index.html`; Node.js é necessário apenas para desenvolvimento.
+
+Com Node.js 20 ou superior e Google Chrome instalado:
+
+```sh
+npm ci
+npm test
+```
+
+Os testes usam Playwright com Chrome em modo headless e verificam:
+
+- Busca sem acentos, nomes alternativos e pequenos erros de digitação.
+- Seleção por clique e teclado, fechamento da lista e edição livre.
+- Cálculo em centavos, dados obrigatórios e bloqueio de valores inválidos.
+- Criação, edição e remoção de cláusulas e itens.
+- Conteúdo de impressão, geração de PDF e tratamento seguro de textos.
+- Rótulos dos campos e ausência de rolagem horizontal em 375, 768 e 1440 pixels.
+
+Também foi feita uma conferência visual do formulário e do modelo de impressão no Chrome. A validação automatizada não substitui testes com leitores de tela ou a conferência da impressora usada pela oficina.
+
+## Estrutura
+
+```text
+index.html        Interface, estilos, catálogo JSON e lógica do aplicativo
+.agents/skills/   Diretrizes locais de código limpo e layout acessível
+tests/            Testes de fluxo no navegador
+```
+
+## Limitações atuais
+
+- Dados e cláusulas alteradas não são salvos entre sessões. Salve o PDF antes de fechar a página.
+- O catálogo é inicial e pode ser ampliado manualmente; a busca aproximada pode sugerir peças diferentes da desejada.
+- A quantidade aceita apenas unidades inteiras. Valores unitários aceitam duas casas decimais, inclusive zero para itens sem cobrança.
+- A paginação e o destino do PDF dependem das opções de impressão do navegador.
