@@ -54,6 +54,7 @@
     .primary:hover { background: var(--accent-dark); }
     .danger { color: #9d2020; border-color: #aa4444; }
     .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .fields > div { min-width: 0; }
     .wide { grid-column: 1 / -1; }
     fieldset { min-width: 0; margin: 20px 0 0; padding: 18px; border: 1px solid #cad5df; border-radius: 8px; }
     legend { font-weight: 700; padding: 0 6px; }
@@ -946,6 +947,8 @@
       const aviso = document.getElementById('storageError');
       aviso.textContent = mensagem;
       aviso.hidden = false;
+      if (!document.getElementById('paginaEditor').hidden) document.getElementById('error').textContent = mensagem;
+      if (document.getElementById('dialogModelo').open) document.getElementById('erroModelo').textContent = mensagem;
     }
 
     function carregarEstado() {
@@ -987,7 +990,9 @@
       return grupo;
     }
 
-    function marcarAlterado() {
+    function marcarAlterado(evento) {
+      // A troca de modelo confirma e registra a alteração em seu próprio evento.
+      if (evento?.target?.id === 'modeloContrato') return;
       alterado = true;
       document.getElementById('situacaoContrato').textContent = 'Alterações ainda não salvas';
     }
@@ -1061,7 +1066,10 @@
       adicionarLinhaPeca();
       const modelo = estado.modelos.find(modelo => modelo.id === modeloId) || estado.modelos[0];
       if (modelo) aplicarModelo(modelo);
-      else { atualizarSeletoresModelos(); atualizarPaginacao(listaClausulas); }
+      else {
+        atualizarSeletoresModelos(); atualizarPaginacao(listaClausulas);
+        document.getElementById('avisoModelo').textContent = 'Nenhum modelo disponível. Acesse “Modelos de contrato” e crie um modelo para começar.';
+      }
       document.getElementById('tituloEditor').textContent = 'Novo contrato';
       document.getElementById('situacaoContrato').textContent = 'Ainda não salvo';
       document.getElementById('error').textContent = '';
