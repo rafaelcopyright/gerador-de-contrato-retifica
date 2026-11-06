@@ -6,7 +6,7 @@
   <meta name="description" content="Preencha peças e serviços da oficina e imprima seu contrato ou salve em PDF.">
   <title>Contrato Fácil | Oficina</title>
   <style>
-    :root { font-family: system-ui, sans-serif; color: #182b3b; background: #f1f5f8; font-size: var(--fonte-tela, 18px); line-height: 1.5; }
+    :root { --accent: #145a48; --accent-dark: #183e38; --surface-accent: #e8f1ed; --radius: 12px; font-family: system-ui, sans-serif; color: #182b3b; background: #f1f5f8; font-size: var(--fonte-tela, 18px); line-height: 1.5; }
     * { box-sizing: border-box; }
     body { margin: 0; }
     main { max-width: 1120px; margin-left: 280px; padding: 32px 32px 64px; }
@@ -16,7 +16,9 @@
     .eyebrow { color: #265a57; font-weight: 750; letter-spacing: .08em; font-size: .8rem; }
     .muted, .hint { color: #465b6b; }
     .hint { font-size: .88rem; margin: 8px 0; }
-    .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; padding: 28px 20px; overflow-y: auto; background: #183e38; color: white; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; padding: 28px 20px; overflow-y: auto; background: var(--accent-dark); color: white; display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-bottom { margin-top: auto; }
+    .editor-nav { border-top: 1px solid #80a79b; padding-top: 12px; }
     .brand { display: block; font-size: 1.3rem; margin-bottom: 28px; }
     .sidebar nav { display: grid; gap: 10px; }
     .sidebar a { display: block; padding: 12px; color: white; text-decoration: none; border: 1px solid transparent; border-radius: 6px; }
@@ -26,7 +28,7 @@
     .font-controls button { text-align: left; }
     .font-controls [aria-pressed="true"] { background: #dcf0e5; border: 2px solid #145a48; }
     .sidebar .hint { color: #dbe9e4; }
-    .form-section { background: white; border: 1px solid #cad5df; border-radius: 12px; margin-top: 24px; scroll-margin-top: 20px; }
+    .form-section { background: white; border: 1px solid #cad5df; border-radius: var(--radius); margin-top: 24px; scroll-margin-top: 20px; }
     summary { cursor: pointer; padding: 18px; font-weight: 650; overflow-wrap: anywhere; }
     .form-section > summary { padding: 24px; }
     summary h2 { display: inline; font-size: 1.2rem; }
@@ -41,14 +43,14 @@
     button:disabled { cursor: default; opacity: .55; }
     .section-heading, .summary { display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     label { display: block; font-weight: 650; margin-bottom: 6px; }
-    input, textarea, button { font: inherit; }
-    input, textarea { width: 100%; padding: 11px 12px; border: 1px solid #6c7d8b; border-radius: 6px; background: white; color: #182b3b; min-height: 48px; }
+    input, textarea, button, select { font: inherit; }
+    input, textarea, select { width: 100%; padding: 11px 12px; border: 1px solid #6c7d8b; border-radius: 6px; background: white; color: #182b3b; min-height: 48px; }
     textarea { resize: vertical; min-height: 110px; }
     button { cursor: pointer; min-height: 48px; padding: 10px 16px; border: 1px solid #526b7e; border-radius: 6px; background: white; color: #183e5b; font-weight: 650; }
     button:hover { background: #eaf0f5; }
     :focus-visible { outline: 3px solid #ab4c00; outline-offset: 3px; }
-    .primary { background: #145a48; color: white; border-color: #145a48; }
-    .primary:hover { background: #0b4435; }
+    .primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .primary:hover { background: var(--accent-dark); }
     .danger { color: #9d2020; border-color: #aa4444; }
     .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .wide { grid-column: 1 / -1; }
@@ -56,7 +58,34 @@
     legend { font-weight: 700; padding: 0 6px; }
     .item-fields { display: grid; grid-template-columns: minmax(0, 1fr) 95px 155px; gap: 14px; }
     .item-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; }
-    .summary { position: sticky; bottom: 0; z-index: 7; margin-top: 24px; background: #e8f1ed; border: 1px solid #aac3b7; border-radius: 8px; padding: 16px; }
+    .summary { position: sticky; bottom: 0; z-index: 7; margin-top: 24px; background: var(--surface-accent); border: 1px solid #aac3b7; border-radius: 8px; padding: 16px; }
+    .page { min-width: 0; }
+    .page-heading { margin-bottom: 28px; }
+    .home-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 850px; margin: 8vh auto 30px; }
+    .shortcut { background: white; border: 1px solid #b5c6d1; border-radius: var(--radius); text-decoration: none; color: #182b3b; padding: 32px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+    .shortcut:hover { border-color: var(--accent); box-shadow: 0 3px 12px #182b3b20; }
+    .shortcut strong { font-size: 1.4rem; }
+    .shortcut-new { grid-column: 1 / -1; background: var(--accent); color: white; min-height: 130px; }
+    .card { background: white; border: 1px solid #cad5df; border-radius: var(--radius); padding: 24px; margin: 20px 0; overflow-wrap: anywhere; }
+    .record-title { font-size: 1.4rem; margin-bottom: 10px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .actions > * { max-width: 100%; }
+    .badge { display: inline-block; font-size: .85rem; background: #edf2f5; border: 1px solid #cad5df; border-radius: 6px; padding: 3px 8px; }
+    .empty { padding: 32px; border: 2px dashed #b5c6d1; border-radius: var(--radius); text-align: center; }
+    .record-data { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin: 16px 0; }
+    .record-data dt { font-size: .85rem; color: #465b6b; }
+    .record-data dd { margin: 0; }
+    dialog { width: min(960px, calc(100% - 24px)); max-height: 90vh; padding: 24px; color: #182b3b; border: 1px solid #526b7e; border-radius: var(--radius); }
+    dialog::backdrop { background: #182b3b99; }
+    .dialog-actions { position: sticky; bottom: -24px; z-index: 8; background: white; padding: 16px 0; border-top: 1px solid #cad5df; }
+    .checkbox { display: flex; align-items: center; gap: 10px; }
+    .checkbox input { width: 24px; min-height: 24px; flex-shrink: 0; }
+    .notice { border-left: 5px solid var(--accent); background: var(--surface-accent); padding: 14px; border-radius: 6px; }
+    .storage-error { color: #821b1b; background: #fff0ed; border-color: #aa4444; }
+    #globalStatus { min-height: 1.5em; }
+    [data-density="compacto"] .entry > summary { padding: 12px 16px; }
+    [data-density="compacto"] .card { padding: 18px; }
+    @media (max-width: 650px) { .home-grid, .record-data { grid-template-columns: 1fr; } .shortcut { padding: 24px; } .home-grid { margin-top: 24px; } }
     .total { font-size: 1.5rem; font-weight: 750; }
     #status { min-height: 1.5em; }
     #error { color: #9d2020; font-weight: 650; }
@@ -104,7 +133,7 @@
         @bottom-right { content: ""; }
       }
       :root { font-size: 11pt; color: black; background: white; }
-      .screen, .skip-link { display: none !important; }
+      .screen, .skip-link, dialog { display: none !important; }
       #documento { display: block; }
       .print-header { border-bottom: 2px solid black; padding-bottom: 12px; margin-bottom: 20px; }
       #documento h1 { font-size: 18pt; } #documento h2 { font-size: 13pt; margin-top: 22px; }
@@ -122,12 +151,18 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#formulario">Ir para o formulário</a>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
   <!-- TELA DO SISTEMA -->
   <aside class="sidebar screen" aria-label="Navegação e acessibilidade">
     <strong class="brand">Contrato Fácil</strong>
-    <nav aria-label="Seções do contrato">
-      <a href="#dados" aria-current="location">1. Oficina e cliente</a>
+    <nav aria-label="Navegação principal">
+      <a href="#inicio" aria-current="page">Página inicial</a>
+      <a href="#historico">Histórico de contratos</a>
+      <a href="#modelos">Modelos de contrato</a>
+      <a href="#novo">Gerar novo contrato</a>
+    </nav>
+    <nav id="menuEditor" class="editor-nav" aria-label="Seções do contrato" hidden>
+      <a href="#dados">1. Oficina e cliente</a>
       <a href="#pecas">2. Peças e serviços</a>
       <a href="#clausulas">3. Cláusulas</a>
       <a href="#finalizar">4. Imprimir contrato</a>
@@ -137,15 +172,48 @@
       <button type="button" data-font="21" aria-pressed="false">Grande</button>
       <button type="button" data-font="24" aria-pressed="false">Extra grande</button>
     </div></fieldset>
-    <p class="hint">Funciona sem internet e sem instalação.</p>
+    <div class="sidebar-bottom"><a href="#configuracoes">Configurações</a><p class="hint">Funciona sem internet e sem instalação.</p></div>
   </aside>
-  <main class="screen">
+  <main id="conteudo" class="screen" tabindex="-1">
+    <p id="storageError" class="notice storage-error" role="alert" hidden></p>
+    <div id="paginaInicio" class="page">
+      <header class="page-heading"><span class="eyebrow">PARA O DIA A DIA DA OFICINA</span><h1>O que vamos fazer hoje?</h1><p class="muted">Seus contratos organizados, da primeira informação até a impressão.</p></header>
+      <div class="home-grid">
+        <a class="shortcut" href="#historico"><strong>Histórico de contratos</strong><span>Encontre, edite ou copie contratos salvos.</span><span id="resumoHistorico" class="badge"></span></a>
+        <a class="shortcut" href="#modelos"><strong>Modelos de contrato</strong><span>Prepare os dados da oficina e as condições de cada documento.</span><span id="resumoModelos" class="badge"></span></a>
+        <a class="shortcut shortcut-new" href="#novo"><strong>+ Gerar novo contrato</strong><span>Escolha um modelo e preencha os dados do cliente.</span></a>
+      </div>
+      <p class="hint">Seus dados ficam neste navegador. Use o backup em Configurações para guardá-los ou levá-los a outro computador.</p>
+    </div>
+    <div id="paginaHistorico" class="page" hidden>
+      <header class="page-heading"><h1>Histórico de contratos</h1><p>Reabra um contrato para editar, imprimir novamente ou usar como ponto de partida.</p></header>
+      <label for="buscarHistorico">Buscar cliente, veículo, placa ou modelo</label><input id="buscarHistorico" type="search" placeholder="Digite para buscar">
+      <div id="listaHistorico"></div><nav id="paginasHistorico" class="pagination" aria-label="Páginas do histórico"></nav>
+    </div>
+    <div id="paginaModelos" class="page" hidden>
+      <header class="page-heading"><h1>Modelos de contrato</h1><p>Guarde as informações fixas da oficina e as cláusulas para não preencher tudo novamente.</p><button id="novoModelo" class="primary" type="button">+ Criar modelo</button></header>
+      <div id="listaModelos"></div>
+    </div>
+    <div id="paginaConfiguracoes" class="page" hidden>
+      <header class="page-heading"><h1>Configurações</h1><p>Ajuste a aparência e cuide dos dados salvos neste navegador.</p></header>
+      <form id="formConfiguracoes" class="card">
+        <h2>Aparência</h2><div class="fields">
+          <div><label for="tema">Cor principal</label><select id="tema"><option value="verde">Verde oficina</option><option value="azul">Azul clássico</option><option value="vinho">Vinho</option><option value="grafite">Grafite</option></select></div>
+          <div><label for="estilo">Estilo dos blocos</label><select id="estilo"><option value="arredondado">Cantos arredondados</option><option value="reto">Cantos discretos</option></select></div>
+          <div><label for="densidade">Espaçamento das listas</label><select id="densidade"><option value="confortavel">Confortável</option><option value="compacto">Compacto</option></select></div>
+          <div><label for="modeloPadrao">Modelo para novos contratos</label><select id="modeloPadrao"></select></div>
+        </div><p class="hint">As cores e o espaçamento alteram a tela. Os contratos continuam em preto e branco, prontos para impressão.</p><button class="primary" type="submit">Salvar configurações</button>
+      </form>
+      <div class="card"><h2>Backup dos dados</h2><p>O backup inclui modelos, contratos e preferências. Guarde o arquivo em um local seguro: ele contém os dados dos clientes.</p><div class="actions"><button id="exportarBackup" type="button">Exportar backup</button><button id="importarBackup" type="button">Restaurar backup</button></div><label for="arquivoBackup" class="hint">Arquivo de backup (.json)</label><input id="arquivoBackup" type="file" accept=".json,application/json"><p class="hint">Restaurar um backup substitui os dados deste navegador após sua confirmação.</p></div>
+    </div>
+    <div id="paginaEditor" class="page" hidden>
     <header>
       <span class="eyebrow">PARA O DIA A DIA DA OFICINA</span>
-      <h1>Contrato Fácil</h1>
+      <h1 id="tituloEditor">Novo contrato</h1>
       <p class="muted">Preencha os dados, confira o total e gere seu contrato para imprimir.</p>
     </header>
     <form id="formulario" novalidate>
+      <div class="card"><label for="modeloContrato">Modelo de contrato *</label><select id="modeloContrato" required></select><p id="avisoModelo" class="hint">Os dados da oficina e as cláusulas vêm do modelo escolhido.</p><span id="situacaoContrato" class="badge">Ainda não salvo</span></div>
       <details id="dados" class="form-section" open>
         <summary><h2 id="dadosTitulo">1. Oficina e cliente</h2></summary>
         <div class="section-content">
@@ -155,9 +223,12 @@
           <div><label for="contato">CNPJ e telefone (opcional)</label><input id="contato" maxlength="150"></div>
           <div class="wide"><label for="endereco">Endereço da oficina (opcional)</label><input id="endereco" maxlength="250"></div>
           <div class="wide"><label for="cliente">Nome do cliente *</label><input id="cliente" required maxlength="200" autocomplete="name"></div>
-          <div><label for="veiculo">Veículo e placa (opcional)</label><input id="veiculo" maxlength="150" placeholder="Ex.: Onix • ABC1D23"></div>
+          <div><label for="veiculo">Modelo do veículo</label><input id="veiculo" maxlength="150" placeholder="Ex.: Chevrolet Onix"></div>
+          <div><label for="placa">Placa</label><input id="placa" maxlength="12" placeholder="Ex.: ABC1D23"></div>
           <div><label for="data">Data do contrato *</label><input id="data" type="date" required></div>
         </div>
+        <details class="card"><summary>Mais dados do cliente e do veículo</summary><div id="camposComplementares" class="fields"></div></details>
+        <details class="card"><summary>Pagamento, observações e revisões</summary><div id="camposPagamento" class="fields"></div></details>
         </div>
       </details>
       <details id="pecas" class="form-section">
@@ -178,12 +249,25 @@
         <nav id="paginasClausulas" class="pagination" aria-label="Páginas de cláusulas"></nav>
         </div>
       </details>
-      <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><button class="primary" type="submit">Imprimir / salvar PDF</button></div>
+      <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><div class="actions"><button id="salvarContrato" type="button">Salvar no histórico</button><button class="primary" type="submit">Imprimir / salvar PDF</button></div></div>
       <p class="hint">Na janela de impressão, escolha sua impressora ou “Salvar como PDF” e papel A4. Se o navegador ainda mostrar data, endereço ou número de página nas bordas, desmarque “Cabeçalhos e rodapés” em Mais configurações.</p>
       <p id="error" role="alert"></p><p id="status" class="hint" role="status"></p>
-      <p class="hint">Salve seu PDF antes de fechar. Os dados preenchidos não ficam salvos ao recarregar a página.</p>
+      <p class="hint">O contrato é salvo no histórico antes de abrir a impressão. Cancelar a impressão mantém o registro salvo. Use “Salvar no histórico” para guardar sem imprimir.</p>
     </form>
+    </div>
+    <p id="globalStatus" role="status"></p>
   </main>
+  <dialog id="dialogModelo" aria-labelledby="tituloDialogModelo">
+    <form id="formModelo" novalidate><h1 id="tituloDialogModelo">Editar modelo</h1>
+      <div class="fields"><div><label for="nomeModelo">Nome do modelo *</label><input id="nomeModelo" required maxlength="150"></div><div><label for="tipoModelo">Formato do documento</label><select id="tipoModelo"><option value="servico">Prestação de serviço</option><option value="garantia">Garantia, nota e cupons de revisão</option></select></div></div>
+      <details class="card" open><summary>Informações fixas da oficina</summary><div id="camposModelo" class="fields"></div></details>
+      <details class="card"><summary>Textos e opções do documento</summary><div class="fields"><div class="wide"><label for="introducaoModelo">Texto de abertura</label><textarea id="introducaoModelo" maxlength="5000"></textarea></div><div class="wide"><label for="reciboModelo">Texto do recibo de retirada</label><textarea id="reciboModelo" maxlength="5000"></textarea></div></div><label class="checkbox"><input id="incluirRecibo" type="checkbox">Incluir recibo de retirada no modelo de garantia</label></details>
+      <div class="section-heading section-toolbar"><h2>Cláusulas do modelo</h2><span id="contagemClausulasModelo"></span><button id="adicionarClausulaModelo" type="button">+ Adicionar cláusula</button></div>
+      <p class="hint">Textos entre chaves duplas são preenchidos automaticamente no contrato: total, valor por extenso, prazos, revisões e dados de pagamento.</p>
+      <div id="listaClausulasModelo"></div><nav id="paginasClausulasModelo" class="pagination" aria-label="Páginas das cláusulas do modelo"></nav>
+      <p id="erroModelo" role="alert"></p><div class="actions dialog-actions"><button type="button" id="cancelarModelo">Cancelar</button><button class="primary" type="submit">Salvar modelo</button></div>
+    </form>
+  </dialog>
   <!-- MODELO DO CONTRATO -->
   <article id="documento" aria-label="Contrato para impressão">
     <header class="print-header"><h1 id="pdfOficina"></h1><p id="pdfContato"></p><p id="pdfEndereco"></p><h2>Contrato de peças e prestação de serviços</h2></header>
@@ -263,6 +347,9 @@
       {"nome":"Tensor da correia dentada","apelidos":["tensionador"]}
     ]
   </script>
+  <script id="modelosIniciais" type="application/json">
+    [{"id":"modelo-basico","nome":"Contrato de peças e serviços","tipo":"servico","oficina":{},"introducao":"","recibo":"","incluirRecibo":false,"clausulas":["O prazo de garantia das peças aplicadas e dos serviços de retífica de motor é de 90 (noventa) dias ou 10.000 km rodados, o que ocorrer primeiro.","A garantia cobre exclusivamente defeitos de usinagem e montagem realizados por esta empresa, isentando-se de danos por mau uso ou superaquecimento."]}]
+  </script>
   <script>
     const catalogoPecas = JSON.parse(document.getElementById('catalogoPecas').textContent);
     const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -273,7 +360,7 @@
     const itensPorPagina = 5;
     const configuracoesListas = new Map();
 
-    function anunciar(mensagem) { document.getElementById('status').textContent = mensagem; }
+    function anunciar(mensagem) { document.getElementById('globalStatus').textContent = mensagem; }
 
     function configurarPaginacao(lista, idNavegacao, idContagem, nome) {
       const navegacao = document.getElementById(idNavegacao);
@@ -304,10 +391,13 @@
       navegacao.querySelector('.previous').disabled = pagina === 1;
       navegacao.querySelector('.next').disabled = pagina === paginas;
       navegacao.querySelector('.page-label').textContent = `Página ${pagina} de ${paginas}`;
-      contagem.textContent = `${total} ${nome} no contrato`;
+      const singular = nome === 'itens' ? 'item' : 'cláusula';
+      contagem.textContent = `${total} ${total === 1 ? singular : nome}`;
     }
 
     function revelarCampo(campo) {
+      let ancestral = campo.parentElement;
+      while (ancestral) { if (ancestral.tagName === 'DETAILS') ancestral.open = true; ancestral = ancestral.parentElement; }
       const secao = campo.closest('.form-section');
       if (secao) secao.open = true;
       const cartao = campo.closest('.entry');
@@ -324,7 +414,7 @@
     function configurarNavegacao() {
       const secoes = document.querySelectorAll('.form-section');
       function atualizarLinkAtivo(id) {
-        document.querySelectorAll('.sidebar nav a').forEach(link => {
+        document.querySelectorAll('#menuEditor a').forEach(link => {
           if (link.hash === '#' + id) link.setAttribute('aria-current', 'location');
           else link.removeAttribute('aria-current');
         });
@@ -338,6 +428,7 @@
       function navegar(hash, focar = true) {
         const alvo = document.getElementById(hash.slice(1));
         if (!alvo || (!alvo.classList.contains('form-section') && alvo.id !== 'finalizar')) return;
+        mostrarPagina('editor', false);
         if (alvo.classList.contains('form-section')) alvo.open = true;
         atualizarLinkAtivo(alvo.id);
         if (focar) {
@@ -345,7 +436,7 @@
           alvo.scrollIntoView({ block: 'start' });
         }
       }
-      document.querySelectorAll('.sidebar nav a').forEach(link => {
+      document.querySelectorAll('#menuEditor a').forEach(link => {
         link.addEventListener('click', () => navegar(link.hash));
       });
       window.addEventListener('hashchange', () => navegar(location.hash));
@@ -359,10 +450,10 @@
         document.documentElement.style.setProperty('--fonte-tela', tamanho + 'px');
         botoes.forEach(botao => botao.setAttribute('aria-pressed', String(botao.dataset.font === tamanho)));
       }
-      try { aplicar(localStorage.getItem('contrato-facil-fonte')); } catch { /* Armazenamento pode estar bloqueado. */ }
+      aplicar(estado.configuracoes.fonte || '18');
       botoes.forEach(botao => botao.addEventListener('click', () => {
         aplicar(botao.dataset.font);
-        try { localStorage.setItem('contrato-facil-fonte', botao.dataset.font); } catch { /* O controle funciona sem persistência. */ }
+        persistirEstado({ ...estado, configuracoes: { ...estado.configuracoes, fonte: botao.dataset.font } });
         anunciar('Tamanho da fonte: ' + botao.textContent + '.');
       }));
     }
@@ -379,7 +470,7 @@
         <div><label for="preco-${id}">Valor unit. (R$) *</label><input id="preco-${id}" class="preco" type="number" inputmode="decimal" required min="0" max="9999999.99" step="0.01" placeholder="0,00"></div>
         </div><div class="item-footer"><span>Subtotal: <strong class="subtotal">R$ 0,00</strong></span><button type="button" class="danger" aria-label="Remover item ${id}">Remover item</button></div></fieldset>`;
       linha.querySelector('button').addEventListener('click', () => {
-        linha.remove(); atualizarTotais(); atualizarPaginacao(listaItens); document.getElementById('adicionarItem').focus(); anunciar('Item removido.');
+        linha.remove(); atualizarTotais(); atualizarPaginacao(listaItens); marcarAlterado(); document.getElementById('adicionarItem').focus(); anunciar('Item removido.');
       });
       linha.addEventListener('input', atualizarTotais);
       listaItens.append(linha);
@@ -517,26 +608,28 @@
       document.getElementById('totalGeral').textContent = moeda.format(calcularTotalCentavos(itens) / 100);
     }
 
-    function adicionarClausula(texto = '') {
+    function adicionarClausula(texto = '', lista = listaClausulas) {
       const id = ++proximaClausula;
       const grupo = document.createElement('details');
       grupo.className = 'entry';
-      grupo.name = 'editorClausulas';
+      grupo.name = lista.id + '-editor';
       grupo.open = true;
       grupo.innerHTML = `<summary><span class="entry-summary"></span></summary><fieldset><legend>Editar cláusula</legend><label for="clausula-${id}">Texto da cláusula *</label><textarea id="clausula-${id}" required maxlength="5000"></textarea><button type="button" class="danger" aria-label="Remover cláusula ${id}">Remover cláusula</button></fieldset>`;
       grupo.querySelector('textarea').value = texto;
       grupo.querySelector('button').addEventListener('click', () => {
-        grupo.remove(); atualizarResumoClausulas(); atualizarPaginacao(listaClausulas); document.getElementById('adicionarClausula').focus(); anunciar('Cláusula removida.');
+        grupo.remove(); atualizarResumoClausulas(lista); atualizarPaginacao(lista);
+        if (lista === listaClausulas) marcarAlterado();
+        document.getElementById(lista === listaClausulas ? 'adicionarClausula' : 'adicionarClausulaModelo').focus(); anunciar('Cláusula removida.');
       });
-      listaClausulas.append(grupo);
-      grupo.addEventListener('input', atualizarResumoClausulas);
-      atualizarResumoClausulas();
-      atualizarPaginacao(listaClausulas, Math.ceil(listaClausulas.children.length / itensPorPagina));
+      lista.append(grupo);
+      grupo.addEventListener('input', () => atualizarResumoClausulas(lista));
+      atualizarResumoClausulas(lista);
+      atualizarPaginacao(lista, Math.ceil(lista.children.length / itensPorPagina));
       return grupo;
     }
 
-    function atualizarResumoClausulas() {
-      Array.from(listaClausulas.children).forEach((cartao, indice) => {
+    function atualizarResumoClausulas(lista = listaClausulas) {
+      Array.from(lista.children).forEach((cartao, indice) => {
         const texto = cartao.querySelector('textarea').value.trim();
         cartao.querySelector('.entry-summary').textContent = `Cláusula ${indice + 1} · ${texto ? texto.slice(0, 90) + (texto.length > 90 ? '…' : '') : 'Escreva as condições combinadas'}`;
       });
@@ -572,54 +665,454 @@
       }));
     }
 
-    function gerarPDF(evento) {
-      evento.preventDefault();
+    function validarContrato() {
       const itens = coletarItens();
       const erro = document.getElementById('error');
       erro.textContent = '';
       // Abre a seção e a página do primeiro erro antes de pedir foco ao navegador.
-      const campoInvalido = Array.from(document.querySelectorAll('#formulario input, #formulario textarea')).find(campo => !campo.validity.valid);
+      const campoInvalido = Array.from(document.querySelectorAll('#formulario input, #formulario textarea, #formulario select')).find(campo => !campo.validity.valid);
       if (campoInvalido) {
         erro.textContent = `${campoInvalido.labels[0].textContent}: ${campoInvalido.validationMessage}`;
         revelarCampo(campoInvalido);
         campoInvalido.reportValidity();
-        return;
+        return false;
       }
       if (!itens.length) {
         erro.textContent = 'Adicione pelo menos uma peça ou serviço antes de gerar o contrato.';
         document.getElementById('pecas').open = true;
-        document.getElementById('adicionarItem').focus(); return;
+        document.getElementById('adicionarItem').focus(); return false;
       }
       const camposTexto = document.querySelectorAll('#oficina, #cliente, .descricao, #listaClausulas textarea');
       const campoVazio = Array.from(camposTexto).find(campo => !campo.value.trim());
       if (campoVazio) {
         erro.textContent = 'Preencha os campos obrigatórios. Espaços em branco não são válidos.';
-        revelarCampo(campoVazio); return;
+        revelarCampo(campoVazio); return false;
       }
+      return true;
+    }
+
+    function gerarPDF(evento) {
+      evento.preventDefault();
+      if (!validarContrato() || !salvarContratoAtual('impressao')) return;
+      const itens = coletarItens();
       preencherDocumento(itens);
       window.print();
     }
 
+    const chaveDados = 'contrato-facil-dados-v1';
+    const camposFixos = [
+      ['empresa', 'Nome da oficina', 150], ['cnpj', 'CNPJ', 30], ['telefone', 'Telefone da oficina', 40], ['email', 'E-mail da oficina', 150],
+      ['endereco', 'Endereço e número', 250], ['bairro', 'Bairro', 100], ['cidade', 'Cidade', 100], ['uf', 'UF', 2], ['cep', 'CEP', 15],
+      ['banco', 'Banco', 100], ['agencia', 'Agência', 30], ['conta', 'Conta', 40], ['pix', 'Chave Pix', 150], ['titular', 'Titular da conta', 150]
+    ];
+    const camposExtras = [
+      ['numeroContrato', 'Número do contrato', 30], ['cpfCliente', 'CPF / CNPJ do cliente', 30], ['rgCliente', 'RG / documento', 40],
+      ['telefoneCliente', 'Telefone do cliente', 40], ['celularCliente', 'Celular do cliente', 40], ['enderecoCliente', 'Endereço do cliente e número', 250],
+      ['complementoCliente', 'Complemento', 100], ['bairroCliente', 'Bairro do cliente', 100], ['cidadeCliente', 'Cidade do cliente', 100], ['ufCliente', 'UF do cliente', 2], ['cepCliente', 'CEP do cliente', 15],
+      ['combustivel', 'Combustível', 40], ['corVeiculo', 'Cor do veículo', 40], ['motor', 'Motor / número', 100], ['chassi', 'Chassi', 40], ['quilometragem', 'Quilometragem atual', 15, 'number']
+    ];
+    const camposPagamento = [
+      ['valorExtenso', 'Valor por extenso (opcional)', 300], ['prazoNacional', 'Prazo: nacionais e importados (dias)', 5, 'number'], ['prazoDiesel', 'Prazo: diesel (dias)', 5, 'number'],
+      ['revisao1', '1ª revisão com (km)', 15, 'number'], ['revisao2', '2ª revisão com (km)', 15, 'number'], ['revisao3', '3ª revisão com (km)', 15, 'number'], ['valorRevisao', 'Valor de cada revisão (R$)', 15, 'number'], ['observacoes', 'Observações do contrato', 3000]
+    ];
+    const idsCamposContrato = ['oficina', 'contato', 'endereco', 'cliente', 'veiculo', 'placa', 'data', ...camposExtras.map(campo => campo[0]), ...camposPagamento.map(campo => campo[0])];
+    let falhaLeitura = false;
+    let conflitoArmazenamento = false;
+    let estado = carregarEstado();
+    let modeloAtual = null;
+    let contratoAtualId = null;
+    let alterado = false;
+    let modeloEditandoId = null;
+    let paginaHistorico = 1;
+
+    function estadoInicial() {
+      return { versao: 1, sequencia: 1, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '18', modeloPadrao: '' } };
+    }
+
+    function textoValido(valor, limite = 5000) { return typeof valor === 'string' && valor.length <= limite; }
+
+    function modeloValido(modelo) {
+      return modelo && textoValido(modelo.id, 100) && modelo.id.trim() && textoValido(modelo.nome, 150) && modelo.nome.trim()
+        && ['servico', 'garantia'].includes(modelo.tipo) && modelo.oficina && typeof modelo.oficina === 'object'
+        && camposFixos.every(([id, , limite]) => modelo.oficina[id] === undefined || textoValido(modelo.oficina[id], limite))
+        && textoValido(modelo.introducao) && textoValido(modelo.recibo) && typeof modelo.incluirRecibo === 'boolean'
+        && Array.isArray(modelo.clausulas) && modelo.clausulas.length <= 200 && modelo.clausulas.every(texto => textoValido(texto) && texto.trim());
+    }
+
+    function validarBackup(dados) {
+      const config = dados?.configuracoes;
+      const idsUnicos = lista => new Set(lista.map(registro => registro.id)).size === lista.length;
+      const dataValida = data => textoValido(data, 40) && Number.isFinite(Date.parse(data));
+      const contratoValido = contrato => contrato && textoValido(contrato.id, 100) && contrato.id.trim() && modeloValido(contrato.modelo)
+        && dataValida(contrato.criadoEm) && dataValida(contrato.atualizadoEm) && ['salvo', 'impressao'].includes(contrato.situacao)
+        && contrato.campos && idsCamposContrato.every(id => textoValido(contrato.campos[id], id === 'observacoes' ? 3000 : 300))
+        && Array.isArray(contrato.clausulas) && contrato.clausulas.length <= 200 && contrato.clausulas.every(texto => textoValido(texto) && texto.trim())
+        && Array.isArray(contrato.itens) && contrato.itens.length > 0 && contrato.itens.length <= 1000
+        && contrato.itens.every(item => textoValido(item.descricao, 250) && item.descricao.trim() && Number.isInteger(item.quantidade) && item.quantidade >= 1 && item.quantidade <= 9999 && Number.isInteger(item.centavos) && item.centavos >= 0 && item.centavos <= 999999999);
+      if (!dados || dados.versao !== 1 || !Number.isSafeInteger(dados.sequencia) || dados.sequencia < 1
+        || !Array.isArray(dados.modelos) || dados.modelos.length > 200 || !dados.modelos.every(modeloValido) || !idsUnicos(dados.modelos)
+        || !Array.isArray(dados.contratos) || dados.contratos.length > 10000 || !dados.contratos.every(contratoValido) || !idsUnicos(dados.contratos)
+        || !config || !['verde', 'azul', 'vinho', 'grafite'].includes(config.tema) || !['arredondado', 'reto'].includes(config.estilo)
+        || !['confortavel', 'compacto'].includes(config.densidade) || !['18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100)) {
+        throw new Error('O arquivo não é um backup válido do Contrato Fácil. Nenhum dado foi alterado.');
+      }
+      return dados;
+    }
+
+    function mostrarErroArmazenamento(mensagem) {
+      const aviso = document.getElementById('storageError');
+      aviso.textContent = mensagem;
+      aviso.hidden = false;
+    }
+
+    function carregarEstado() {
+      try {
+        const salvo = localStorage.getItem(chaveDados);
+        return salvo ? validarBackup(JSON.parse(salvo)) : estadoInicial();
+      } catch {
+        falhaLeitura = true;
+        mostrarErroArmazenamento('Não foi possível ler os dados locais. Eles não serão sobrescritos. Exporte uma cópia em Configurações ou restaure um backup válido.');
+        return estadoInicial();
+      }
+    }
+
+    function persistirEstado(proximoEstado, restauracao = false) {
+      try {
+        if (!restauracao && (falhaLeitura || conflitoArmazenamento)) throw new Error('Recarregue a página ou restaure um backup antes de salvar.');
+        validarBackup(proximoEstado);
+        localStorage.setItem(chaveDados, JSON.stringify(proximoEstado));
+        estado = proximoEstado;
+        falhaLeitura = false; conflitoArmazenamento = false;
+        document.getElementById('storageError').hidden = true;
+        return true;
+      } catch (erro) {
+        mostrarErroArmazenamento('Não foi possível salvar. O armazenamento pode estar bloqueado ou cheio. Exporte um backup antes de sair. ' + (falhaLeitura || conflitoArmazenamento ? erro.message : ''));
+        return false;
+      }
+    }
+
+    function criarCampo([id, rotulo, limite, tipo = 'text'], prefixo = '') {
+      const grupo = document.createElement('div');
+      const label = document.createElement('label');
+      label.htmlFor = prefixo + id; label.textContent = rotulo;
+      const input = document.createElement(id === 'observacoes' ? 'textarea' : 'input');
+      input.id = prefixo + id; input.maxLength = limite;
+      if (input.tagName === 'INPUT') input.type = tipo;
+      if (tipo === 'number') { input.min = '0'; input.max = id === 'valorRevisao' ? '9999999.99' : '999999999'; input.step = id === 'valorRevisao' ? '0.01' : '1'; }
+      if (prefixo && id === 'empresa') input.required = true;
+      grupo.append(label, input);
+      return grupo;
+    }
+
+    function marcarAlterado() {
+      alterado = true;
+      document.getElementById('situacaoContrato').textContent = 'Alterações ainda não salvas';
+    }
+
+    function podeSubstituirFormulario() { return !alterado || confirm('Há alterações não salvas neste contrato. Deseja descartá-las e continuar?'); }
+
+    function mostrarPagina(nome, focar = true) {
+      const paginas = { inicio: 'paginaInicio', historico: 'paginaHistorico', modelos: 'paginaModelos', configuracoes: 'paginaConfiguracoes', editor: 'paginaEditor' };
+      document.querySelectorAll('.page').forEach(pagina => { pagina.hidden = pagina.id !== paginas[nome]; });
+      document.getElementById('menuEditor').hidden = nome !== 'editor';
+      document.querySelectorAll('.sidebar a:not(#menuEditor a)').forEach(link => {
+        if (link.hash === '#' + nome || (nome === 'editor' && link.hash === '#novo')) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      if (nome === 'historico') renderizarHistorico();
+      if (nome === 'modelos') renderizarModelos();
+      if (nome === 'configuracoes') preencherConfiguracoes();
+      if (focar) { document.getElementById('conteudo').focus(); window.scrollTo(0, 0); }
+    }
+
+    function configurarPaginas() {
+      function navegar() {
+        const rota = location.hash.slice(1) || 'inicio';
+        if (['dados', 'pecas', 'clausulas', 'finalizar'].includes(rota)) return;
+        if (rota === 'novo') {
+          if (!podeSubstituirFormulario()) { location.hash = 'dados'; return; }
+          novoContrato();
+        } else if (['inicio', 'historico', 'modelos', 'configuracoes'].includes(rota)) mostrarPagina(rota);
+        else mostrarPagina('inicio');
+      }
+      document.querySelectorAll('a[href="#novo"]').forEach(link => link.addEventListener('click', evento => {
+        if (location.hash === '#novo') { evento.preventDefault(); navegar(); }
+      }));
+      window.addEventListener('hashchange', navegar);
+      navegar();
+    }
+
+    function atualizarSeletoresModelos() {
+      const select = document.getElementById('modeloContrato');
+      select.replaceChildren();
+      const modelos = [...estado.modelos];
+      if (modeloAtual && !modelos.some(modelo => modelo.id === modeloAtual.id)) modelos.unshift({ ...modeloAtual, nome: modeloAtual.nome + ' (arquivado)' });
+      for (const modelo of modelos) select.add(new Option(modelo.nome, modelo.id));
+      if (!modelos.length) select.add(new Option('Crie um modelo para continuar', ''));
+      if (modeloAtual) select.value = modeloAtual.id;
+      document.getElementById('resumoHistorico').textContent = `${estado.contratos.length} contrato(s) salvo(s)`;
+      document.getElementById('resumoModelos').textContent = `${estado.modelos.length} modelo(s) disponível(is)`;
+    }
+
+    function aplicarModelo(modelo) {
+      modeloAtual = structuredClone(modelo);
+      const oficina = modelo.oficina;
+      document.getElementById('oficina').value = oficina.empresa || '';
+      document.getElementById('contato').value = [oficina.cnpj, oficina.telefone].filter(Boolean).join(' | ');
+      document.getElementById('endereco').value = oficina.endereco || '';
+      listaClausulas.replaceChildren();
+      modelo.clausulas.forEach(texto => adicionarClausula(texto));
+      atualizarPaginacao(listaClausulas, 1);
+      atualizarSeletoresModelos();
+      document.getElementById('avisoModelo').textContent = 'As informações deste contrato são uma cópia do modelo. Alterar um modelo depois não modifica contratos salvos.';
+    }
+
+    function novoContrato(modeloId = estado.configuracoes.modeloPadrao) {
+      contratoAtualId = null;
+      modeloAtual = null;
+      document.getElementById('formulario').reset();
+      idsCamposContrato.forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('data').value = dataLocal();
+      document.getElementById('numeroContrato').value = String(estado.sequencia);
+      listaItens.replaceChildren(); listaClausulas.replaceChildren();
+      adicionarLinhaPeca();
+      const modelo = estado.modelos.find(modelo => modelo.id === modeloId) || estado.modelos[0];
+      if (modelo) aplicarModelo(modelo);
+      else { atualizarSeletoresModelos(); atualizarPaginacao(listaClausulas); }
+      document.getElementById('tituloEditor').textContent = 'Novo contrato';
+      document.getElementById('situacaoContrato').textContent = 'Ainda não salvo';
+      document.getElementById('error').textContent = '';
+      document.getElementById('dados').open = true;
+      alterado = false;
+      mostrarPagina('editor');
+    }
+
+    function dataLocal() {
+      const hoje = new Date();
+      return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+    }
+
+    function capturarContrato(situacao) {
+      const anterior = estado.contratos.find(contrato => contrato.id === contratoAtualId);
+      const agora = new Date().toISOString();
+      return {
+        id: contratoAtualId || crypto.randomUUID(), criadoEm: anterior?.criadoEm || agora, atualizadoEm: agora, situacao,
+        modelo: structuredClone(modeloAtual), campos: Object.fromEntries(idsCamposContrato.map(id => [id, document.getElementById(id).value.trim()])),
+        itens: coletarItens(), clausulas: Array.from(listaClausulas.querySelectorAll('textarea'), campo => campo.value.trim())
+      };
+    }
+
+    function salvarContratoAtual(situacao = 'salvo') {
+      if (!modeloAtual) { document.getElementById('error').textContent = 'Crie e escolha um modelo antes de salvar.'; return false; }
+      const registro = capturarContrato(situacao);
+      const contratos = estado.contratos.filter(contrato => contrato.id !== registro.id);
+      contratos.unshift(registro);
+      if (!persistirEstado({ ...estado, contratos, sequencia: estado.sequencia + (contratoAtualId ? 0 : 1) })) return false;
+      contratoAtualId = registro.id; alterado = false;
+      document.getElementById('tituloEditor').textContent = 'Editar contrato';
+      document.getElementById('situacaoContrato').textContent = 'Salvo no histórico';
+      atualizarSeletoresModelos();
+      anunciar('Contrato salvo no histórico deste navegador.');
+      return true;
+    }
+
+    function abrirContrato(registro, copiar = false) {
+      if (!podeSubstituirFormulario()) return;
+      aplicarModelo(registro.modelo);
+      idsCamposContrato.forEach(id => { document.getElementById(id).value = registro.campos[id] || ''; });
+      contratoAtualId = copiar ? null : registro.id;
+      if (copiar) document.getElementById('numeroContrato').value = String(estado.sequencia);
+      listaItens.replaceChildren();
+      registro.itens.forEach(item => {
+        const linha = adicionarLinhaPeca();
+        linha.querySelector('.descricao').value = item.descricao; linha.querySelector('.quantidade').value = item.quantidade; linha.querySelector('.preco').value = (item.centavos / 100).toFixed(2);
+      });
+      listaClausulas.replaceChildren(); registro.clausulas.forEach(texto => adicionarClausula(texto));
+      atualizarTotais(); atualizarPaginacao(listaItens, 1); atualizarPaginacao(listaClausulas, 1);
+      document.getElementById('tituloEditor').textContent = copiar ? 'Copiar contrato' : 'Editar contrato';
+      document.getElementById('situacaoContrato').textContent = copiar ? 'Cópia ainda não salva' : 'Salvo no histórico';
+      document.getElementById('error').textContent = ''; document.getElementById('dados').open = true;
+      alterado = copiar;
+      location.hash = 'dados'; mostrarPagina('editor');
+    }
+
+    function criarBotao(texto, acao, descricao = texto) {
+      const botao = document.createElement('button'); botao.type = 'button'; botao.textContent = texto; botao.setAttribute('aria-label', descricao); botao.addEventListener('click', acao);
+      if (texto === 'Excluir') botao.className = 'danger';
+      return botao;
+    }
+
+    function criarTexto(tag, texto, classe = '') {
+      const elemento = document.createElement(tag); elemento.textContent = texto; elemento.className = classe; return elemento;
+    }
+
+    function renderizarHistorico() {
+      const busca = normalizarBusca(document.getElementById('buscarHistorico').value);
+      const registros = estado.contratos.filter(contrato => normalizarBusca([contrato.campos.cliente, contrato.campos.veiculo, contrato.campos.placa, contrato.modelo.nome].join(' ')).includes(busca)).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+      const paginas = Math.max(1, Math.ceil(registros.length / 10)); paginaHistorico = Math.min(paginaHistorico, paginas);
+      const lista = document.getElementById('listaHistorico'); lista.replaceChildren();
+      if (!registros.length) lista.append(criarTexto('p', busca ? 'Nenhum contrato encontrado para esta busca.' : 'Nenhum contrato salvo. Comece em “Gerar novo contrato”.', 'empty'));
+      for (const registro of registros.slice((paginaHistorico - 1) * 10, paginaHistorico * 10)) {
+        const card = document.createElement('article'); card.className = 'card';
+        card.append(criarTexto('h2', registro.campos.cliente, 'record-title'));
+        const dados = document.createElement('dl'); dados.className = 'record-data';
+        for (const [rotulo, valor] of [['Veículo e placa', [registro.campos.veiculo, registro.campos.placa].filter(Boolean).join(' · ') || 'Não informado'], ['Criado em', new Date(registro.criadoEm).toLocaleString('pt-BR')], ['Modelo usado', registro.modelo.nome], ['Situação', registro.situacao === 'impressao' ? 'Impressão solicitada' : 'Salvo sem imprimir']]) {
+          const grupo = document.createElement('div'); grupo.append(criarTexto('dt', rotulo), criarTexto('dd', valor)); dados.append(grupo);
+        }
+        const acoes = document.createElement('div'); acoes.className = 'actions';
+        acoes.append(criarBotao('Editar', () => abrirContrato(registro), 'Editar contrato de ' + registro.campos.cliente), criarBotao('Copiar', () => abrirContrato(registro, true), 'Copiar contrato de ' + registro.campos.cliente), criarBotao('Excluir', () => {
+          if (!confirm(`Excluir o contrato de ${registro.campos.cliente}? Essa ação não pode ser desfeita.`)) return;
+          if (persistirEstado({ ...estado, contratos: estado.contratos.filter(contrato => contrato.id !== registro.id) })) {
+            if (contratoAtualId === registro.id) { contratoAtualId = null; marcarAlterado(); }
+            renderizarHistorico(); atualizarSeletoresModelos(); anunciar('Contrato excluído.');
+          }
+        }, 'Excluir contrato de ' + registro.campos.cliente));
+        card.append(dados, acoes); lista.append(card);
+      }
+      const nav = document.getElementById('paginasHistorico'); nav.replaceChildren(); nav.hidden = paginas <= 1;
+      const anterior = criarBotao('Anterior', () => { paginaHistorico--; renderizarHistorico(); document.getElementById('buscarHistorico').focus(); }); anterior.disabled = paginaHistorico === 1;
+      const proxima = criarBotao('Próxima', () => { paginaHistorico++; renderizarHistorico(); document.getElementById('buscarHistorico').focus(); }); proxima.disabled = paginaHistorico === paginas;
+      nav.append(anterior, criarTexto('span', `Página ${paginaHistorico} de ${paginas}`), proxima);
+    }
+
+    function renderizarModelos() {
+      const lista = document.getElementById('listaModelos'); lista.replaceChildren();
+      if (!estado.modelos.length) lista.append(criarTexto('p', 'Nenhum modelo cadastrado. Use “Criar modelo” para começar.', 'empty'));
+      for (const modelo of estado.modelos) {
+        const card = document.createElement('article'); card.className = 'card';
+        card.append(criarTexto('h2', modelo.nome, 'record-title'), criarTexto('p', modelo.oficina.empresa || 'Oficina ainda não informada'), criarTexto('span', modelo.tipo === 'garantia' ? 'Garantia, nota e revisões' : 'Prestação de serviço', 'badge'));
+        const acoes = document.createElement('div'); acoes.className = 'actions';
+        acoes.append(criarBotao('Usar modelo', () => { if (podeSubstituirFormulario()) { novoContrato(modelo.id); location.hash = 'dados'; } }, 'Usar modelo ' + modelo.nome), criarBotao('Editar', () => abrirEditorModelo(modelo), 'Editar modelo ' + modelo.nome), criarBotao('Copiar', () => {
+          const copia = { ...structuredClone(modelo), id: crypto.randomUUID(), nome: (modelo.nome.slice(0, 142) + ' (cópia)') };
+          if (persistirEstado({ ...estado, modelos: [...estado.modelos, copia] })) { renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo copiado.'); }
+        }, 'Copiar modelo ' + modelo.nome), criarBotao('Excluir', () => {
+          if (!confirm(`Excluir o modelo “${modelo.nome}”? Contratos já salvos manterão suas informações.`)) return;
+          if (persistirEstado({ ...estado, modelos: estado.modelos.filter(item => item.id !== modelo.id) })) { renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo excluído.'); }
+        }, 'Excluir modelo ' + modelo.nome));
+        card.append(acoes); lista.append(card);
+      }
+    }
+
+    function abrirEditorModelo(modelo = null) {
+      modeloEditandoId = modelo?.id || null;
+      document.getElementById('formModelo').reset();
+      document.getElementById('tituloDialogModelo').textContent = modelo ? 'Editar modelo' : 'Criar modelo';
+      document.getElementById('nomeModelo').value = modelo?.nome || '';
+      document.getElementById('tipoModelo').value = modelo?.tipo || 'servico';
+      camposFixos.forEach(([id]) => { document.getElementById('modelo-' + id).value = modelo?.oficina[id] || ''; });
+      document.getElementById('introducaoModelo').value = modelo?.introducao || '';
+      document.getElementById('reciboModelo').value = modelo?.recibo || '';
+      document.getElementById('incluirRecibo').checked = modelo?.incluirRecibo || false;
+      const lista = document.getElementById('listaClausulasModelo'); lista.replaceChildren();
+      (modelo?.clausulas || []).forEach(texto => adicionarClausula(texto, lista)); atualizarPaginacao(lista, 1);
+      document.getElementById('erroModelo').textContent = '';
+      document.getElementById('dialogModelo').showModal();
+      document.getElementById('nomeModelo').focus();
+    }
+
+    function salvarModelo(evento) {
+      evento.preventDefault();
+      const form = document.getElementById('formModelo');
+      const invalido = Array.from(form.querySelectorAll('input, textarea')).find(campo => !campo.validity.valid || (campo.required && !campo.value.trim()));
+      if (invalido) { document.getElementById('erroModelo').textContent = 'Preencha os campos obrigatórios do modelo.'; revelarCampo(invalido); invalido.reportValidity(); return; }
+      const modelo = {
+        id: modeloEditandoId || crypto.randomUUID(), nome: document.getElementById('nomeModelo').value.trim(), tipo: document.getElementById('tipoModelo').value,
+        oficina: Object.fromEntries(camposFixos.map(([id]) => [id, document.getElementById('modelo-' + id).value.trim()])),
+        introducao: document.getElementById('introducaoModelo').value.trim(), recibo: document.getElementById('reciboModelo').value.trim(), incluirRecibo: document.getElementById('incluirRecibo').checked,
+        clausulas: Array.from(document.querySelectorAll('#listaClausulasModelo textarea'), campo => campo.value.trim())
+      };
+      const modelos = estado.modelos.some(item => item.id === modelo.id) ? estado.modelos.map(item => item.id === modelo.id ? modelo : item) : [...estado.modelos, modelo];
+      if (persistirEstado({ ...estado, modelos })) { document.getElementById('dialogModelo').close(); renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo salvo. Contratos existentes foram preservados.'); }
+    }
+
+    function aplicarAparencia() {
+      const paletas = { verde: ['#145a48', '#183e38', '#e8f1ed'], azul: ['#174f88', '#17344f', '#e8eff8'], vinho: ['#84314f', '#4f2034', '#f8eaf0'], grafite: ['#374451', '#202b35', '#eaf0f4'] };
+      const cores = paletas[estado.configuracoes.tema];
+      ['--accent', '--accent-dark', '--surface-accent'].forEach((variavel, indice) => document.documentElement.style.setProperty(variavel, cores[indice]));
+      document.documentElement.style.setProperty('--radius', estado.configuracoes.estilo === 'reto' ? '4px' : '12px');
+      document.documentElement.dataset.density = estado.configuracoes.densidade;
+    }
+
+    function preencherConfiguracoes() {
+      ['tema', 'estilo', 'densidade'].forEach(id => { document.getElementById(id).value = estado.configuracoes[id]; });
+      const select = document.getElementById('modeloPadrao'); select.replaceChildren(new Option('Primeiro modelo disponível', ''));
+      estado.modelos.forEach(modelo => select.add(new Option(modelo.nome, modelo.id)));
+      select.value = estado.configuracoes.modeloPadrao;
+      if (select.selectedIndex === -1) select.value = '';
+    }
+
+    function exportarBackup() {
+      let conteudo = JSON.stringify(estado, null, 2);
+      if (falhaLeitura) { try { conteudo = localStorage.getItem(chaveDados) || conteudo; } catch { /* Mantém a cópia em memória. */ } }
+      const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }));
+      const link = document.createElement('a'); link.href = url; link.download = `contrato-facil-backup-${dataLocal()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      anunciar('Backup exportado. Contratos com alterações ainda não salvas não entram no backup.');
+    }
+
+    async function importarBackup() {
+      const campo = document.getElementById('arquivoBackup'); const arquivo = campo.files[0];
+      if (!arquivo) { anunciar('Escolha um arquivo .json de backup antes de restaurar.'); campo.focus(); return; }
+      try {
+        if (arquivo.size > 5 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 5 MB.');
+        const dados = validarBackup(JSON.parse(await arquivo.text()));
+        if (!confirm(`Restaurar ${dados.contratos.length} contrato(s) e ${dados.modelos.length} modelo(s)? Os dados atuais e as alterações não salvas serão substituídos.`)) return;
+        if (!persistirEstado(dados, true)) return;
+        modeloAtual = null; contratoAtualId = null; alterado = false;
+        novoContrato(); aplicarAparencia(); configurarFonteAposRestauracao(); atualizarSeletoresModelos(); preencherConfiguracoes(); mostrarPagina('configuracoes');
+        anunciar('Backup restaurado com sucesso.'); campo.value = '';
+      } catch (erro) { anunciar('Não foi possível restaurar. ' + erro.message); }
+    }
+
+    function configurarFonteAposRestauracao() {
+      document.documentElement.style.setProperty('--fonte-tela', estado.configuracoes.fonte + 'px');
+      document.querySelectorAll('[data-font]').forEach(botao => botao.setAttribute('aria-pressed', String(botao.dataset.font === estado.configuracoes.fonte)));
+    }
+
     document.getElementById('adicionarItem').addEventListener('click', () => {
-      revelarCampo(adicionarLinhaPeca().querySelector('input')); anunciar('Item adicionado.');
+      revelarCampo(adicionarLinhaPeca().querySelector('input')); marcarAlterado(); anunciar('Item adicionado.');
     });
     document.getElementById('adicionarClausula').addEventListener('click', () => {
-      revelarCampo(adicionarClausula().querySelector('textarea')); anunciar('Cláusula adicionada.');
+      revelarCampo(adicionarClausula().querySelector('textarea')); marcarAlterado(); anunciar('Cláusula adicionada.');
     });
     document.getElementById('formulario').addEventListener('submit', gerarPDF);
     // Atualiza o contrato também quando a impressão é aberta pelo atalho do navegador.
     window.addEventListener('beforeprint', () => preencherDocumento(coletarItens()));
     configurarPaginacao(listaItens, 'paginasItens', 'contagemItens', 'itens');
     configurarPaginacao(listaClausulas, 'paginasClausulas', 'contagemClausulas', 'cláusulas');
+    configurarPaginacao(document.getElementById('listaClausulasModelo'), 'paginasClausulasModelo', 'contagemClausulasModelo', 'cláusulas');
+    camposFixos.forEach(campo => document.getElementById('camposModelo').append(criarCampo(campo, 'modelo-')));
+    camposExtras.forEach(campo => document.getElementById('camposComplementares').append(criarCampo(campo)));
+    camposPagamento.forEach(campo => document.getElementById('camposPagamento').append(criarCampo(campo)));
+    document.getElementById('formulario').addEventListener('input', marcarAlterado);
+    document.getElementById('formulario').addEventListener('change', marcarAlterado);
+    document.getElementById('modeloContrato').addEventListener('change', evento => {
+      const anterior = modeloAtual?.id || '';
+      const modelo = estado.modelos.find(item => item.id === evento.target.value);
+      if (!modelo || !podeSubstituirFormulario()) { evento.target.value = anterior; return; }
+      aplicarModelo(modelo); marcarAlterado();
+    });
+    document.getElementById('salvarContrato').addEventListener('click', () => { if (validarContrato()) salvarContratoAtual(); });
+    document.getElementById('novoModelo').addEventListener('click', () => abrirEditorModelo());
+    document.getElementById('cancelarModelo').addEventListener('click', () => document.getElementById('dialogModelo').close());
+    document.getElementById('formModelo').addEventListener('submit', salvarModelo);
+    document.getElementById('adicionarClausulaModelo').addEventListener('click', () => revelarCampo(adicionarClausula('', document.getElementById('listaClausulasModelo')).querySelector('textarea')));
+    document.getElementById('buscarHistorico').addEventListener('input', () => { paginaHistorico = 1; renderizarHistorico(); });
+    document.getElementById('formConfiguracoes').addEventListener('submit', evento => {
+      evento.preventDefault();
+      const configuracoes = { ...estado.configuracoes, ...Object.fromEntries(['tema', 'estilo', 'densidade', 'modeloPadrao'].map(id => [id, document.getElementById(id).value])) };
+      if (persistirEstado({ ...estado, configuracoes })) { aplicarAparencia(); anunciar('Configurações salvas.'); }
+    });
+    document.getElementById('exportarBackup').addEventListener('click', exportarBackup);
+    document.getElementById('importarBackup').addEventListener('click', importarBackup);
+    window.addEventListener('beforeunload', evento => { if (alterado) { evento.preventDefault(); evento.returnValue = ''; } });
+    window.addEventListener('storage', evento => {
+      if (evento.key === chaveDados || evento.key === null) { conflitoArmazenamento = true; mostrarErroArmazenamento('Os dados foram alterados em outra aba. Exporte seu backup e recarregue antes de salvar para evitar sobrescrever alterações.'); }
+    });
+    novoContrato();
+    aplicarAparencia();
     configurarNavegacao();
     configurarFonte();
-    // Usa a data local: UTC pode mudar o dia do contrato à noite no Brasil.
-    const hoje = new Date();
-    document.getElementById('data').value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
-    adicionarLinhaPeca();
-    // Mantém os textos da versão original como ponto de partida editável.
-    adicionarClausula('O prazo de garantia das peças aplicadas e dos serviços de retífica de motor é de 90 (noventa) dias ou 10.000 km rodados, o que ocorrer primeiro.');
-    adicionarClausula('A garantia cobre exclusivamente defeitos de usinagem e montagem realizados por esta empresa, isentando-se de danos por mau uso ou superaquecimento.');
+    configurarPaginas();
   </script>
 </body>
 </html>

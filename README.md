@@ -16,7 +16,7 @@ Node.js e Playwright são usados exclusivamente nos testes de desenvolvimento. O
 4. Em **Cláusulas**, revise os textos e adicione, edite ou remova as condições necessárias.
 5. Clique em **Imprimir / salvar PDF** e escolha a impressora ou **Salvar como PDF**, usando papel A4.
 
-Salve o PDF antes de fechar ou recarregar a página: os dados do contrato não são mantidos entre sessões.
+Os contratos são salvos no histórico deste navegador antes de abrir a impressão. Também é possível salvar sem imprimir. Alterações ainda não salvas são sinalizadas.
 
 ## Recursos e usabilidade
 
@@ -90,7 +90,25 @@ package.json      Comandos e dependências exclusivas de desenvolvimento
 
 ## Limitações atuais
 
-- Dados do contrato e cláusulas alteradas não são salvos entre sessões; apenas a preferência de fonte pode ser mantida.
+- O armazenamento é local ao navegador e ao endereço do HTML. Limpar os dados do navegador ou mudar de computador pode tornar o histórico indisponível. Exporte backups regularmente.
 - O catálogo é inicial e ampliado manualmente. A busca aproximada pode sugerir peças diferentes da desejada.
 - A quantidade aceita unidades inteiras. Valores unitários aceitam duas casas decimais, inclusive zero para itens sem cobrança.
 - O destino do PDF e ajustes personalizados da impressão dependem do navegador.
+
+## Página inicial, histórico e modelos
+
+A página inicial reúne dois blocos de consulta (Histórico e Modelos) e um bloco destacado para gerar um novo contrato. O menu lateral também dá acesso às páginas e às Configurações, no rodapé.
+
+O histórico permite buscar cliente, veículo, placa ou modelo, editar, copiar e excluir contratos. Exibe data/hora de criação, modelo usado e situação. A cópia abre um novo preenchimento e só cria outro registro ao salvar. Editar e salvar mantém a data de criação e atualiza o mesmo registro.
+
+Modelos podem ser criados, editados, copiados e excluídos. Guardam os dados fixos da oficina, dados bancários, textos e cláusulas. Cada contrato preserva uma cópia do modelo usado: alterações e exclusões de modelos não alteram contratos já salvos.
+
+A impressão é solicitada após salvar o registro. Cancelar a janela de impressão não exclui o contrato nem confirma que ele foi impresso.
+
+## Configurações e backup
+
+As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão. Os três tamanhos de fonte continuam disponíveis no menu. A personalização afeta a interface; o documento impresso permanece em preto e branco.
+
+Os dados ficam em `localStorage`, sem servidor ou instalação. Exporte um backup JSON em Configurações para transferir ou recuperar os dados. A restauração valida o arquivo antes de pedir confirmação para substituir os dados atuais. Backups incluem informações dos clientes e devem ser guardados com cuidado.
+
+Falhas de leitura ou gravação são informadas na tela. Dados inválidos não são sobrescritos automaticamente. Alterações em outra aba bloqueiam novas gravações até recarregar ou restaurar, para evitar sobrescrever versões diferentes.

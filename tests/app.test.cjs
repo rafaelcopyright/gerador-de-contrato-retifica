@@ -16,7 +16,7 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   try {
-    await page.goto(pathToFileURL(path.resolve(__dirname, '../index.html')).href);
+    await page.goto(pathToFileURL(path.resolve(__dirname, '../index.html')).href + '#dados');
     await page.evaluate(() => { window.print = () => { window.impressoes = (window.impressoes || 0) + 1; }; });
     assert.equal(await page.locator('.item').count(), 1);
     assert.equal(await page.locator('#listaClausulas textarea').count(), 2);
@@ -60,14 +60,14 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     await segundo.locator('.preco').fill('0.20');
     await page.locator('a[href="#clausulas"]').click();
     await page.locator('#adicionarClausula').click();
-    await page.locator('textarea').fill('Pagamento na entrega.\nCondição combinada com o cliente.');
+    await page.locator('#listaClausulas textarea').fill('Pagamento na entrega.\nCondição combinada com o cliente.');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
     assert.equal(await page.evaluate(() => window.impressoes), 1);
     assert.match(await page.locator('#pdfTotal').innerText(), /30,50/);
     assert.equal(await page.locator('#pdfTabelaItens img').count(), 0);
     assert.match(await page.locator('#pdfTabelaItens').innerText(), /<img src=x/);
     assert.match(await page.locator('#pdfClausulas').innerText(), /1\. Pagamento na entrega/);
-    await page.locator('textarea').fill('Condição editada.');
+    await page.locator('#listaClausulas textarea').fill('Condição editada.');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
     assert.equal(await page.locator('#pdfClausulas').innerText(), '1. Condição editada.');
     await page.emulateMedia({ media: 'print' });
@@ -185,3 +185,4 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
     await browser.close();
   }
 });
+
