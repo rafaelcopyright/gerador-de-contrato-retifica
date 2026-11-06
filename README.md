@@ -1,65 +1,128 @@
 # Contrato Fácil
 
-Aplicativo local para oficinas preencherem peças, valores e condições de serviço e gerarem um contrato para impressão ou PDF. Feito com HTML, CSS e JavaScript, com foco em rapidez, legibilidade e uso por pessoas sem experiência técnica.
+Aplicativo offline para oficinas criarem contratos de peças, serviços e garantia, com histórico local e modelos reutilizáveis. Preencha os dados, confira o total e imprima ou salve em PDF.
 
-## Entrega ao cliente: um único arquivo
+**Um único HTML para o cliente. Sem instalação, servidor, cadastro ou conexão com a internet.**
 
-Envie somente **`index.html`**. O cliente abre o arquivo no navegador, sem instalar Node.js, npm ou dependências. O aplicativo funciona offline e não envia os dados a serviços externos.
+![Página inicial do Contrato Fácil](docs/pagina-inicial.png)
 
-Node.js e Playwright são usados exclusivamente nos testes de desenvolvimento. Os arquivos `package.json`, `package-lock.json`, `tests/` e `.agents/` não precisam acompanhar a entrega.
+## Entrega e primeiros passos
 
-## Como usar
+Envie apenas `index.html` ao cliente. Ele abre o arquivo no navegador e começa a usar. Node.js, npm e os arquivos de desenvolvimento não são necessários para executar o aplicativo.
 
-1. Abra `index.html` no navegador. A impressão foi validada no Google Chrome.
-2. Preencha os dados da oficina, do cliente e, se desejar, do veículo.
-3. Acesse **Peças e serviços** pelo menu, adicione os itens e informe quantidades e valores unitários.
-4. Em **Cláusulas**, revise os textos e adicione, edite ou remova as condições necessárias.
-5. Clique em **Imprimir / salvar PDF** e escolha a impressora ou **Salvar como PDF**, usando papel A4.
+1. Em **Modelos de contrato**, confira os dados fixos da oficina, as cláusulas e os dados de pagamento.
+2. Acesse **Gerar novo contrato** e escolha o modelo desejado.
+3. Informe o cliente, o veículo, as peças ou serviços, quantidades e valores unitários.
+4. Preencha informações complementares, prazos e revisões, quando necessários.
+5. Clique em **Salvar no histórico** ou **Imprimir / salvar PDF**. Na janela de impressão, escolha papel A4 e o destino desejado.
 
-Os contratos são salvos no histórico deste navegador antes de abrir a impressão. Também é possível salvar sem imprimir. Alterações ainda não salvas são sinalizadas.
+O contrato é salvo antes de abrir a janela de impressão. Cancelar essa janela mantém o registro no histórico; o aplicativo não consegue confirmar se o documento foi efetivamente impresso.
 
-## Recursos e usabilidade
+## Página inicial e navegação
 
-- Menu fixo à esquerda no computador, com links âncora para cada seção e para a impressão. Em telas menores, a navegação passa para o topo.
-- Três tamanhos de fonte: **Normal**, **Grande** e **Extra grande**. A preferência é mantida neste navegador quando o armazenamento local está disponível e não muda a fonte do PDF.
-- Uma seção de preenchimento aberta por vez. Os editores de peças e cláusulas são recolhíveis e mostram resumos para facilitar a revisão.
-- Listas divididas em páginas de cinco registros, com apenas um editor aberto por lista. Todos os registros são incluídos no contrato, mesmo em páginas ou seções fechadas.
-- Botões de adicionar em barras que acompanham a seção durante a rolagem. Novos registros abrem na última página, já com foco no campo de preenchimento.
-- Totais automáticos em reais, calculados em centavos, com subtotais por item.
-- Validação de dados obrigatórios, quantidades inteiras e preços não negativos. Um erro abre automaticamente sua seção, página e editor para correção.
-- Campos com rótulos, foco visível, botões grandes e navegação por teclado.
-- Cláusulas numeradas automaticamente e espaços para assinatura no contrato.
+A página inicial apresenta dois blocos de consulta — **Histórico de contratos** e **Modelos de contrato** — e um bloco destacado para **Gerar novo contrato**.
 
-As duas cláusulas da versão original são carregadas como ponto de partida editável. Revise os textos conforme as condições da oficina antes de gerar cada contrato.
+O menu fica fixo à esquerda em telas de computador e passa para o topo em telas menores. As configurações ficam na parte inferior do menu. Durante o preenchimento, links âncora levam às seções do contrato.
 
-## Catálogo local de peças
+## Histórico de contratos
 
-O catálogo contém 65 peças e insumos comuns, com nomes alternativos. Digite ao menos duas letras no campo **Peça ou serviço** para receber até seis sugestões.
+Cada registro mostra cliente, modelo do veículo e placa, data/hora de criação, modelo usado e situação. A lista tem busca e paginação.
 
-A busca ignora acentos e maiúsculas, prioriza correspondências diretas e usa distância de edição para tolerar pequenos erros, como `pistao`, `cabesote` e `virabrequin`.
+| Ação | Comportamento |
+| --- | --- |
+| Editar | Reabre os dados e atualiza o mesmo registro ao salvar, preservando a data de criação. |
+| Copiar | Abre um novo preenchimento com os dados do original. Outro registro só é criado ao salvar. |
+| Excluir | Remove o registro após confirmação. |
 
-- **↑ / ↓:** percorrem as sugestões.
-- **Enter:** seleciona a sugestão destacada.
-- **Esc:** fecha a lista.
-- **Tab:** segue para o próximo campo.
+O histórico guarda os dados necessários para gerar novamente o documento, e não o arquivo PDF binário. Cada contrato mantém uma cópia do modelo utilizado: editar ou excluir um modelo não muda contratos já salvos.
 
-Também é possível selecionar com o mouse ou escrever livremente peças e serviços fora do catálogo. As sugestões não preenchem preços nem verificam compatibilidade com veículos.
+## Modelos de contrato
 
-Para ampliar o catálogo, edite o bloco JSON `catalogoPecas` em `index.html`. Cada entrada contém `nome` e uma lista de `apelidos`. O catálogo fica embutido no HTML para permitir a abertura direta do arquivo, sem servidor ou acesso à rede.
+Modelos podem ser criados, editados, copiados, excluídos e usados para iniciar um contrato. A listagem usa títulos maiores e ações por extenso.
+
+O editor reúne nome e formato do modelo, dados fixos da oficina, informações bancárias e Pix, texto de abertura, cláusulas e opções do recibo. Mudanças feitas no navegador não alteram o arquivo HTML: use um backup para transferi-las a outro computador.
+
+### Modelos iniciais Shekinah
+
+Os dois modelos foram reconstruídos em HTML/CSS a partir dos PDFs e das cinco fotografias fornecidos:
+
+| Modelo | Conteúdo |
+| --- | --- |
+| Prestação de serviço — Shekinah | Oficina, cliente, veículo, tabela de itens, cláusulas 1 a 16, pagamento e assinaturas. |
+| Garantia e revisões — Shekinah | Termo de garantia, nota de serviço executado, três cupons de revisão e recibo de retirada opcional. |
+
+O recibo está habilitado inicialmente no modelo de garantia e pode ser desativado em suas opções. As quilometragens e o valor das revisões são preenchidos em cada contrato.
+
+As fotografias legíveis foram consideradas na transcrição. A cláusula 16 adicional do PDF de garantia foi preservada. Como as fotografias não mostram outra chave Pix, foram mantidos os dados bancários do PDF de prestação de serviço, disponíveis para edição no modelo.
+
+Nomes, documentos, placas, valores e assinaturas dos clientes dos exemplos não são dados iniciais do aplicativo. Os PDFs e as fotografias originais não foram adicionados ao repositório.
+
+Os modelos iniciais são carregados quando ainda não há dados locais. Atualizar o HTML não sobrescreve modelos já salvos neste navegador.
+
+### Campos automáticos
+
+As cláusulas podem usar os seguintes marcadores, substituídos pelos dados do contrato na impressão:
+
+- Valor: `{{total}}` e `{{valorExtenso}}`.
+- Prazos: `{{prazoNacional}}` e `{{prazoDiesel}}`.
+- Revisões: `{{revisao1}}`, `{{revisao2}}` e `{{revisao3}}`.
+- Oficina e pagamento: `{{empresa}}`, `{{banco}}`, `{{agencia}}`, `{{conta}}`, `{{titular}}` e `{{pix}}`.
+
+O valor por extenso é digitado pelo usuário. Campos opcionais não informados aparecem como espaços para preenchimento manual.
+
+## Preenchimento rápido e acessibilidade
+
+- Três tamanhos de fonte: **Normal**, **Grande** e **Extra grande**.
+- Rótulos nos campos, foco visível, botões grandes e operação por teclado.
+- Uma seção de preenchimento aberta por vez e apenas um editor aberto em cada lista.
+- Peças e cláusulas em páginas de cinco registros, com resumos para revisão.
+- Botões de adicionar em barras que acompanham a rolagem da seção.
+- Novos registros abertos automaticamente, com foco no campo de preenchimento.
+- Validação que revela a seção, a página e o editor do primeiro campo incorreto.
+- Subtotais e total em reais, calculados em centavos.
+- Sinalização de alterações não salvas e confirmação antes de substituir um preenchimento em andamento.
+
+## Catálogo de peças
+
+O catálogo local contém 65 peças e insumos comuns, incluindo nomes alternativos. Digite pelo menos duas letras para receber até seis sugestões. A busca ignora acentos e maiúsculas e usa distância de edição para tolerar pequenos erros, como `cabesote` e `virabrequin`.
+
+Use **↑ / ↓** e **Enter** para selecionar, **Esc** para fechar ou o mouse para clicar. O texto é livre: serviços e peças fora do catálogo também podem ser usados.
+
+O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com veículos. Para ampliá-lo, edite o bloco JSON `catalogoPecas` em `index.html`.
+
+## Configurações, armazenamento e backup
+
+As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
+
+Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. Não há envio de dados a serviços externos.
+
+**Exporte backups regularmente em Configurações.** Limpar os dados do navegador, mover o HTML ou mudar de computador pode tornar os dados locais indisponíveis.
+
+O backup JSON inclui contratos, modelos e preferências, mas não alterações ainda não salvas. Ele contém dados dos clientes e deve ser guardado em local adequado. A restauração valida o arquivo e pede confirmação antes de substituir os dados atuais.
+
+Falhas de leitura ou gravação são informadas sem anunciar um salvamento inexistente. Dados locais inválidos não são sobrescritos automaticamente. Alterações em outra aba bloqueiam novas gravações até recarregar ou restaurar, evitando sobrescrever versões diferentes.
 
 ## Impressão e PDF
 
-O contrato usa papel A4 com margens de 15 mm. A interface e os controles de navegação ficam ocultos na impressão. A tabela repete o cabeçalho nas páginas seguintes, e cláusulas longas podem continuar na próxima página sem serem cortadas.
+Os documentos usam papel A4 e margens de 15 mm. A interface fica oculta na impressão. Todos os itens e cláusulas são incluídos, mesmo em seções fechadas ou outras páginas da tela. A tabela repete seu cabeçalho quando necessário.
 
-O estilo de impressão declara caixas de margem vazias para suprimir data/hora, título do aplicativo, URL e numeração inseridos pelo navegador. A remoção foi validada no **Chrome 156.0.8078.80**, comparando PDFs com a opção de cabeçalhos e rodapés ligada e desligada, inclusive com múltiplas páginas.
+O estilo de impressão usa caixas de margem vazias para remover data/hora, título do aplicativo, URL e paginação automáticos do navegador. Essa saída foi validada no Chrome 156 com a opção de cabeçalhos e rodapés ligada e desligada. Em outros navegadores ou configurações personalizadas, pode ser necessário desmarcar **Cabeçalhos e rodapés** em **Mais configurações**.
 
-Se outro navegador ou uma configuração personalizada ainda mostrar esses elementos, desmarque **Cabeçalhos e rodapés** em **Mais configurações** na janela de impressão. A data escolhida no formulário permanece no corpo do contrato.
+A paginação se adapta ao conteúdo. Na amostra conferida, o modelo de prestação de serviço ocupou duas páginas, e o de garantia ocupou cinco com o recibo habilitado. Itens extensos ou cláusulas maiores podem acrescentar páginas. A janela de impressão permite escolher quais páginas imprimir.
 
-A janela de impressão também pode ser aberta pelo atalho do navegador; o contrato é atualizado antes de imprimir. A geração não baixa um arquivo automaticamente: o usuário escolhe o destino nessa janela.
+## Desenvolvimento
 
-## Desenvolvimento e testes
+O código usa HTML semântico, CSS local e APIs nativas do navegador, seguindo as skills de código limpo e layout acessível em `.agents/skills/`. Os textos do usuário são inseridos no documento com `textContent`, sem execução de HTML.
 
-O projeto segue as skills locais de código limpo e layout acessível em `.agents/skills/`. O código usa APIs nativas do navegador e funções pequenas. Os textos do usuário são inseridos no contrato com `textContent`, sem execução de HTML.
+```text
+index.html          Aplicativo, catálogo e modelos iniciais embutidos
+.agents/skills/     Diretrizes locais de desenvolvimento
+tests/              Testes de fluxo no navegador
+docs/               Imagem da interface para documentação
+package.json        Comandos e dependências de desenvolvimento
+```
+
+### Testes
 
 Com Node.js 20 ou superior e Google Chrome instalado:
 
@@ -68,59 +131,14 @@ npm ci
 npm test
 ```
 
-Os testes usam Playwright com Chrome em modo headless e cobrem:
+Os testes com Playwright verificam busca e teclado, cálculos, validação, listas extensas, CRUD de modelos e contratos, preservação do histórico, backup e restauração, falhas de armazenamento, segurança dos textos e impressão com e sem cabeçalhos automáticos.
 
-- Busca aproximada, nomes alternativos, seleção por mouse e teclado.
-- Totais, validação, tratamento seguro de textos e edição de cláusulas.
-- Navegação por âncoras, abertura de editores e paginação de listas extensas.
-- Foco em erros de campos recolhidos ou fora da página atual.
-- Três tamanhos de fonte, preferência entre recargas e layout em 375, 768, 1200 e 1440 pixels.
-- Inclusão de todos os itens e cláusulas no PDF e equivalência da saída com cabeçalhos automáticos ligados ou desligados.
-
-Também foi feita conferência visual do formulário e de um PDF de quatro páginas com cláusula longa. A validação automatizada não substitui testes com leitores de tela ou a conferência da impressora usada pela oficina.
-
-## Estrutura
-
-```text
-index.html        Interface, estilos, catálogo JSON e lógica do aplicativo
-.agents/skills/   Diretrizes locais de código limpo e layout acessível
-tests/            Testes de fluxo no navegador
-package.json      Comandos e dependências exclusivas de desenvolvimento
-```
+Também cobrem fonte ampliada, rótulos e ausência de rolagem horizontal em 375, 768, 1200 e 1440 pixels. Os dois modelos foram renderizados e conferidos visualmente. A verificação automatizada não substitui testes com leitores de tela nem a conferência da impressora usada pela oficina.
 
 ## Limitações atuais
 
-- O armazenamento é local ao navegador e ao endereço do HTML. Limpar os dados do navegador ou mudar de computador pode tornar o histórico indisponível. Exporte backups regularmente.
-- O catálogo é inicial e ampliado manualmente. A busca aproximada pode sugerir peças diferentes da desejada.
-- A quantidade aceita unidades inteiras. Valores unitários aceitam duas casas decimais, inclusive zero para itens sem cobrança.
-- O destino do PDF e ajustes personalizados da impressão dependem do navegador.
-
-## Página inicial, histórico e modelos
-
-A página inicial reúne dois blocos de consulta (Histórico e Modelos) e um bloco destacado para gerar um novo contrato. O menu lateral também dá acesso às páginas e às Configurações, no rodapé.
-
-O histórico permite buscar cliente, veículo, placa ou modelo, editar, copiar e excluir contratos. Exibe data/hora de criação, modelo usado e situação. A cópia abre um novo preenchimento e só cria outro registro ao salvar. Editar e salvar mantém a data de criação e atualiza o mesmo registro.
-
-Modelos podem ser criados, editados, copiados e excluídos. Guardam os dados fixos da oficina, dados bancários, textos e cláusulas. Cada contrato preserva uma cópia do modelo usado: alterações e exclusões de modelos não alteram contratos já salvos.
-
-A impressão é solicitada após salvar o registro. Cancelar a janela de impressão não exclui o contrato nem confirma que ele foi impresso.
-
-## Configurações e backup
-
-As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão. Os três tamanhos de fonte continuam disponíveis no menu. A personalização afeta a interface; o documento impresso permanece em preto e branco.
-
-Os dados ficam em `localStorage`, sem servidor ou instalação. Exporte um backup JSON em Configurações para transferir ou recuperar os dados. A restauração valida o arquivo antes de pedir confirmação para substituir os dados atuais. Backups incluem informações dos clientes e devem ser guardados com cuidado.
-
-Falhas de leitura ou gravação são informadas na tela. Dados inválidos não são sobrescritos automaticamente. Alterações em outra aba bloqueiam novas gravações até recarregar ou restaurar, para evitar sobrescrever versões diferentes.
-
-## Modelos iniciais Shekinah
-
-O HTML inclui os modelos **Prestação de serviço — Shekinah** e **Garantia e revisões — Shekinah**, reconstruídos em HTML/CSS a partir dos dois PDFs e das cinco fotografias fornecidos. Os dados fixos da oficina podem ser alterados no editor de modelos.
-
-- Prestação de serviço: cabeçalho da oficina, dados do cliente e veículo, itens, cláusulas 1 a 16, pagamento e assinaturas.
-- Garantia: termo com cláusulas 1 a 16, nota de serviço executado, três cupons de revisão e recibo de retirada opcional, habilitado inicialmente. O recibo pode ser desativado nas opções do modelo.
-- Os textos visíveis nas fotografias foram considerados na transcrição; a cláusula 16 adicional do PDF de garantia foi preservada.
-- As imagens não apresentam uma chave Pix alternativa legível. A chave e os dados bancários do PDF de prestação de serviço foram mantidos e ficam editáveis no modelo.
-- Nomes, documentos, placas, valores e assinaturas dos clientes dos exemplos não são dados iniciais do aplicativo. Os PDFs e fotografias originais não foram adicionados ao repositório.
-
-Os campos automáticos dos modelos usam marcadores como `{{total}}`, `{{valorExtenso}}`, `{{prazoNacional}}`, `{{prazoDiesel}}`, `{{revisao1}}`, `{{revisao2}}`, `{{revisao3}}`, `{{banco}}`, `{{agencia}}`, `{{conta}}`, `{{titular}}` e `{{pix}}`. Os valores são preenchidos na impressão. Campos opcionais não informados aparecem como espaços para preenchimento manual. A paginação se adapta ao volume de dados; cláusulas e itens extensos podem gerar páginas adicionais.
+- Os dados não são sincronizados entre computadores ou navegadores; a transferência é feita por backup.
+- O preenchimento em andamento precisa ser salvo antes de fechar a página.
+- A quantidade aceita unidades inteiras; o preço unitário aceita duas casas decimais, inclusive zero.
+- O catálogo é ampliado manualmente e pode sugerir peças diferentes da desejada.
+- A geração usa a janela de impressão do navegador; não há download automático nem confirmação física da impressão.

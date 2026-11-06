@@ -186,5 +186,3 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
     await browser.close();
   }
 });
-
-
