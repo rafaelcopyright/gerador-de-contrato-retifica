@@ -19,7 +19,7 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     await page.goto(pathToFileURL(path.resolve(__dirname, '../index.html')).href + '#dados');
     await page.evaluate(() => { window.print = () => { window.impressoes = (window.impressoes || 0) + 1; }; });
     assert.equal(await page.locator('.item').count(), 1);
-    assert.equal(await page.locator('#listaClausulas textarea').count(), 2);
+    assert.equal(await page.locator('#listaClausulas textarea').count(), 16);
     await page.locator('a[href="#clausulas"]').click();
     while (await page.locator('#listaClausulas button').count()) {
       if (!await page.locator('#listaClausulas > details').first().evaluate(cartao => cartao.open)) {
@@ -66,10 +66,10 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     assert.match(await page.locator('#pdfTotal').innerText(), /30,50/);
     assert.equal(await page.locator('#pdfTabelaItens img').count(), 0);
     assert.match(await page.locator('#pdfTabelaItens').innerText(), /<img src=x/);
-    assert.match(await page.locator('#pdfClausulas').innerText(), /1\. Pagamento na entrega/);
+    assert.match(await page.locator('#pdfClausulas').innerText(), /Pagamento na entrega/);
     await page.locator('#listaClausulas textarea').fill('Condição editada.');
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
-    assert.equal(await page.locator('#pdfClausulas').innerText(), '1. Condição editada.');
+    assert.match(await page.locator('#pdfClausulas').innerText(), /Condição editada/);
     await page.emulateMedia({ media: 'print' });
     assert.equal(await page.locator('main').isVisible(), false);
     assert.equal(await page.locator('#documento').isVisible(), true);
@@ -143,6 +143,7 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
         cartao.querySelector('.descricao').value = `Peça ${i + 1}`;
         cartao.querySelector('.preco').value = '10.10';
       }
+      listaClausulas.replaceChildren(); adicionarClausula('Condição inicial 1.'); adicionarClausula('Condição inicial 2.');
       for (let i = 0; i < 12; i++) adicionarClausula(`Condição ${i + 1}. ` + 'Texto longo para verificar paginação. '.repeat(i === 11 ? 100 : 3));
       atualizarTotais(); atualizarResumoClausulas();
     });
@@ -172,7 +173,7 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
     await page.getByRole('button', { name: 'Imprimir / salvar PDF' }).click();
     assert.equal(await page.evaluate(() => window.impressoes), 1);
     assert.equal(await page.locator('#pdfTabelaItens tr').count(), 32);
-    assert.equal(await page.locator('#pdfClausulas p').count(), 15);
+    assert.equal(await page.locator('#pdfClausulas p, #pdfClausulasRestantes p').count(), 15);
     assert.match(await page.locator('#pdfTotal').innerText(), /333,10/);
     const comCabecalhos = await page.pdf({ preferCSSPageSize: true, displayHeaderFooter: true });
     const semCabecalhos = await page.pdf({ preferCSSPageSize: true, displayHeaderFooter: false });
@@ -185,4 +186,5 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
     await browser.close();
   }
 });
+
 

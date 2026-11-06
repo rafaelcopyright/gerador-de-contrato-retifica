@@ -112,3 +112,15 @@ As configurações incluem quatro paletas de alto contraste, cantos arredondados
 Os dados ficam em `localStorage`, sem servidor ou instalação. Exporte um backup JSON em Configurações para transferir ou recuperar os dados. A restauração valida o arquivo antes de pedir confirmação para substituir os dados atuais. Backups incluem informações dos clientes e devem ser guardados com cuidado.
 
 Falhas de leitura ou gravação são informadas na tela. Dados inválidos não são sobrescritos automaticamente. Alterações em outra aba bloqueiam novas gravações até recarregar ou restaurar, para evitar sobrescrever versões diferentes.
+
+## Modelos iniciais Shekinah
+
+O HTML inclui os modelos **Prestação de serviço — Shekinah** e **Garantia e revisões — Shekinah**, reconstruídos em HTML/CSS a partir dos dois PDFs e das cinco fotografias fornecidos. Os dados fixos da oficina podem ser alterados no editor de modelos.
+
+- Prestação de serviço: cabeçalho da oficina, dados do cliente e veículo, itens, cláusulas 1 a 16, pagamento e assinaturas.
+- Garantia: termo com cláusulas 1 a 16, nota de serviço executado, três cupons de revisão e recibo de retirada opcional, habilitado inicialmente. O recibo pode ser desativado nas opções do modelo.
+- Os textos visíveis nas fotografias foram considerados na transcrição; a cláusula 16 adicional do PDF de garantia foi preservada.
+- As imagens não apresentam uma chave Pix alternativa legível. A chave e os dados bancários do PDF de prestação de serviço foram mantidos e ficam editáveis no modelo.
+- Nomes, documentos, placas, valores e assinaturas dos clientes dos exemplos não são dados iniciais do aplicativo. Os PDFs e fotografias originais não foram adicionados ao repositório.
+
+Os campos automáticos dos modelos usam marcadores como `{{total}}`, `{{valorExtenso}}`, `{{prazoNacional}}`, `{{prazoDiesel}}`, `{{revisao1}}`, `{{revisao2}}`, `{{revisao3}}`, `{{banco}}`, `{{agencia}}`, `{{conta}}`, `{{titular}}` e `{{pix}}`. Os valores são preenchidos na impressão. Campos opcionais não informados aparecem como espaços para preenchimento manual. A paginação se adapta ao volume de dados; cláusulas e itens extensos podem gerar páginas adicionais.

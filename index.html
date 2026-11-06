@@ -13,7 +13,7 @@
     h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 8px 0; line-height: 1.2; }
     h2 { font-size: 1.25rem; margin: 0 0 8px; }
     p { margin: 8px 0 20px; }
-    .eyebrow { color: #265a57; font-weight: 750; letter-spacing: .08em; font-size: .8rem; }
+    .eyebrow { color: var(--accent); font-weight: 750; letter-spacing: .08em; font-size: .8rem; }
     .muted, .hint { color: #465b6b; }
     .hint { font-size: .88rem; margin: 8px 0; }
     .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; padding: 28px 20px; overflow-y: auto; background: var(--accent-dark); color: white; display: flex; flex-direction: column; gap: 16px; }
@@ -22,11 +22,11 @@
     .brand { display: block; font-size: 1.3rem; margin-bottom: 28px; }
     .sidebar nav { display: grid; gap: 10px; }
     .sidebar a { display: block; padding: 12px; color: white; text-decoration: none; border: 1px solid transparent; border-radius: 6px; }
-    .sidebar a:hover, .sidebar a[aria-current="location"] { background: #2c5a52; border-color: #b5d8cc; }
+    .sidebar a:hover, .sidebar a[aria-current] { background: var(--accent); border-color: #b5d8cc; }
     .sidebar fieldset { border-color: #80a79b; margin-top: 32px; padding: 12px; }
     .font-controls { display: grid; gap: 8px; }
     .font-controls button { text-align: left; }
-    .font-controls [aria-pressed="true"] { background: #dcf0e5; border: 2px solid #145a48; }
+    .font-controls [aria-pressed="true"] { background: var(--surface-accent); border: 2px solid var(--accent); }
     .sidebar .hint { color: #dbe9e4; }
     .form-section { background: white; border: 1px solid #cad5df; border-radius: var(--radius); margin-top: 24px; scroll-margin-top: 20px; }
     summary { cursor: pointer; padding: 18px; font-weight: 650; overflow-wrap: anywhere; }
@@ -49,6 +49,7 @@
     button { cursor: pointer; min-height: 48px; padding: 10px 16px; border: 1px solid #526b7e; border-radius: 6px; background: white; color: #183e5b; font-weight: 650; }
     button:hover { background: #eaf0f5; }
     :focus-visible { outline: 3px solid #ab4c00; outline-offset: 3px; }
+    #conteudo:focus-visible { outline: none; }
     .primary { background: var(--accent); color: white; border-color: var(--accent); }
     .primary:hover { background: var(--accent-dark); }
     .danger { color: #9d2020; border-color: #aa4444; }
@@ -134,18 +135,29 @@
       }
       :root { font-size: 11pt; color: black; background: white; }
       .screen, .skip-link, dialog { display: none !important; }
-      #documento { display: block; }
-      .print-header { border-bottom: 2px solid black; padding-bottom: 12px; margin-bottom: 20px; }
-      #documento h1 { font-size: 18pt; } #documento h2 { font-size: 13pt; margin-top: 22px; }
-      #documento p { margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-      table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
-      th, td { border: 1px solid #555; padding: 8px; text-align: left; overflow-wrap: anywhere; }
+      #documento { display: block; font: 9.5pt/1.25 Arial, sans-serif; }
+      .print-header { border: 1px solid black; padding: 10px; margin-bottom: 12px; break-inside: avoid; }
+      #documento h1 { font-size: 14pt; text-align: center; margin: 0 0 8px; text-transform: uppercase; }
+      #documento h2 { font-size: 11pt; margin: 12px 0 6px; }
+      #documento p { margin: 4px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+      .print-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
+      .print-box { border: 1px solid black; padding: 10px; margin-bottom: 12px; break-inside: avoid; }
+      .print-new-page { break-before: page; }
+      .clause-label { display: block; margin-bottom: 3px; break-after: avoid; }
+      .clause-text { display: block; }
+      #documento .clause { margin: 8px 0; }
+      #pdfVeiculoDados { grid-template-columns: repeat(3, 1fr); }
+      #documento .coupon { border: 2px solid black; padding: 16px; margin-bottom: 24px; break-inside: avoid; }
+      #documento .coupon h2 { margin-top: 0; text-align: center; }
+      #pdfEmail { text-align: center; font-weight: bold; }
+      table { width: 100%; border-collapse: collapse; margin-top: 12px; table-layout: fixed; }
+      th, td { border: 1px solid #555; padding: 6px; text-align: left; overflow-wrap: anywhere; }
       th:first-child { width: 10%; } th:nth-child(3), th:nth-child(4) { width: 22%; }
       .number { text-align: right; } thead { display: table-header-group; } tfoot { display: table-row-group; }
       tr, .signature { break-inside: avoid; }
       #pdfClausulas p { orphans: 3; widows: 3; }
       #documento h2 { break-after: avoid; }
-      .signature { display: flex; gap: 40px; margin-top: 65px; }
+      .signature { display: flex; gap: 40px; margin-top: 40px; }
       .signature p { width: 50%; border-top: 1px solid black; padding-top: 8px; text-align: center; }
     }
   </style>
@@ -270,12 +282,18 @@
   </dialog>
   <!-- MODELO DO CONTRATO -->
   <article id="documento" aria-label="Contrato para impressão">
-    <header class="print-header"><h1 id="pdfOficina"></h1><p id="pdfContato"></p><p id="pdfEndereco"></p><h2>Contrato de peças e prestação de serviços</h2></header>
-    <p><strong>Contratante: </strong><span id="pdfCliente"></span></p>
-    <p id="pdfVeiculo"></p><p><strong>Data: </strong><span id="pdfData"></span></p>
+    <header class="print-header"><h1 id="pdfTitulo"></h1><p><strong>Contratado: </strong><strong id="pdfOficina"></strong></p><div class="print-grid"><p id="pdfContato"></p><p id="pdfNumero"></p><p id="pdfEndereco"></p><p id="pdfLocalOficina"></p></div><p id="pdfEmail"></p></header>
+    <div class="print-box"><p><strong>Contratante: </strong><strong id="pdfCliente"></strong></p><div id="pdfClienteDados" class="print-grid"></div><p id="pdfVeiculo"></p><div id="pdfVeiculoDados" class="print-grid"></div><p><strong>Data: </strong><span id="pdfData"></span></p></div>
+    <p id="pdfIntroducao"></p>
+    <div id="pdfPosicaoItens"></div>
+    <div id="pdfTermos"><div id="pdfClausulas"></div><div id="pdfContinuacao" class="print-new-page"><h2 id="pdfTituloContinuacao"></h2><div id="pdfClausulasRestantes"></div></div></div>
+    <p id="pdfDataAssinatura"></p><div id="pdfAssinaturas" class="signature"></div>
+    <section id="pdfNota" class="print-new-page"><h1>Nota de serviço executado</h1><p id="pdfNotaDados"></p><div id="pdfPosicaoNota"></div><p id="pdfObservacoes"></p><div id="pdfNotaAssinaturas" class="signature"></div></section>
+    <section id="pdfCupons" class="print-new-page"></section>
+    <section id="pdfRecibo" class="print-new-page"></section>
+    <div id="pdfItens"><h2>Peças e serviços contratados</h2>
     <table><thead><tr><th scope="col">Qtd.</th><th scope="col">Peça / serviço</th><th scope="col" class="number">Valor unitário</th><th scope="col" class="number">Subtotal</th></tr></thead><tbody id="pdfTabelaItens"></tbody><tfoot><tr><th colspan="3" scope="row">Total do contrato</th><td id="pdfTotal" class="number"></td></tr></tfoot></table>
-    <div id="pdfTermos"><h2>Cláusulas e condições</h2><div id="pdfClausulas"></div></div>
-    <div class="signature"><p>Assinatura da oficina</p><p>Assinatura do cliente</p></div>
+    </div>
   </article>
   <!-- Catálogo embutido para funcionar também ao abrir o HTML sem servidor. -->
   <script id="catalogoPecas" type="application/json">
@@ -348,7 +366,92 @@
     ]
   </script>
   <script id="modelosIniciais" type="application/json">
-    [{"id":"modelo-basico","nome":"Contrato de peças e serviços","tipo":"servico","oficina":{},"introducao":"","recibo":"","incluirRecibo":false,"clausulas":["O prazo de garantia das peças aplicadas e dos serviços de retífica de motor é de 90 (noventa) dias ou 10.000 km rodados, o que ocorrer primeiro.","A garantia cobre exclusivamente defeitos de usinagem e montagem realizados por esta empresa, isentando-se de danos por mau uso ou superaquecimento."]}]
+[
+  {
+    "id": "shekinah-servico",
+    "nome": "Prestação de serviço — Shekinah",
+    "tipo": "servico",
+    "oficina": {
+      "empresa": "RETÍFICA DE MOTORES SHEKINAH LTDA",
+      "cnpj": "61.028.039/0001-01",
+      "telefone": "(11) 95793-8059",
+      "email": "retificashekinah2025@gmail.com",
+      "endereco": "Av. Sapopemba, 10558",
+      "bairro": "São Mateus",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "cep": "03988-000",
+      "banco": "PAGBANK",
+      "agencia": "0001",
+      "conta": "88882551-0",
+      "pix": "61028039000101",
+      "titular": "RETIFICA MOTORES"
+    },
+    "introducao": "Termo de garantia em conformidade com o Código de Defesa do Consumidor (Lei 8078/90), que deverá ser observado em todas as suas cláusulas, sob pena de descumprimento de qualquer delas, ser cancelado.",
+    "recibo": "As partes acima identificadas têm entre si, justo e acertado, o presente contrato de prestação de serviços referente aos itens descritos acima. Declaro que conferi e retirei o veículo acima discriminado e fiz a vistoria necessária, constatando que o mesmo continua com as mesmas características, não tendo nada a reclamar futuramente. Reconheço o serviço de retífica e usinagem do motor descrito acima e reconheço a exatidão deste, na importância de {{total}}, que pagarei(emos) à {{empresa}} ou à sua ordem, na praça e vencimento indicados. Para dirimir qualquer litígio decorrente do presente contrato fica eleito pelas partes o Foro da comarca de São Paulo – Fórum Central. Por estarem justos e acertados, assinam o presente contrato em 02 vias de igual teor, valendo o presente como título executivo extrajudicial.",
+    "incluirRecibo": false,
+    "clausulas": [
+      "Do valor do contrato: O valor acertado deste contrato para retífica de motor será de {{total}} ({{valorExtenso}}).",
+      "Serão retificadas as seguintes peças: VIRABREQUIM: (Retifica de colos de biela, Retificas de mancais. Banho Quimico, Normalizacão e polimento). BIELAS: (Retifica de ferros, banho) Bloco:(Banho Quimico, Abertura de cilindros ou Brunimento e pintura).CABEÇOTE(S): (Banho Quimico, Plaina, Retifica das sedes de Valvulas, Retifica de Valvulas",
+      "Serão Trocadas por peças novas, (MÓVEIS) Jogo de Pistões/Anéis/Bronzinas de Bielas, Bronzinas de Mancal/Retentores/vedadores de Válvulas. filtro oleo, buchas de bielas, oleo e jogo de junta completo.",
+      "O serviço de retifica do motor e composto pela troca de peças moveis, usinagem de peças fixas (Descritas acima) e de 3 revisões, onde a qual terá uma taxa variando de veiculo, Na revisão serão realizados serviços de reaperto, regulagem, troca de óleo e substituição de peça(s) ou acessório de peça que houver necessidade.",
+      "O prazo previsto para execução dos serviços será de {{prazoNacional}} dias para veículos nacionais e veículos importados, e {{prazoDiesel}} dias para veículos a diesel, incluída a data da chegada do veículo no pátio da empresa. Havendo qualquer irregularidade no veículo, por exemplo, motor com a numeração raspada, será de inteira responsabilidade do CONTRATANTE, com a consequente paralisação dos serviços.",
+      "Neste orçamento não estão inclusos correias, rolamento, embreagem, coxins, jogos de vela, mangueiras, canos d'água, carburação ou injeção, limpeza no sistema de refrigeração, filtro de ar, filtro de óleo hidráulico e recarga do ar condicionado (bomba, bico, velas aquecedoras e turbinas) encamisamento, mandrilhamento, teste de trinca, soldas, enchimento dos colos, laterais, e tratamento do virabrequim, soldas de galeria, troca da sede do cabecote, carburação ou injeção eletronica, limpeza no sistema, bomba óleo, comando de válvulas, tuchos, refrigeração e parte eletrica. Sendo esses orçamentos á parte, com autorização do cliente, implicando em acréscimo",
+      "Plano sem juros, fazendo somente para serviço de retifica, até 6(seis) vezes no cartao de credito ou 12(doze) vezes no cartão de credito com taxas da operadora do cartão.",
+      "Não trabalhamos com cheque nem boleto Bancario",
+      "Em caso de cancelamento do serviço contratado, sera cobrado uma taxa de 30% do orçamento inicial para despesas com guincho, retirada e desmontagem do motor",
+      "O Contratante está absolutamente ciente que após a desmontagem do motor para realizaçao do orçamento, o mesmo não podera ser montado novamente, tendo em vista que as peças (juntas, vedações, bucha de biela, Óleo, retentores, selo do motor, bucha de bielas, vedadores de valvulas, guias de Válvulas), são deterioradas.",
+      "O motor somente poderá ser remontado com a substituição das referidas peças por novas e retificadas",
+      "Se por qualquer que seja o motivo do desligamento do serviço, o mesmo devera providenciar a remoção do veiculo no prazo de 48 horas, para que não ocorra despesas de estacionamento, 30(trinta reais) ao dia, sendo que no ato do desligamento entrara em vigor a clausula 9",
+      "A retifica não se responsabiliza por objetos deixados no interior do veiculo, razão pela qual solicita que este sejam retirados antes da entrega do veiculo para realização do serviço.",
+      "Declaro assumir inteira responsabilidade pelas informações acima prestadas.",
+      "Depósitos bancários para: Banco {{banco}}. Agência {{agencia}}. Conta {{conta}}. Titular: {{titular}}. Chave Pix: {{pix}}.",
+      "Fica eleito, para dirimir qualquer dúvida quanto a este contrato, o Foro Regional da Vila Prudente."
+    ]
+  },
+  {
+    "id": "shekinah-garantia",
+    "nome": "Garantia e revisões — Shekinah",
+    "tipo": "garantia",
+    "oficina": {
+      "empresa": "RETÍFICA DE MOTORES SHEKINAH LTDA",
+      "cnpj": "61.028.039/0001-01",
+      "telefone": "(11) 95793-8059",
+      "email": "retificashekinah2025@gmail.com",
+      "endereco": "Av. Sapopemba, 10558",
+      "bairro": "São Mateus",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "cep": "03988-000",
+      "banco": "PAGBANK",
+      "agencia": "0001",
+      "conta": "88882551-0",
+      "pix": "61028039000101",
+      "titular": "RETIFICA MOTORES"
+    },
+    "introducao": "Termo de garantia em conformidade com o Código de Defesa do Consumidor (Lei 8078/90), que deverá ser observado em todas as suas cláusulas, sob pena de descumprimento de qualquer delas, ser cancelado.",
+    "recibo": "As partes acima identificadas têm entre si, justo e acertado, o presente contrato de prestação de serviços referente aos itens descritos acima. Declaro que conferi e retirei o veículo acima discriminado e fiz a vistoria necessária, constatando que o mesmo continua com as mesmas características, não tendo nada a reclamar futuramente. Reconheço o serviço de retífica e usinagem do motor descrito acima e reconheço a exatidão deste, na importância de {{total}}, que pagarei(emos) à {{empresa}} ou à sua ordem, na praça e vencimento indicados. Para dirimir qualquer litígio decorrente do presente contrato fica eleito pelas partes o Foro da comarca de São Paulo – Fórum Central. Por estarem justos e acertados, assinam o presente contrato em 02 vias de igual teor, valendo o presente como título executivo extrajudicial.",
+    "incluirRecibo": true,
+    "clausulas": [
+      "A troca de óleo somente poderá ser efetuada pela RETÍFICA sob pena de perda da garantia.",
+      "As revisões são essenciais para o bom funcionamento do motor. O não comparecimento cancela esta garantia.",
+      "A garantia deste serviço terá o prazo de 1 ANO COM KM ILIMITADO. Sendo a que vencer primeiro automaticamente excluirá a outra.",
+      "Fazer as revisões seguindo a quilometragem abaixo:\nPrimeira revisão com {{revisao1}} quilômetros.\nSegunda revisão com {{revisao2}} quilômetros.\nTerceira revisão com {{revisao3}} quilômetros.",
+      "As peças utilizadas nos serviços possuem garantia de até 90 (NOVENTA) dias, são dadas pelo fabricante e valem a partir da data ao final deste contrato firmado.",
+      "O veículo retirado nesta data, com todos os equipamentos constantes do check list de entrada e em perfeitas condições de uso pelo contratante, deverá ser levado à empresa contratada para que sejam executadas todas as revisões constantes no anexo 1 desta garantia.",
+      "O contratante fica obrigado a manter o carro em perfeitas condições de uso. No caso de problemas no motor por motivos diferentes dos serviços prestados e descritos nesta GARANTIA (ANEXO 1) ou pela incorreta utilização do mesmo, ficará SEM EFEITO ESTA GARANTIA.",
+      "Se durante a vigência desta garantia ocorrer qualquer tipo de problema com o veículo, o mesmo deverá ser encaminhado imediatamente ao CONTRATADO para que seja identificado o defeito (problema) e informado ao CONTRATANTE. Se constatado que o defeito foi motivado por TERCEIRO, esta GARANTIA FICARÁ SEM EFEITO.",
+      "Os gastos referentes ao deslocamento do veículo para o CONTRATADO, por qualquer situação, SERÃO DE INTEIRA RESPONSABILIDADE do CONTRATANTE. As revisões obrigatórias constantes neste TERMO deverão ser agendadas com antecedência, sempre respeitando as datas MARCADAS pelo CONTRATADO.",
+      "As revisões não poderão ultrapassar 200 km das estipuladas na CLÁUSULA 04, podendo ser cancelada a GARANTIA.",
+      "O hodômetro (velocímetro) do veículo deverá ser mantido em perfeito estado de funcionamento. No caso de inobservância, PERDERÁ GARANTIA.",
+      "O CONTRATADO é uma empresa especializada em RETÍFICA DE MOTORES e não fará serviços alheios à sua ESPECIALIDADE, tais como sistema de alimentação, elétrico, de refrigeração e de injeção, ficando estes sob responsabilidade do CONTRATANTE.",
+      "No caso de venda do veículo durante a vigência desta GARANTIA, informar ao COMPRADOR sobre os serviços realizados e CUIDADOS a serem tomados.",
+      "Com base em todas as cláusulas acima descritas, o contratante, ciente dos direitos e deveres que possui, expressa, assinando este contrato, sua inteira concordância com este TERMO DE GARANTIA.",
+      "Após o recebimento do veículo pelo CONTRATANTE, este deverá providenciar a limpeza do radiador de água, carburador e sistema de injeção, para que não ocorram futuros problemas quanto ao aquecimento e falhas no motor.",
+      "Após o recebimento do veículo, o contratante tem até 3 dias para apresentar um laudo de que foi feito o sistema de arrefecimento e verificação dos sensores de ventoinha e/ou parte de injeção."
+    ]
+  }
+]
   </script>
   <script>
     const catalogoPecas = JSON.parse(document.getElementById('catalogoPecas').textContent);
@@ -635,34 +738,114 @@
       });
     }
 
-    function preencherDocumento(itens) {
-      for (const campo of ['oficina', 'contato', 'endereco', 'cliente']) {
-        document.getElementById('pdf' + campo[0].toUpperCase() + campo.slice(1)).textContent = document.getElementById(campo).value.trim();
-      }
-      const veiculo = document.getElementById('veiculo').value.trim();
-      document.getElementById('pdfVeiculo').textContent = veiculo ? 'Veículo e placa: ' + veiculo : '';
-      const [ano, mes, dia] = document.getElementById('data').value.split('-');
-      document.getElementById('pdfData').textContent = ano ? `${dia}/${mes}/${ano}` : '';
-      const tabela = document.getElementById('pdfTabelaItens');
-      tabela.replaceChildren();
+    function valoresDocumento(itens) {
+      const valores = Object.fromEntries(idsCamposContrato.map(id => [id, document.getElementById(id).value.trim()]));
+      return { ...valores, ...modeloAtual?.oficina, empresa: valores.oficina, enderecoOficina: valores.endereco, total: moeda.format(calcularTotalCentavos(itens) / 100) };
+    }
+
+    function resolverTexto(texto, valores) {
+      return texto.replace(/{{(\w+)}}/g, (original, nome) => Object.hasOwn(valores, nome) ? valores[nome] || '____________' : original);
+    }
+
+    function adicionarDadosImpressos(destino, dados) {
+      destino.replaceChildren(...dados.map(([rotulo, valor]) => criarTexto('p', rotulo + ': ' + (valor || '____________'))));
+    }
+
+    function preencherAssinaturas(destino, valores) {
+      destino.replaceChildren(criarTexto('p', 'CONTRATANTE\n' + (valores.cliente || '________________________')), criarTexto('p', 'CONTRATADO\n' + valores.empresa));
+    }
+
+    function preencherClausulas(destino, clausulas, inicio, valores) {
+      destino.replaceChildren(...clausulas.map((texto, indice) => {
+        const paragrafo = criarTexto('p', '', 'clause');
+        const rotulo = criarTexto('strong', 'CLÁUSULA ' + String(inicio + indice + 1).padStart(2, '0'), 'clause-label');
+        const corpo = criarTexto('span', resolverTexto(texto, valores), 'clause-text');
+        paragrafo.append(rotulo, corpo);
+        return paragrafo;
+      }));
+    }
+
+    function preencherTabelaDocumento(itens) {
+      const tabela = document.getElementById('pdfTabelaItens'); tabela.replaceChildren();
       for (const item of itens) {
         const linha = document.createElement('tr');
         [item.quantidade, item.descricao, moeda.format(item.centavos / 100), moeda.format(item.quantidade * item.centavos / 100)].forEach((valor, indice) => {
-          const celula = document.createElement('td');
-          celula.textContent = valor;
+          const celula = criarTexto('td', valor);
           if (indice > 1) celula.className = 'number';
           linha.append(celula);
         });
         tabela.append(linha);
       }
       document.getElementById('pdfTotal').textContent = moeda.format(calcularTotalCentavos(itens) / 100);
+    }
+
+    function preencherCupons(valores) {
+      const cupons = document.getElementById('pdfCupons'); cupons.replaceChildren();
+      for (let indice = 1; indice <= 3; indice++) {
+        const cupom = document.createElement('div'); cupom.className = 'coupon';
+        cupom.append(criarTexto('h2', 'Cupom para revisão do motor de força ' + String(indice).padStart(2, '0')),
+          criarTexto('p', 'Fazer a ' + indice + 'ª revisão com ' + (valores['revisao' + indice] || '________________') + ' quilômetros.'));
+        const dados = document.createElement('div'); dados.className = 'print-grid';
+        adicionarDadosImpressos(dados, [['Veículo', valores.veiculo], ['Placa', valores.placa], ['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem]]);
+        cupom.append(dados, criarTexto('p', 'Valor da revisão: ' + (valores.valorRevisao ? moeda.format(Number(valores.valorRevisao)) : 'R$ ________________')));
+        cupons.append(cupom);
+      }
+    }
+
+    function clonarSemIds(elemento) {
+      const copia = elemento.cloneNode(true); copia.removeAttribute('id');
+      copia.querySelectorAll('[id]').forEach(filho => filho.removeAttribute('id'));
+      return copia;
+    }
+
+    function preencherDocumento(itens) {
+      if (!modeloAtual) return;
+      const valores = valoresDocumento(itens);
+      const garantia = modeloAtual.tipo === 'garantia';
+      document.getElementById('documento').dataset.tipo = modeloAtual.tipo;
+      document.getElementById('pdfTitulo').textContent = garantia ? 'Contrato de garantia — serviço executado' : 'Contrato de prestação de serviço';
+      document.getElementById('pdfOficina').textContent = valores.empresa;
+      document.getElementById('pdfContato').textContent = 'CNPJ / Telefone: ' + document.getElementById('contato').value.trim();
+      document.getElementById('pdfNumero').textContent = 'Contrato: ' + (valores.numeroContrato || '____________');
+      document.getElementById('pdfEndereco').textContent = 'Endereço: ' + valores.enderecoOficina;
+      document.getElementById('pdfLocalOficina').textContent = [valores.bairro, valores.cidade, valores.uf, valores.cep].filter(Boolean).join(' · ');
+      document.getElementById('pdfEmail').textContent = valores.email || '';
+      document.getElementById('pdfCliente').textContent = valores.cliente;
+      adicionarDadosImpressos(document.getElementById('pdfClienteDados'), [['CPF / CNPJ', valores.cpfCliente], ['RG / documento', valores.rgCliente], ['Telefone', valores.telefoneCliente], ['Celular', valores.celularCliente], ['Endereço', valores.enderecoCliente], ['Complemento', valores.complementoCliente], ['Bairro', valores.bairroCliente], ['Cidade / UF / CEP', [valores.cidadeCliente, valores.ufCliente, valores.cepCliente].filter(Boolean).join(' · ')]]);
+      document.getElementById('pdfVeiculo').textContent = 'VEÍCULO: ' + (valores.veiculo || '________________') + ' | PLACA: ' + (valores.placa || '________________');
+      adicionarDadosImpressos(document.getElementById('pdfVeiculoDados'), [['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem], ['Chassi', valores.chassi]]);
+      const [ano, mes, dia] = valores.data.split('-');
+      const data = ano ? dia + '/' + mes + '/' + ano : '';
+      document.getElementById('pdfData').textContent = data;
+      const dataAssinatura = (valores.cidade || '') + (valores.cidade ? ', ' : '') + data;
+      document.getElementById('pdfDataAssinatura').textContent = dataAssinatura;
+      document.getElementById('pdfIntroducao').textContent = resolverTexto(modeloAtual.introducao, valores);
+      preencherTabelaDocumento(itens);
+      document.getElementById(garantia ? 'pdfPosicaoNota' : 'pdfPosicaoItens').append(document.getElementById('pdfItens'));
       const clausulas = Array.from(listaClausulas.querySelectorAll('textarea'), campo => campo.value.trim());
+      const limite = garantia ? 7 : 4;
       document.getElementById('pdfTermos').hidden = clausulas.length === 0;
-      document.getElementById('pdfClausulas').replaceChildren(...clausulas.map((texto, indice) => {
-        const paragrafo = document.createElement('p');
-        paragrafo.textContent = `${indice + 1}. ${texto}`;
-        return paragrafo;
-      }));
+      preencherClausulas(document.getElementById('pdfClausulas'), clausulas.slice(0, limite), 0, valores);
+      preencherClausulas(document.getElementById('pdfClausulasRestantes'), clausulas.slice(limite), limite, valores);
+      document.getElementById('pdfContinuacao').hidden = clausulas.length <= limite;
+      document.getElementById('pdfTituloContinuacao').textContent = garantia ? 'Garantia — continuação' : 'Prestação de serviço — continuação';
+      preencherAssinaturas(document.getElementById('pdfAssinaturas'), valores);
+      document.getElementById('pdfNota').hidden = !garantia;
+      document.getElementById('pdfCupons').hidden = !garantia;
+      document.getElementById('pdfRecibo').hidden = !garantia || !modeloAtual.incluirRecibo;
+      if (garantia) {
+        document.getElementById('pdfNotaDados').textContent = [valores.empresa, 'Contrato ' + valores.numeroContrato, valores.cliente, valores.veiculo, valores.placa, data].filter(Boolean).join(' · ');
+        document.getElementById('pdfObservacoes').textContent = 'Observações: ' + (valores.observacoes || '________________________________') + '\n\nConfirma a retirada do veículo do pátio da empresa e que o mesmo foi vistoriado por mim, não tendo nada a reclamar posteriormente.\n' + dataAssinatura;
+        preencherAssinaturas(document.getElementById('pdfNotaAssinaturas'), valores);
+        preencherCupons(valores);
+        const recibo = document.getElementById('pdfRecibo'); recibo.replaceChildren();
+        if (modeloAtual.incluirRecibo) {
+          const cabecalho = clonarSemIds(document.querySelector('#documento > .print-header'));
+          cabecalho.querySelector('h1').textContent = 'Recibo de retirada do veículo (motor força)';
+          const assinaturas = document.createElement('div'); assinaturas.className = 'signature'; preencherAssinaturas(assinaturas, valores);
+          recibo.append(cabecalho, clonarSemIds(document.querySelector('#documento > .print-box')), clonarSemIds(document.getElementById('pdfItens')), criarTexto('p', resolverTexto(modeloAtual.recibo, valores)), criarTexto('p', dataAssinatura), assinaturas);
+        }
+      }
     }
 
     function validarContrato() {
@@ -799,7 +982,7 @@
       input.id = prefixo + id; input.maxLength = limite;
       if (input.tagName === 'INPUT') input.type = tipo;
       if (tipo === 'number') { input.min = '0'; input.max = id === 'valorRevisao' ? '9999999.99' : '999999999'; input.step = id === 'valorRevisao' ? '0.01' : '1'; }
-      if (prefixo && id === 'empresa') input.required = true;
+      if (prefixo && id === 'empresa') { input.required = true; label.textContent += ' *'; }
       grupo.append(label, input);
       return grupo;
     }
@@ -850,8 +1033,8 @@
       for (const modelo of modelos) select.add(new Option(modelo.nome, modelo.id));
       if (!modelos.length) select.add(new Option('Crie um modelo para continuar', ''));
       if (modeloAtual) select.value = modeloAtual.id;
-      document.getElementById('resumoHistorico').textContent = `${estado.contratos.length} contrato(s) salvo(s)`;
-      document.getElementById('resumoModelos').textContent = `${estado.modelos.length} modelo(s) disponível(is)`;
+      document.getElementById('resumoHistorico').textContent = estado.contratos.length === 1 ? '1 contrato salvo' : `${estado.contratos.length} contratos salvos`;
+      document.getElementById('resumoModelos').textContent = estado.modelos.length === 1 ? '1 modelo disponível' : `${estado.modelos.length} modelos disponíveis`;
     }
 
     function aplicarModelo(modelo) {
