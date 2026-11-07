@@ -224,6 +224,12 @@
           <div><label for="densidade">Espaçamento das listas</label><select id="densidade"><option value="confortavel">Confortável</option><option value="compacto">Compacto</option></select></div>
           <div><label for="modeloPadrao">Modelo para novos contratos</label><select id="modeloPadrao"></select></div>
         </div><p class="hint">As cores e o espaçamento alteram a tela. Os contratos continuam em preto e branco, prontos para impressão.</p><button class="primary" type="submit">Salvar configurações</button>
+        <h2>Padrões para novos contratos</h2><div class="fields">
+          <div><label for="padraoRevisao1">1ª revisão após (km)</label><input id="padraoRevisao1" type="number" min="1" max="999999999" step="1" required></div>
+          <div><label for="padraoRevisao2">2ª revisão após (km)</label><input id="padraoRevisao2" type="number" min="1" max="999999999" step="1" required></div>
+          <div><label for="padraoRevisao3">3ª revisão após (km)</label><input id="padraoRevisao3" type="number" min="1" max="999999999" step="1" required></div>
+          <div><label for="padraoValorRevisao">Valor padrão de cada revisão (R$)</label><input id="padraoValorRevisao" type="number" min="0" max="9999999.99" step="0.01" required></div>
+        </div><p class="hint">Os intervalos são somados à quilometragem atual do veículo. Contratos já salvos não são alterados.</p>
       </form>
       <div class="card"><h2>Backup dos dados</h2><p>O backup inclui modelos, contratos e preferências. Guarde o arquivo em um local seguro: ele contém os dados dos clientes.</p><div class="actions"><button id="exportarBackup" type="button">Exportar backup</button><button id="importarBackup" type="button">Restaurar backup</button></div><label for="arquivoBackup" class="hint">Arquivo de backup (.json)</label><input id="arquivoBackup" type="file" accept=".json,application/json"><p class="hint">Restaurar um backup substitui os dados deste navegador após sua confirmação.</p></div>
     </div>
@@ -922,6 +928,21 @@
     let modeloEditandoId = null;
     let paginaHistorico = 1;
     const consultasCep = new Map();
+    const revisoesIniciais = { primeira: 1000, segunda: 4000, terceira: 7000, valor: 850 };
+    let revisoesAutomaticas = new Set();
+
+    function padroesRevisao() {
+      return estado.configuracoes.revisoes || revisoesIniciais;
+    }
+
+    function atualizarRevisoes() {
+      const base = Number(document.getElementById('quilometragem').value) || 0;
+      const padroes = padroesRevisao();
+      ['primeira', 'segunda', 'terceira'].forEach((nome, indice) => {
+        const id = 'revisao' + (indice + 1);
+        if (revisoesAutomaticas.has(id)) document.getElementById(id).value = base + padroes[nome];
+      });
+    }
 
     function estadoInicial() {
       return { versao: 1, sequencia: 1, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '18', modeloPadrao: '' } };
@@ -939,6 +960,8 @@
 
     function validarBackup(dados) {
       const config = dados?.configuracoes;
+      const revisoes = config?.revisoes;
+      const revisoesValidas = revisoes === undefined || (revisoes && ['primeira', 'segunda', 'terceira'].every(nome => Number.isInteger(revisoes[nome]) && revisoes[nome] > 0 && revisoes[nome] <= 999999999) && revisoes.primeira < revisoes.segunda && revisoes.segunda < revisoes.terceira && typeof revisoes.valor === 'number' && Number.isFinite(revisoes.valor) && revisoes.valor >= 0 && revisoes.valor <= 9999999.99);
       const idsUnicos = lista => new Set(lista.map(registro => registro.id)).size === lista.length;
       const dataValida = data => textoValido(data, 40) && Number.isFinite(Date.parse(data));
       const contratoValido = contrato => contrato && textoValido(contrato.id, 100) && contrato.id.trim() && modeloValido(contrato.modelo)
@@ -951,7 +974,7 @@
         || !Array.isArray(dados.modelos) || dados.modelos.length > 200 || !dados.modelos.every(modeloValido) || !idsUnicos(dados.modelos)
         || !Array.isArray(dados.contratos) || dados.contratos.length > 10000 || !dados.contratos.every(contratoValido) || !idsUnicos(dados.contratos)
         || !config || !['verde', 'azul', 'vinho', 'grafite'].includes(config.tema) || !['arredondado', 'reto'].includes(config.estilo)
-        || !['confortavel', 'compacto'].includes(config.densidade) || !['18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100)) {
+        || !['confortavel', 'compacto'].includes(config.densidade) || !['18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100) || !revisoesValidas) {
         throw new Error('O arquivo não é um backup válido do Contrato Fácil. Nenhum dado foi alterado.');
       }
       return dados;
@@ -1069,7 +1092,7 @@
           informar(preservado ? 'Endereço carregado. Suas alterações durante a busca foram preservadas; confira os campos.' : dados.logradouro ? 'Endereço carregado. Confira e acrescente o número do imóvel.' : 'CEP encontrado sem logradouro. Complete a rua e o número manualmente.', 'success');
         } catch (erro) {
           if (atual !== operacao) return;
-          informar(signal.aborted ? 'A consulta demorou demais. Tente novamente ou preencha o endereço manualmente.' : erro instanceof TypeError ? 'Não foi possível conectar ao ViaCEP. Tente novamente ou preencha manualmente.' : erro.message, 'error');
+          informar(signal.aborted ? 'A consulta demorou demais. Tente novamente ou preencha o endereço manualmente.' : erro instanceof TypeError ? 'Não foi possível conectar ao ViaCEP. Tente novamente ou preencha manualmente.' : erro instanceof SyntaxError ? 'O serviço retornou uma resposta inválida. Tente novamente ou preencha manualmente.' : erro.message, 'error');
         } finally {
           clearTimeout(limite);
           if (atual === operacao) { controlador = null; botao.disabled = false; grupo.setAttribute('aria-busy', 'false'); }
@@ -1159,6 +1182,9 @@
       modeloAtual = null;
       document.getElementById('formulario').reset();
       idsCamposContrato.forEach(id => { document.getElementById(id).value = ''; });
+      revisoesAutomaticas = new Set(['revisao1', 'revisao2', 'revisao3']);
+      atualizarRevisoes();
+      document.getElementById('valorRevisao').value = padroesRevisao().valor.toFixed(2);
       document.getElementById('data').value = dataLocal();
       document.getElementById('numeroContrato').value = String(estado.sequencia);
       listaItens.replaceChildren(); listaClausulas.replaceChildren();
@@ -1208,6 +1234,7 @@
 
     function abrirContrato(registro, copiar = false) {
       if (!podeSubstituirFormulario()) return;
+      revisoesAutomaticas.clear();
       aplicarModelo(registro.modelo);
       idsCamposContrato.forEach(id => { document.getElementById(id).value = registro.campos[id] || ''; });
       for (const [id, chave] of [['cepOficina', 'cep'], ['bairroOficina', 'bairro'], ['cidadeOficina', 'cidade'], ['ufOficina', 'uf']]) {
@@ -1333,6 +1360,9 @@
       estado.modelos.forEach(modelo => select.add(new Option(modelo.nome, modelo.id)));
       select.value = estado.configuracoes.modeloPadrao;
       if (select.selectedIndex === -1) select.value = '';
+      const padroes = padroesRevisao();
+      ['primeira', 'segunda', 'terceira'].forEach((nome, indice) => { document.getElementById('padraoRevisao' + (indice + 1)).value = padroes[nome]; });
+      document.getElementById('padraoValorRevisao').value = padroes.valor.toFixed(2);
     }
 
     function exportarBackup() {
@@ -1377,6 +1407,9 @@
     camposFixos.forEach(campo => document.getElementById('camposModelo').append(criarCampo(campo, 'modelo-')));
     camposExtras.forEach(campo => document.getElementById('camposComplementares').append(criarCampo(campo)));
     camposPagamento.forEach(campo => document.getElementById('camposPagamento').append(criarCampo(campo)));
+    document.getElementById('camposPagamento').append(criarTexto('p', 'As revisões padrão usam a quilometragem atual mais os intervalos de Configurações. Campos alterados manualmente e contratos reabertos mantêm seus valores.', 'hint wide'));
+    document.getElementById('quilometragem').addEventListener('input', atualizarRevisoes);
+    ['revisao1', 'revisao2', 'revisao3'].forEach(id => document.getElementById(id).addEventListener('input', () => revisoesAutomaticas.delete(id)));
     configurarConsultaCep('cepOficina', { logradouro: 'endereco', bairro: 'bairroOficina', localidade: 'cidadeOficina', uf: 'ufOficina' });
     configurarConsultaCep('cepCliente', { logradouro: 'enderecoCliente', bairro: 'bairroCliente', localidade: 'cidadeCliente', uf: 'ufCliente' });
     configurarConsultaCep('modelo-cep', { logradouro: 'modelo-endereco', bairro: 'modelo-bairro', localidade: 'modelo-cidade', uf: 'modelo-uf' });
@@ -1397,7 +1430,12 @@
     document.getElementById('buscarHistorico').addEventListener('input', () => { paginaHistorico = 1; renderizarHistorico(); });
     document.getElementById('formConfiguracoes').addEventListener('submit', evento => {
       evento.preventDefault();
-      const configuracoes = { ...estado.configuracoes, ...Object.fromEntries(['tema', 'estilo', 'densidade', 'modeloPadrao'].map(id => [id, document.getElementById(id).value])) };
+      const revisoes = { primeira: Number(document.getElementById('padraoRevisao1').value), segunda: Number(document.getElementById('padraoRevisao2').value), terceira: Number(document.getElementById('padraoRevisao3').value), valor: Number(document.getElementById('padraoValorRevisao').value) };
+      if (!(revisoes.primeira < revisoes.segunda && revisoes.segunda < revisoes.terceira)) {
+        anunciar('Informe os intervalos em ordem crescente: primeira, segunda e terceira revisão.');
+        document.getElementById('padraoRevisao1').focus(); return;
+      }
+      const configuracoes = { ...estado.configuracoes, revisoes, ...Object.fromEntries(['tema', 'estilo', 'densidade', 'modeloPadrao'].map(id => [id, document.getElementById(id).value])) };
       if (persistirEstado({ ...estado, configuracoes })) { aplicarAparencia(); anunciar('Configurações salvas.'); }
     });
     document.getElementById('exportarBackup').addEventListener('click', exportarBackup);

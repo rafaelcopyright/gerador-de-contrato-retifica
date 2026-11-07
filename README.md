@@ -2,7 +2,7 @@
 
 Aplicativo offline para oficinas criarem contratos de peças, serviços e garantia, com histórico local e modelos reutilizáveis. Preencha os dados, confira o total e imprima ou salve em PDF.
 
-**Um único HTML para o cliente. Sem instalação, servidor, cadastro ou conexão com a internet.**
+**Um único HTML para o cliente, sem instalação, servidor ou cadastro. A consulta opcional de CEP precisa de internet; as demais funções continuam locais.**
 
 ![Página inicial do Contrato Fácil](docs/pagina-inicial.png)
 
@@ -51,7 +51,7 @@ Os dois modelos foram reconstruídos em HTML/CSS a partir dos PDFs e das cinco f
 | Prestação de serviço — Shekinah | Oficina, cliente, veículo, tabela de itens, cláusulas 1 a 16, pagamento e assinaturas. |
 | Garantia e revisões — Shekinah | Termo de garantia, nota de serviço executado, três cupons de revisão e recibo de retirada opcional. |
 
-O recibo está habilitado inicialmente no modelo de garantia e pode ser desativado em suas opções. As quilometragens e o valor das revisões são preenchidos em cada contrato.
+O recibo está habilitado inicialmente no modelo de garantia e pode ser desativado em suas opções. As revisões recebem valores iniciais editáveis. Os intervalos padrão são somados à quilometragem informada em cada contrato.
 
 As fotografias legíveis foram consideradas na transcrição. A cláusula 16 adicional do PDF de garantia foi preservada. Como as fotografias não mostram outra chave Pix, foram mantidos os dados bancários do PDF de prestação de serviço, disponíveis para edição no modelo.
 
@@ -94,7 +94,7 @@ O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com v
 
 As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
 
-Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. Não há envio de dados a serviços externos.
+Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional de endereço envia somente o CEP ao ViaCEP. Contratos, dados dos clientes e modelos não são enviados ao serviço.
 
 **Exporte backups regularmente em Configurações.** Limpar os dados do navegador, mover o HTML ou mudar de computador pode tornar os dados locais indisponíveis.
 
@@ -150,3 +150,17 @@ O CEP é o primeiro campo de endereço no contrato (oficina e cliente) e no edit
 A consulta mostra carregamento, sucesso, CEP não encontrado, erro de conexão ou tempo esgotado. Não apaga o endereço em caso de erro nem substitui campos corrigidos durante uma consulta. Respostas de consultas antigas são descartadas ao trocar o CEP ou abrir outro contrato/modelo.
 
 Somente a busca por CEP precisa de internet e envia o CEP ao ViaCEP, sem dados do cliente, credenciais ou informações do contrato. O preenchimento manual e as demais funções continuam disponíveis offline. Não há consultas automáticas ao simplesmente abrir contratos já salvos.
+
+## Revisões com valores iniciais
+
+Novos contratos começam com intervalos de **1.000, 4.000 e 7.000 km** e valor de **R$ 850,00 por revisão**, com base nos exemplos fornecidos. Ajuste esses padrões em Configurações para os valores praticados pela oficina.
+
+Ao informar a quilometragem atual, os intervalos são somados automaticamente: com 241.025 km, as revisões ficam em 242.025, 245.025 e 248.025 km. Sem leitura informada, a base é zero. Confira os valores antes de imprimir.
+
+Uma revisão alterada manualmente deixa de acompanhar o cálculo automático naquele preenchimento. Contratos reabertos ou copiados preservam as quilometragens e o preço registrados, mesmo que os padrões das configurações tenham mudado. Os novos campos são opcionais na validação de backups antigos, mantendo a compatibilidade com os dados já salvos.
+
+## Pesquisa de consulta por placa
+
+A pesquisa e os requisitos de integração estão em [Consultas externas](docs/consultas-externas.md). A API Placas oferece consultas por placa, mas exige conta e token mantido em um serviço externo. A consulta veicular remota não foi ativada no HTML; o preenchimento dos dados do veículo permanece manual.
+
+Os testes adicionais usam respostas controladas do ViaCEP para verificar carregamento, preenchimento, falhas, ausência de internet, tempo limite, respostas atrasadas e preservação de edições. Também verificam os padrões de revisão e a leitura de dados antigos. Uma consulta real ao CEP público de exemplo `01001-000` foi conferida no Chrome, abrindo o HTML diretamente como arquivo local.
