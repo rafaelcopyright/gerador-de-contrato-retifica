@@ -2,7 +2,17 @@
 
 Pesquisa feita em 7 de novembro de 2026, nas documentações dos próprios fornecedores.
 
-## Opção avaliada: API Placas
+## Prioridade atual: FIPE API / Parallelum
+
+A [FIPE API](https://fipe.api.br/docs/comece-aqui) é um serviço independente baseado na tabela FIPE, com banco próprio. Não é uma API oficial da Fundação FIPE. O catálogo permite selecionar marca, modelo e ano e obter combustível e preço de referência. A documentação prevê uso sem cadastro, limitado a 500 requisições diárias.
+
+A [consulta por placa Alpha](https://fipe.api.br/docs/api/busca-por-placa-alpha) oferece `GET https://fipe.parallelum.com.br/api/v2/plates/{plate}`. Em 7/11/2026, a cota documentada sem token era de cinco consultas mensais. A resposta pode trazer marca, modelo, ano, cor, combustível, placa e chassi parcialmente oculto. A rota pode mudar por estar em testes.
+
+**Avaliação:** o catálogo é viável para auxiliar a seleção manual de veículos no HTML. A consulta por placa é viável para experimentação, mas sua cota anônima é insuficiente para o uso diário da oficina. A documentação não oferece leitura atual do odômetro nem número de motor nessa resposta; potência não deve ser tratada como identificação do motor. O preço FIPE é do veículo, não das peças ou do serviço.
+
+Não foi ativada uma nova consulta remota no aplicativo nem consumida a cota por placa. O preenchimento continua manual. Uma integração futura deve ser acionada explicitamente, tratar cota esgotada e falhas, preservar correções do operador e deixar campos ausentes para edição. Caso seja usado token, o fornecedor determina que ele fique no backend, fora do HTML e dos backups.
+
+## Alternativa pesquisada anteriormente: API Placas
 
 A [documentação da API Placas](https://apiplacas.com.br/documentacao) oferece consulta veicular por placa e descreve a rota básica:
 
@@ -30,3 +40,4 @@ A consulta remota por placa **não está ativada nesta versão**. O campo de pla
 ## CEP: integração já implementada
 
 O [ViaCEP](https://viacep.com.br/) documenta consultas públicas no formato `https://viacep.com.br/ws/{cep}/json/`, sem exigir credencial. Um CEP deve ter oito dígitos; o retorno `erro` indica que ele não foi encontrado. Essa integração está ativa, com carregamento acessível, possibilidade de tentar novamente e edição manual em caso de indisponibilidade.
+

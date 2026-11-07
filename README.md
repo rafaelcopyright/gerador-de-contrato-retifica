@@ -172,3 +172,7 @@ No preenchimento do contrato, os dados da oficina aparecem agrupados em um resum
 Celular aparece antes do telefone nos dados complementares do cliente e no documento. O rodapé foi reduzido a uma orientação curta de impressão. Confirmações e mensagens operacionais aparecem em avisos temporários, que podem ser fechados e permanecem enquanto recebem foco ou passam sob o mouse. Erros que exigem correção continuam identificados junto ao formulário.
 
 Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar uma cópia ou um novo preenchimento com os mesmos dados, o registro existente é reutilizado, sem consumir outro número. A comparação considera os dados, itens, valores, cláusulas e conteúdo do modelo, ignorando o número automático e normalizando espaços e diferenças de caixa. A data do contrato é considerada: contratos de datas diferentes podem ser registros distintos. Se editar um registro para ficar igual a outro já salvo, a gravação é bloqueada sem excluir os dados existentes. Registros antigos não são apagados automaticamente.
+
+## Avaliação da FIPE API
+
+A pesquisa atual prioriza a FIPE API / Parallelum, conforme [Consultas externas](docs/consultas-externas.md). Seu catálogo pode ajudar a selecionar marca/modelo/ano. A rota por placa está em Alpha e tem cota anônima documentada de cinco consultas mensais, insuficiente para a rotina de uma oficina. Ela não foi ativada no app nem confundida com o catálogo de preços do veículo. O campo de placa e os dados não fornecidos continuam manuais.
