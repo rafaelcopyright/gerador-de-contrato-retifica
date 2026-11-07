@@ -142,3 +142,11 @@ Também cobrem fonte ampliada, rótulos e ausência de rolagem horizontal em 375
 - A quantidade aceita unidades inteiras; o preço unitário aceita duas casas decimais, inclusive zero.
 - O catálogo é ampliado manualmente e pode sugerir peças diferentes da desejada.
 - A geração usa a janela de impressão do navegador; não há download automático nem confirmação física da impressão.
+
+## Consulta de endereço por CEP
+
+O CEP é o primeiro campo de endereço no contrato (oficina e cliente) e no editor do modelo. Ao completar oito números, o aplicativo consulta o [ViaCEP](https://viacep.com.br/) e preenche logradouro, bairro, cidade e UF. O botão **Buscar endereço** permite tentar novamente. Confira e acrescente o número do imóvel.
+
+A consulta mostra carregamento, sucesso, CEP não encontrado, erro de conexão ou tempo esgotado. Não apaga o endereço em caso de erro nem substitui campos corrigidos durante uma consulta. Respostas de consultas antigas são descartadas ao trocar o CEP ou abrir outro contrato/modelo.
+
+Somente a busca por CEP precisa de internet e envia o CEP ao ViaCEP, sem dados do cliente, credenciais ou informações do contrato. O preenchimento manual e as demais funções continuam disponíveis offline. Não há consultas automáticas ao simplesmente abrir contratos já salvos.
