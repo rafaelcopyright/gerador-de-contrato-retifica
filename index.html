@@ -267,6 +267,19 @@
           <div><label for="placa">Placa</label><input id="placa" maxlength="12" placeholder="Ex.: ABC1D23"></div>
           <div><label for="data">Data do contrato *</label><input id="data" type="date" required></div>
         </div>
+        <details id="consultaVeiculo" class="card"><summary>Buscar veículo no catálogo FIPE</summary>
+          <p class="hint">Escolha marca, modelo e ano. Esta busca não consulta a placa e não altera valores de peças ou serviços.</p>
+          <div class="fields">
+            <div><label for="provedorVeiculo">Serviço de consulta</label><select id="provedorVeiculo"><option value="brasilapi">BrasilAPI</option><option value="parallelum">Fipe.api.br / Parallelum</option></select></div>
+            <div><label for="tipoVeiculo">Tipo de veículo</label><select id="tipoVeiculo"><option value="carros">Carros</option><option value="motos">Motos</option><option value="caminhoes">Caminhões</option></select></div>
+            <div><label for="marcaVeiculo">Marca</label><select id="marcaVeiculo" disabled><option value="">Carregue as marcas para começar</option></select></div>
+            <div><label for="modeloVeiculo">Modelo do catálogo</label><select id="modeloVeiculo" disabled><option value="">Escolha uma marca</option></select></div>
+            <div><label for="anoVeiculoFipe">Ano / combustível</label><select id="anoVeiculoFipe" disabled><option value="">Escolha um modelo</option></select></div>
+          </div>
+          <div class="actions"><button id="carregarMarcas" type="button">Carregar marcas</button><button id="repetirConsultaVeiculo" type="button" hidden>Tentar novamente</button></div>
+          <p id="statusVeiculo" class="lookup-status" role="status" aria-live="polite">A consulta requer internet e só começa quando você solicitar.</p>
+          <div id="resultadoVeiculo" class="notice" hidden><p id="detalhesVeiculo"></p><button id="usarVeiculo" type="button" class="primary">Usar dados no contrato</button></div>
+        </details>
         <details class="card"><summary>Mais dados do cliente e do veículo</summary><div id="camposComplementares" class="fields"></div></details>
         <details class="card"><summary>Pagamento, observações e revisões</summary><div id="camposPagamento" class="fields"></div></details>
         </div>
@@ -970,6 +983,11 @@
     let modeloEditandoId = null;
     let paginaHistorico = 1;
     const consultasCep = new Map();
+    const cacheCatalogo = new Map();
+    let controladorCatalogo = null;
+    let versaoCatalogo = 0;
+    let ultimaEtapaCatalogo = null;
+    let veiculoEncontrado = null;
     const revisoesIniciais = { primeira: 1000, segunda: 4000, terceira: 7000, valor: 850 };
     let revisoesAutomaticas = new Set();
 
@@ -1074,6 +1092,166 @@
       consultasCep.forEach(consulta => consulta.cancelar());
     }
 
+    function limparSeletorCatalogo(id, mensagem) {
+      const campo = document.getElementById(id);
+      campo.replaceChildren(new Option(mensagem, '')); campo.disabled = true;
+    }
+
+    function informarCatalogo(mensagem, situacao = '') {
+      const status = document.getElementById('statusVeiculo');
+      status.textContent = mensagem; status.dataset.state = situacao;
+      if (situacao === 'error') anunciar(mensagem);
+    }
+
+    function invalidarResultadoCatalogo() {
+      veiculoEncontrado = null;
+      document.getElementById('resultadoVeiculo').hidden = true;
+    }
+
+    function cancelarCatalogo() {
+      versaoCatalogo++; controladorCatalogo?.abort(); controladorCatalogo = null;
+      ultimaEtapaCatalogo = null; invalidarResultadoCatalogo();
+      document.getElementById('consultaVeiculo').setAttribute('aria-busy', 'false');
+      document.getElementById('carregarMarcas').disabled = false;
+      document.getElementById('repetirConsultaVeiculo').hidden = true;
+    }
+
+    function reiniciarCatalogo() {
+      cancelarCatalogo();
+      limparSeletorCatalogo('marcaVeiculo', 'Carregue as marcas para começar');
+      limparSeletorCatalogo('modeloVeiculo', 'Escolha uma marca');
+      limparSeletorCatalogo('anoVeiculoFipe', 'Escolha um modelo');
+      informarCatalogo('A consulta requer internet e só começa quando você solicitar.');
+    }
+
+    function urlCatalogo(etapa) {
+      const tipo = document.getElementById('tipoVeiculo').value;
+      const provedor = document.getElementById('provedorVeiculo').value;
+      if (!['carros', 'motos', 'caminhoes'].includes(tipo) || !['brasilapi', 'parallelum'].includes(provedor)) throw new Error('Escolha o serviço e o tipo de veículo.');
+      const marca = document.getElementById('marcaVeiculo').value;
+      const modelo = document.getElementById('modeloVeiculo').value;
+      const ano = document.getElementById('anoVeiculoFipe').value;
+      if (etapa !== 'marcas' && !/^\d+$/.test(marca)) throw new Error('Escolha uma marca.');
+      if (['anos', 'detalhes'].includes(etapa) && !/^\d+$/.test(modelo)) throw new Error('Escolha um modelo.');
+      if (etapa === 'detalhes' && !/^\d{4,5}-\d+$/.test(ano)) throw new Error('Escolha um ano e combustível.');
+      if (provedor === 'brasilapi') {
+        const caminhos = { marcas: `marcas/v1/${tipo}`, modelos: `veiculos/v1/${tipo}/${marca}`, anos: `anos/v1/${tipo}/${marca}/${modelo}`, detalhes: `detalhes/v1/${tipo}/${marca}/${modelo}/${ano}` };
+        return 'https://brasilapi.com.br/api/fipe/' + caminhos[etapa];
+      }
+      const tipos = { carros: 'cars', motos: 'motorcycles', caminhoes: 'trucks' };
+      const base = `https://fipe.parallelum.com.br/api/v2/${tipos[tipo]}/brands`;
+      return base + ({ marcas: '', modelos: `/${marca}/models`, anos: `/${marca}/models/${modelo}/years`, detalhes: `/${marca}/models/${modelo}/years/${ano}` })[etapa];
+    }
+
+    function normalizarListaCatalogo(dados, etapa, provedor) {
+      if (Array.isArray(dados) && !dados.length) throw new Error('Nenhum resultado disponível. Tente novamente, escolha outro serviço ou preencha manualmente.');
+      if (!Array.isArray(dados) || dados.length > 20000) throw new Error('O serviço retornou uma lista inválida. Tente novamente ou use o preenchimento manual.');
+      return dados.map(item => {
+        const nome = provedor === 'parallelum' ? item?.name : etapa === 'modelos' ? item?.modelo : item?.nome;
+        const codigo = String((provedor === 'parallelum' ? item?.code : item?.valor) ?? '');
+        const formato = etapa === 'anos' ? /^\d{4,5}-\d+$/ : /^\d+$/;
+        if (typeof nome !== 'string' || !nome.trim() || nome.length > 500 || !formato.test(codigo)) throw new Error('O serviço retornou dados incompletos. Tente novamente ou preencha manualmente.');
+        return { nome: nome.trim(), codigo };
+      });
+    }
+
+    function normalizarDetalhesCatalogo(dados, provedor) {
+      if (!dados || Array.isArray(dados) || dados.error || dados.erro) throw new Error('Não foi possível encontrar os detalhes deste veículo.');
+      const campos = provedor === 'brasilapi'
+        ? { marca: dados.marca, modelo: dados.modelo, ano: dados.anoModelo, combustivel: dados.combustivel, codigo: dados.codigoFipe, preco: dados.valor, referencia: dados.mesReferencia }
+        : { marca: dados.brand, modelo: dados.model, ano: dados.modelYear, combustivel: dados.fuel, codigo: dados.codeFipe, preco: dados.price, referencia: dados.referenceMonth };
+      for (const id of ['marca', 'modelo']) if (typeof campos[id] !== 'string' || !campos[id].trim() || campos[id].length > 500) throw new Error('Os detalhes do veículo estão incompletos. Use o preenchimento manual.');
+      if (!/^\d{4,5}$/.test(String(campos.ano))) throw new Error('O serviço não informou um ano válido para o veículo.');
+      for (const id of ['combustivel', 'codigo', 'preco', 'referencia']) campos[id] = typeof campos[id] === 'string' ? campos[id].trim().slice(0, 500) : '';
+      return campos;
+    }
+
+    function mostrarRespostaCatalogo(dados, etapa, provedor) {
+      if (etapa !== 'detalhes') {
+        const lista = normalizarListaCatalogo(dados, etapa, provedor);
+        const ids = { marcas: 'marcaVeiculo', modelos: 'modeloVeiculo', anos: 'anoVeiculoFipe' };
+        const campo = document.getElementById(ids[etapa]);
+        campo.replaceChildren(new Option('Selecione uma opção', ''));
+        lista.forEach(item => campo.add(new Option(item.nome, item.codigo)));
+        campo.disabled = lista.length === 0;
+        informarCatalogo(lista.length ? `${lista.length} opções carregadas. Escolha ${etapa === 'marcas' ? 'a marca' : etapa === 'modelos' ? 'o modelo' : 'o ano e combustível'}.` : 'Nenhum resultado disponível. Tente outro serviço ou preencha manualmente.', lista.length ? 'success' : 'error');
+        return;
+      }
+      veiculoEncontrado = normalizarDetalhesCatalogo(dados, provedor);
+      const d = veiculoEncontrado;
+      document.getElementById('detalhesVeiculo').textContent = [d.marca, d.modelo, String(d.ano) === '32000' ? 'Zero km' : d.ano, d.combustivel, d.codigo ? 'Código FIPE: ' + d.codigo : '', d.preco ? 'Referência do veículo: ' + d.preco : '', d.referencia].filter(Boolean).join(' · ');
+      document.getElementById('resultadoVeiculo').hidden = false;
+      informarCatalogo('Dados encontrados. Confira e clique em “Usar dados no contrato”.', 'success');
+    }
+
+    async function consultarCatalogo(etapa) {
+      cancelarCatalogo();
+      const atual = versaoCatalogo;
+      const provedor = document.getElementById('provedorVeiculo').value;
+      const nomeServico = provedor === 'brasilapi' ? 'BrasilAPI' : 'Fipe.api.br';
+      ultimaEtapaCatalogo = etapa;
+      let limite;
+      try {
+        const url = urlCatalogo(etapa);
+        if (!navigator.onLine) throw new Error('Sem internet. Você pode continuar preenchendo o veículo manualmente.');
+        const cache = cacheCatalogo.get(url);
+        if (cache && Date.now() - cache.instante < 600000) { mostrarRespostaCatalogo(cache.dados, etapa, provedor); return; }
+        const requisicao = new AbortController(); controladorCatalogo = requisicao;
+        limite = setTimeout(() => requisicao.abort(), 10000);
+        document.getElementById('consultaVeiculo').setAttribute('aria-busy', 'true');
+        document.getElementById('carregarMarcas').disabled = true;
+        informarCatalogo(`${nomeServico}: carregando ${etapa}…`, 'loading');
+        const resposta = await fetch(url, { signal: requisicao.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
+        if (!resposta.ok) throw new Error(resposta.status === 429 ? `${nomeServico}: limite de consultas atingido. Aguarde ou tente o outro serviço.` : `${nomeServico} indisponível (HTTP ${resposta.status}). Tente novamente, escolha outro serviço ou preencha manualmente.`);
+        const dados = await resposta.json();
+        if (atual !== versaoCatalogo) return;
+        mostrarRespostaCatalogo(dados, etapa, provedor);
+        cacheCatalogo.set(url, { instante: Date.now(), dados });
+        // O cache é apenas da sessão e tem tamanho limitado.
+        if (cacheCatalogo.size > 100) cacheCatalogo.delete(cacheCatalogo.keys().next().value);
+      } catch (erro) {
+        if (atual !== versaoCatalogo) return;
+        informarCatalogo(erro.name === 'AbortError' ? 'A consulta demorou demais. Tente novamente ou preencha manualmente.' : erro instanceof TypeError || erro instanceof SyntaxError ? 'Não foi possível ler o catálogo. Tente novamente, escolha outro serviço ou preencha manualmente.' : erro.message, 'error');
+        document.getElementById('repetirConsultaVeiculo').hidden = false;
+      } finally {
+        clearTimeout(limite);
+        if (atual === versaoCatalogo) {
+          controladorCatalogo = null;
+          document.getElementById('consultaVeiculo').setAttribute('aria-busy', 'false');
+          document.getElementById('carregarMarcas').disabled = false;
+        }
+      }
+    }
+
+    function configurarCatalogo() {
+      for (const id of ['provedorVeiculo', 'tipoVeiculo']) document.getElementById(id).addEventListener('change', reiniciarCatalogo);
+      document.getElementById('carregarMarcas').addEventListener('click', () => { reiniciarCatalogo(); consultarCatalogo('marcas'); });
+      document.getElementById('repetirConsultaVeiculo').addEventListener('click', () => { if (ultimaEtapaCatalogo) consultarCatalogo(ultimaEtapaCatalogo); });
+      document.getElementById('marcaVeiculo').addEventListener('change', evento => {
+        cancelarCatalogo(); limparSeletorCatalogo('modeloVeiculo', 'Escolha uma marca'); limparSeletorCatalogo('anoVeiculoFipe', 'Escolha um modelo');
+        if (evento.target.value) consultarCatalogo('modelos'); else informarCatalogo('Escolha uma marca.');
+      });
+      document.getElementById('modeloVeiculo').addEventListener('change', evento => {
+        cancelarCatalogo(); limparSeletorCatalogo('anoVeiculoFipe', 'Escolha um modelo');
+        if (evento.target.value) consultarCatalogo('anos'); else informarCatalogo('Escolha um modelo.');
+      });
+      document.getElementById('anoVeiculoFipe').addEventListener('change', evento => {
+        cancelarCatalogo();
+        if (evento.target.value) consultarCatalogo('detalhes'); else informarCatalogo('Escolha um ano e combustível.');
+      });
+      document.getElementById('usarVeiculo').addEventListener('click', () => {
+        if (!veiculoEncontrado) return;
+        const d = veiculoEncontrado;
+        const nome = normalizarBusca(d.modelo).startsWith(normalizarBusca(d.marca) + ' ') ? d.modelo : d.marca + ' ' + d.modelo;
+        const novos = { veiculo: (nome + ' (' + (String(d.ano) === '32000' ? 'Zero km' : d.ano) + ')').slice(0, 150) };
+        if (d.combustivel) novos.combustivel = d.combustivel.slice(0, 40);
+        const substituir = Object.entries(novos).some(([id, texto]) => document.getElementById(id).value.trim() && document.getElementById(id).value !== texto);
+        if (substituir && !confirm('Substituir o modelo e o combustível já preenchidos pelos dados escolhidos no catálogo?')) return;
+        for (const [id, texto] of Object.entries(novos)) { const campo = document.getElementById(id); campo.value = texto; campo.dispatchEvent(new Event('input', { bubbles: true })); }
+        anunciar('Veículo preenchido. Confira os dados; placa, cor, motor e quilometragem continuam manuais.');
+      });
+    }
+
     function configurarConsultaCep(idCampo, destinos) {
       const campo = document.getElementById(idCampo);
       campo.maxLength = 9; campo.inputMode = 'numeric'; campo.placeholder = '00000-000';
@@ -1157,7 +1335,7 @@
 
     function marcarAlterado(evento) {
       // A troca de modelo confirma e registra a alteração em seu próprio evento.
-      if (evento?.target?.id === 'modeloContrato') return;
+      if (evento?.target?.id === 'modeloContrato' || evento?.target?.closest?.('#consultaVeiculo')) return;
       alterado = true;
       document.getElementById('situacaoContrato').textContent = 'Alterações ainda não salvas';
     }
@@ -1165,6 +1343,7 @@
     function podeSubstituirFormulario() { return !alterado || confirm('Há alterações não salvas neste contrato. Deseja descartá-las e continuar?'); }
 
     function mostrarPagina(nome, focar = true) {
+      if (nome !== 'editor') reiniciarCatalogo();
       const paginas = { inicio: 'paginaInicio', historico: 'paginaHistorico', modelos: 'paginaModelos', configuracoes: 'paginaConfiguracoes', editor: 'paginaEditor' };
       document.querySelectorAll('.page').forEach(pagina => { pagina.hidden = pagina.id !== paginas[nome]; });
       document.getElementById('menuEditor').hidden = nome !== 'editor';
@@ -1209,6 +1388,7 @@
 
     function aplicarModelo(modelo) {
       cancelarConsultasCep();
+      reiniciarCatalogo();
       modeloAtual = structuredClone(modelo);
       const oficina = modelo.oficina;
       document.getElementById('oficina').value = oficina.empresa || '';
@@ -1225,6 +1405,7 @@
 
     function novoContrato(modeloId = estado.configuracoes.modeloPadrao) {
       cancelarConsultasCep();
+      reiniciarCatalogo();
       contratoAtualId = null;
       modeloAtual = null;
       document.getElementById('formulario').reset();
@@ -1497,6 +1678,7 @@
     configurarConsultaCep('cepCliente', { logradouro: 'enderecoCliente', bairro: 'bairroCliente', localidade: 'cidadeCliente', uf: 'ufCliente' });
     configurarConsultaCep('modelo-cep', { logradouro: 'modelo-endereco', bairro: 'modelo-bairro', localidade: 'modelo-cidade', uf: 'modelo-uf' });
     document.getElementById('dialogModelo').addEventListener('close', cancelarConsultasCep);
+    configurarCatalogo();
     document.getElementById('formulario').addEventListener('input', marcarAlterado);
     document.getElementById('formulario').addEventListener('change', marcarAlterado);
     document.getElementById('modeloContrato').addEventListener('change', evento => {

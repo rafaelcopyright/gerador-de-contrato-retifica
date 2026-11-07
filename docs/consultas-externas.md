@@ -1,49 +1,84 @@
-# Pesquisa de consulta veicular por placa
+# Consultas externas de endereço e veículos
 
-Pesquisa feita em 7 de novembro de 2026, nas documentações dos próprios fornecedores.
+## Integrações disponíveis no HTML
 
-## Prioridade atual: FIPE API / Parallelum
+| Serviço | Uso no aplicativo | Credencial no HTML |
+| --- | --- | --- |
+| ViaCEP | Preencher endereço pelo CEP | Nenhuma |
+| BrasilAPI | Catálogo FIPE: marca → modelo → ano → detalhes | Nenhuma |
+| Fipe.api.br / Parallelum | Catálogo FIPE: marca → modelo → ano → detalhes | Nenhuma |
 
-A [FIPE API](https://fipe.api.br/docs/comece-aqui) é um serviço independente baseado na tabela FIPE, com banco próprio. Não é uma API oficial da Fundação FIPE. O catálogo permite selecionar marca, modelo e ano e obter combustível e preço de referência. A documentação prevê uso sem cadastro, limitado a 500 requisições diárias.
+O usuário escolhe o provedor no formulário. As consultas de veículo começam somente ao clicar em **Carregar marcas**, e continuam conforme as seleções. Os dados encontrados aparecem para conferência; só são aplicados após **Usar dados no contrato**.
 
-A [consulta por placa Alpha](https://fipe.api.br/docs/api/busca-por-placa-alpha) oferece `GET https://fipe.parallelum.com.br/api/v2/plates/{plate}`. Em 7/11/2026, a cota documentada sem token era de cinco consultas mensais. A resposta pode trazer marca, modelo, ano, cor, combustível, placa e chassi parcialmente oculto. A rota pode mudar por estar em testes.
+O catálogo preenche o nome do veículo com ano e, quando informado, combustível. Placa, cor, número de motor, chassi e quilometragem continuam manuais. O preço de referência é do veículo: nunca é usado como preço de peça, serviço ou revisão.
 
-**Avaliação:** o catálogo é viável para auxiliar a seleção manual de veículos no HTML. A consulta por placa é viável para experimentação, mas sua cota anônima é insuficiente para o uso diário da oficina. A documentação não oferece leitura atual do odômetro nem número de motor nessa resposta; potência não deve ser tratada como identificação do motor. O preço FIPE é do veículo, não das peças ou do serviço.
+## BrasilAPI
 
-Não foi ativada uma nova consulta remota no aplicativo nem consumida a cota por placa. O preenchimento continua manual. Uma integração futura deve ser acionada explicitamente, tratar cota esgotada e falhas, preservar correções do operador e deixar campos ausentes para edição. Caso seja usado token, o fornecedor determina que ele fique no backend, fora do HTML e dos backups.
+Referências: [documentação pública](https://brasilapi.com.br/docs#tag/FIPE) e [especificação no repositório oficial](https://github.com/BrasilAPI/BrasilAPI/blob/main/pages/docs/doc/fipe.json).
 
-## Alternativa pesquisada anteriormente: API Placas
+A base REST é `https://brasilapi.com.br/api/fipe`. Tipos aceitos: `carros`, `motos` e `caminhoes`.
 
-A [documentação da API Placas](https://apiplacas.com.br/documentacao) oferece consulta veicular por placa e descreve a rota básica:
+| Etapa | Caminho GET |
+| --- | --- |
+| Marcas | `/marcas/v1/{tipo}` |
+| Modelos | `/veiculos/v1/{tipo}/{marca}` |
+| Anos | `/anos/v1/{tipo}/{marca}/{modelo}` |
+| Detalhes | `/detalhes/v1/{tipo}/{marca}/{modelo}/{ano}` |
 
-```http
-GET https://wdapi2.com.br/v3/basico/{placa}
-Authorization: Bearer TOKEN_DO_FORNECEDOR
-Accept: application/json
-```
+As listas usam `valor` como identificador, com `nome` ou `modelo` como descrição. Os detalhes incluem `marca`, `modelo`, `anoModelo`, `combustivel`, `codigoFipe`, `valor` e `mesReferencia`. Essa API de catálogo não documenta consulta de veículo por placa nesses endpoints.
 
-A placa deve estar sem espaços ou pontuação, no padrão antigo (`ABC1234`) ou Mercosul (`ABC1D23`). Os campos retornados dependem do produto e da disponibilidade dos dados do veículo. A documentação distingue os blocos de consulta; o produto contratado deve ser conferido para obter os campos desejados de modelo, cor, combustível e identificação do motor.
+## Fipe.api.br / Parallelum
 
-O fornecedor instrui a manter o token no servidor, em variável de ambiente, sem expô-lo em código de navegador ou em repositórios. Portanto, colocar essa chave diretamente no HTML distribuído ao cliente não atende ao modelo de integração documentado.
+Referências: [introdução](https://fipe.api.br/docs/comece-aqui) e [endpoints REST JSON](https://fipe.api.br/docs/api/fipe).
 
-## O que falta para ativar
+A base REST vigente documentada é `https://fipe.parallelum.com.br/api/v2`, e não a URL das páginas de documentação. Tipos: `cars`, `motorcycles` e `trucks`, mapeados a partir das opções em português na tela.
 
-1. Conta e credencial do fornecedor, com produto que cubra os dados necessários. Não foi feita contratação nem consulta paga.
-2. Um serviço HTTPS externo, administrado pela oficina, que guarde o token e autentique os usuários autorizados antes de consultar o fornecedor. Ele deve limitar requisições para controlar consumo e custo.
-3. Liberação CORS adequada para o uso pelo HTML local, com tratamento do acesso a arquivos `file://`, e teste da autenticação no navegador do cliente.
-4. Mapeamento do retorno real para os campos do formulário e teste de falhas, dados ausentes ou mascarados e resultados por placa.
+| Etapa | Caminho GET |
+| --- | --- |
+| Marcas | `/{tipo}/brands` |
+| Modelos | `/{tipo}/brands/{marca}/models` |
+| Anos | `/{tipo}/brands/{marca}/models/{modelo}/years` |
+| Detalhes | `/{tipo}/brands/{marca}/models/{modelo}/years/{ano}` |
 
-Esse serviço pode ser hospedado; o cliente continuaria abrindo apenas o HTML, sem instalação. Entretanto, a consulta por placa passaria a depender desse serviço e de internet. Nenhuma credencial foi solicitada, embutida, armazenada ou enviada pelo aplicativo.
+As listas usam `code` e `name`. Os detalhes usam `brand`, `model`, `modelYear`, `fuel`, `codeFipe`, `price` e `referenceMonth`. A documentação prevê 500 requisições diárias sem autenticação e 1.000 com token gratuito. O aplicativo usa somente acesso anônimo; não solicita nem armazena tokens. Os limites de catálogo não equivalem à cota de consulta por placa.
 
-A consulta remota por placa **não está ativada nesta versão**. O campo de placa continua disponível para preenchimento manual. Quilometragem deve ser informada pelo operador, pois é uma leitura atual do veículo.
+### Consulta por placa
 
-## CEP: integração já implementada
+A [rota por placa Alpha](https://fipe.api.br/docs/api/busca-por-placa-alpha) é outro produto, com cota documentada de cinco consultas mensais sem token em 7/11/2026. Essa rota não foi ativada nem consultada durante os testes. Ela não fornece leitura atual do odômetro e pode devolver chassi mascarado; potência não é número de motor.
 
-O [ViaCEP](https://viacep.com.br/) documenta consultas públicas no formato `https://viacep.com.br/ws/{cep}/json/`, sem exigir credencial. Um CEP deve ter oito dígitos; o retorno `erro` indica que ele não foi encontrado. Essa integração está ativa, com carregamento acessível, possibilidade de tentar novamente e edição manual em caso de indisponibilidade.
+O serviço Parallelum usa dados da tabela FIPE e banco próprio; não é a API oficial da Fundação FIPE. Para eventual uso autenticado, a documentação exige manter tokens no backend, fora do HTML público e dos backups.
 
+## Falhas e proteção do preenchimento
 
-### Verificação prática no navegador
+- Carregamento e erros são mostrados na área da consulta; erros também geram aviso temporário.
+- O limite de espera é de dez segundos por requisição. O botão **Tentar novamente** repete a etapa que falhou.
+- Mudar provedor, tipo ou uma seleção cancela requisições antigas e limpa os resultados dependentes.
+- Abrir outro contrato, mudar de modelo de contrato ou sair do editor descarta a consulta em andamento.
+- Preenchimentos manuais existentes só são substituídos após confirmação ao aplicar o resultado.
+- Respostas inválidas, listas vazias, HTTP 404/429/500 e ausência de conexão mantêm a edição manual disponível.
+- Listas e detalhes válidos são guardados em memória por dez minutos, com até cem entradas, separados pela URL completa. Falhas não entram no cache. O cache não vai para backups.
+- Não há troca automática de provedor, consulta em lote nem carregamento de catálogo ao abrir o app.
 
-Em 7/11/2026, com o HTML aberto diretamente no Chrome, a consulta anônima ao catálogo v2 respondeu HTTP 404 e a rota legada v1 (`https://parallelum.com.br/fipe/api/v1/carros/marcas`) respondeu HTTP 500. Ambas retornaram a mensagem `failed to locate the information on fipe.org`. A consulta v2 foi conferida novamente com o mesmo resultado. Não foi realizada consulta de placa.
+As requisições enviam apenas tipo e identificadores públicos do catálogo, sem nome do cliente, placa, dados do contrato, cookies ou token. O preenchimento e a impressão permanecem disponíveis offline.
 
-Portanto, a viabilidade é condicionada à recuperação do serviço e à validação do endpoint no ambiente do cliente. A disponibilidade descrita na documentação não foi confirmada neste teste. A integração não foi ativada e a edição manual continua disponível.
+## Validação realizada em 7/11/2026
+
+### Testes reais, abrindo o HTML no Chrome
+
+| Requisição | Resultado observado |
+| --- | --- |
+| BrasilAPI: marcas de carros | Tempo limite |
+| BrasilAPI: marcas de motos | HTTP 500 |
+| BrasilAPI: marcas de caminhões | HTTP 200, 29 marcas em uma consulta |
+| BrasilAPI: nova consulta de caminhões pela interface | HTTP 500 |
+| Parallelum v2: marcas de carros | HTTP 404, erro de obtenção dos dados na origem |
+
+Esses resultados mostram oscilação do serviço, sem garantir disponibilidade posterior. Não foi possível confirmar um fluxo real completo até os detalhes do veículo. A implementação está disponível para ambos os provedores e trata falhas sem bloquear o contrato; o êxito do preenchimento online depende da recuperação dos serviços.
+
+### Testes end-to-end controlados
+
+Os testes de navegador interceptam as requisições e verificam os caminhos e formatos publicados: fluxo completo dos dois provedores para os três tipos, confirmação de substituição, cache, erros, limite de cota, modo offline, tempo esgotado e cancelamento de resultados atrasados. Esses testes validam o aplicativo, não a disponibilidade dos fornecedores.
+
+## CEP
+
+A consulta [ViaCEP](https://viacep.com.br/) continua disponível para a oficina e para o cliente, com validação de oito dígitos, possibilidade de nova tentativa e preservação de edições. Ela envia apenas o CEP.

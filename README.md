@@ -180,3 +180,17 @@ A pesquisa atual prioriza a FIPE API / Parallelum, conforme [Consultas externas]
 Na conferência real dos catálogos FIPE no Chrome, as rotas v2 e v1 retornaram HTTP 404 e 500, respectivamente. A adoção depende de nova validação de disponibilidade; nenhuma consulta por placa foi feita.
 
 Os testes end-to-end adicionais cobrem o resumo/edição da oficina, a ordem dos contatos, a expiração dos avisos, cliques repetidos em salvar e imprimir, cópias idênticas, recarga da página e cópias de modelos com o mesmo conteúdo. A reutilização de um contrato preserva o modelo originalmente usado no registro.
+
+## Buscar veículo em catálogos online
+
+No formulário, abra **Buscar veículo no catálogo FIPE**:
+
+1. Escolha **BrasilAPI** ou **Fipe.api.br / Parallelum** e o tipo: carros, motos ou caminhões.
+2. Clique em **Carregar marcas** e selecione marca, modelo e ano/combustível.
+3. Confira os detalhes e clique em **Usar dados no contrato**.
+
+O app preenche o nome do veículo com ano e o combustível disponível. Se houver dados manuais, pede confirmação antes de substituí-los. A placa e os identificadores específicos do veículo continuam manuais. O preço FIPE exibido é apenas referência do veículo e não altera os valores do contrato.
+
+As duas integrações usam endpoints públicos sem tokens, com indicadores de carregamento, botão de nova tentativa e cache de dez minutos durante a sessão. O catálogo depende de internet; os campos manuais continuam funcionando em caso de falha. Nenhuma consulta por placa é feita.
+
+Os testes reais encontraram oscilação na BrasilAPI (inclusive uma resposta de 29 marcas de caminhões) e erros na Parallelum. Os fluxos completos foram verificados com respostas controladas em testes end-to-end. Endpoints, limites e resultados reais estão em [Consultas externas](docs/consultas-externas.md).
