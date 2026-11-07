@@ -2,7 +2,7 @@
 
 Aplicativo offline para oficinas criarem contratos de peças, serviços e garantia, com histórico local e modelos reutilizáveis. Preencha os dados, confira o total e imprima ou salve em PDF.
 
-**Um único HTML para o cliente, sem instalação, servidor ou cadastro. As consultas opcionais de CEP e catálogo de veículos precisam de internet; as demais funções continuam locais.**
+**Um único HTML para o cliente, sem instalação, servidor ou cadastro. Somente a consulta opcional de CEP precisa de internet; as demais funções continuam locais.**
 
 ![Página inicial do Contrato Fácil](docs/pagina-inicial.png)
 
@@ -94,7 +94,7 @@ O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com v
 
 As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
 
-Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. As consultas opcionais enviam o CEP ao ViaCEP ou identificadores do catálogo ao provedor escolhido. Contratos, nomes de clientes e placas não são enviados a esses serviços.
+Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional envia somente o CEP ao ViaCEP. Contratos, nomes de clientes e placas não são enviados ao serviço.
 
 **Exporte backups regularmente em Configurações.** Limpar os dados do navegador, mover o HTML ou mudar de computador pode tornar os dados locais indisponíveis.
 
@@ -159,9 +159,9 @@ Ao informar a quilometragem atual, os intervalos são somados automaticamente: c
 
 Uma revisão alterada manualmente deixa de acompanhar o cálculo automático naquele preenchimento. Contratos reabertos ou copiados preservam as quilometragens e o preço registrados, mesmo que os padrões das configurações tenham mudado. Os novos campos são opcionais na validação de backups antigos, mantendo a compatibilidade com os dados já salvos.
 
-## Pesquisa de consulta por placa
+## Dados do veículo
 
-A consulta por placa permanece manual. As integrações ativas de BrasilAPI e Fipe.api.br usam catálogo por marca, modelo e ano. Endpoints, limites e requisitos estão em [Consultas externas](docs/consultas-externas.md).
+Modelo, placa, combustível e demais dados do veículo são preenchidos manualmente. Os catálogos online foram removidos; contratos e backups existentes mantêm as informações já salvas. A consulta de CEP continua disponível, conforme [Consultas externas](docs/consultas-externas.md).
 
 Os testes adicionais usam respostas controladas do ViaCEP para verificar carregamento, preenchimento, falhas, ausência de internet, tempo limite, respostas atrasadas e preservação de edições. Também verificam os padrões de revisão e a leitura de dados antigos. Uma consulta real ao CEP público de exemplo `01001-000` foi conferida no Chrome, abrindo o HTML diretamente como arquivo local.
 
@@ -172,17 +172,3 @@ No preenchimento do contrato, os dados da oficina aparecem agrupados em um resum
 Celular aparece antes do telefone nos dados complementares do cliente e no documento. O rodapé foi reduzido a uma orientação curta de impressão. Confirmações e mensagens operacionais aparecem em avisos temporários, que podem ser fechados e permanecem enquanto recebem foco ou passam sob o mouse. Erros que exigem correção continuam identificados junto ao formulário.
 
 Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar uma cópia ou um novo preenchimento com os mesmos dados, o registro existente é reutilizado, sem consumir outro número. A comparação considera os dados, itens, valores, cláusulas e conteúdo do modelo, ignorando o número automático e normalizando espaços e diferenças de caixa. A data do contrato é considerada: contratos de datas diferentes podem ser registros distintos. Se editar um registro para ficar igual a outro já salvo, a gravação é bloqueada sem excluir os dados existentes. Registros antigos não são apagados automaticamente.
-
-## Buscar veículo em catálogos online
-
-No formulário, abra **Buscar veículo no catálogo FIPE**:
-
-1. Escolha **BrasilAPI** ou **Fipe.api.br / Parallelum** e o tipo: carros, motos ou caminhões.
-2. Clique em **Carregar marcas** e selecione marca, modelo e ano/combustível.
-3. Confira os detalhes e clique em **Usar dados no contrato**.
-
-O app preenche o nome do veículo com ano e o combustível disponível. Se houver dados manuais, pede confirmação antes de substituí-los. A placa e os identificadores específicos do veículo continuam manuais. O preço FIPE exibido é apenas referência do veículo e não altera os valores do contrato.
-
-As duas integrações usam endpoints públicos sem tokens, com indicadores de carregamento, botão de nova tentativa e cache de dez minutos durante a sessão. O catálogo depende de internet; os campos manuais continuam funcionando em caso de falha. Nenhuma consulta por placa é feita.
-
-Os testes reais encontraram oscilação na BrasilAPI (inclusive uma resposta de 29 marcas de caminhões) e erros na Parallelum. Os fluxos completos foram verificados com respostas controladas em testes end-to-end. Endpoints, limites e resultados reais estão em [Consultas externas](docs/consultas-externas.md).

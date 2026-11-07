@@ -106,3 +106,26 @@ test('modelo copiado sem mudanças não duplica contrato nem altera o modelo ori
   assert.deepEqual(salvo.contratos[0].modelo, original.modelo);
   assert.equal(await page.locator('#modeloContrato').inputValue(), original.modelo.id);
 });
+
+test('veículo manual sem catálogos externos preserva os dados no histórico', async t => {
+  const page = await abrir(t); const requisicoes = [];
+  page.on('request', request => { if (/^https?:/.test(request.url())) requisicoes.push(request.url()); });
+  assert.equal(await page.locator('#consultaVeiculo').count(), 0);
+  await preencher(page);
+  await page.locator('.sidebar a[href="#dados"]').click();
+  await page.getByText('Mais dados do cliente e do veículo', { exact: true }).click();
+  await page.locator('#combustivel').fill('Diesel');
+  await page.locator('#motor').fill('MOTOR123');
+  await page.locator('#quilometragem').fill('100000');
+  await page.locator('#salvarContrato').click();
+  const original = (await estado(page)).contratos[0];
+  await page.reload(); await historico(page);
+  await page.getByRole('button', { name: 'Editar contrato de Cliente Único', exact: true }).click();
+  assert.equal(await page.locator('#veiculo').inputValue(), 'Carro');
+  assert.equal(await page.locator('#placa').inputValue(), 'ABC1D23');
+  assert.equal(await page.locator('#combustivel').inputValue(), 'Diesel');
+  assert.equal(await page.locator('#motor').inputValue(), 'MOTOR123');
+  assert.equal(await page.locator('#quilometragem').inputValue(), '100000');
+  assert.equal((await estado(page)).contratos[0].id, original.id);
+  assert.deepEqual(requisicoes, []);
+});
