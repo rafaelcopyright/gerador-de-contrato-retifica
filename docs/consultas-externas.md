@@ -41,3 +41,9 @@ A consulta remota por placa **não está ativada nesta versão**. O campo de pla
 
 O [ViaCEP](https://viacep.com.br/) documenta consultas públicas no formato `https://viacep.com.br/ws/{cep}/json/`, sem exigir credencial. Um CEP deve ter oito dígitos; o retorno `erro` indica que ele não foi encontrado. Essa integração está ativa, com carregamento acessível, possibilidade de tentar novamente e edição manual em caso de indisponibilidade.
 
+
+### Verificação prática no navegador
+
+Em 7/11/2026, com o HTML aberto diretamente no Chrome, a consulta anônima ao catálogo v2 respondeu HTTP 404 e a rota legada v1 (`https://parallelum.com.br/fipe/api/v1/carros/marcas`) respondeu HTTP 500. Ambas retornaram a mensagem `failed to locate the information on fipe.org`. A consulta v2 foi conferida novamente com o mesmo resultado. Não foi realizada consulta de placa.
+
+Portanto, a viabilidade é condicionada à recuperação do serviço e à validação do endpoint no ambiente do cliente. A disponibilidade descrita na documentação não foi confirmada neste teste. A integração não foi ativada e a edição manual continua disponível.

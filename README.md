@@ -176,3 +176,7 @@ Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar 
 ## Avaliação da FIPE API
 
 A pesquisa atual prioriza a FIPE API / Parallelum, conforme [Consultas externas](docs/consultas-externas.md). Seu catálogo pode ajudar a selecionar marca/modelo/ano. A rota por placa está em Alpha e tem cota anônima documentada de cinco consultas mensais, insuficiente para a rotina de uma oficina. Ela não foi ativada no app nem confundida com o catálogo de preços do veículo. O campo de placa e os dados não fornecidos continuam manuais.
+
+Na conferência real dos catálogos FIPE no Chrome, as rotas v2 e v1 retornaram HTTP 404 e 500, respectivamente. A adoção depende de nova validação de disponibilidade; nenhuma consulta por placa foi feita.
+
+Os testes end-to-end adicionais cobrem o resumo/edição da oficina, a ordem dos contatos, a expiração dos avisos, cliques repetidos em salvar e imprimir, cópias idênticas, recarga da página e cópias de modelos com o mesmo conteúdo. A reutilização de um contrato preserva o modelo originalmente usado no registro.

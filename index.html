@@ -94,6 +94,7 @@
     .storage-error { color: #821b1b; background: #fff0ed; border-color: #aa4444; }
     .toast { position: fixed; right: 20px; top: 20px; z-index: 30; width: min(520px, calc(100vw - 40px)); padding: 16px; display: flex; align-items: start; gap: 14px; background: white; color: #182b3b; border: 2px solid var(--accent); border-radius: 10px; box-shadow: 0 6px 24px #182b3b40; }
     .toast button { flex-shrink: 0; margin-left: auto; }
+    .toast #globalStatus { min-width: 0; overflow-wrap: anywhere; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .office-summary { position: relative; border: 1px solid #cad5df; border-radius: var(--radius); padding: 18px; margin-bottom: 20px; }
     .office-summary h3 { margin: 0; font-size: 1.1rem; }
@@ -1285,11 +1286,13 @@
       if (duplicado) {
         registro.id = duplicado.id; registro.criadoEm = duplicado.criadoEm;
         registro.campos.numeroContrato = duplicado.campos.numeroContrato;
+        registro.modelo = structuredClone(duplicado.modelo);
       }
       const contratos = estado.contratos.filter(contrato => contrato.id !== registro.id);
       contratos.unshift(registro);
       if (!persistirEstado({ ...estado, contratos, sequencia: estado.sequencia + (novo ? 1 : 0) })) return false;
       contratoAtualId = registro.id; alterado = false;
+      modeloAtual = structuredClone(registro.modelo);
       document.getElementById('numeroContrato').value = registro.campos.numeroContrato;
       document.getElementById('tituloEditor').textContent = 'Editar contrato';
       document.getElementById('situacaoContrato').textContent = 'Salvo no histórico';
