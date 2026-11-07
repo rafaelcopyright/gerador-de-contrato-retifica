@@ -14,6 +14,7 @@ async function abrir(t) {
   const erros = []; page.on('pageerror', erro => erros.push(erro.message));
   t.after(() => assert.deepEqual(erros, []));
   await page.goto(url + '#dados');
+  await page.locator('#editarOficina').click();
   return page;
 }
 async function responder(route, dados) {

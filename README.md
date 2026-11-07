@@ -164,3 +164,11 @@ Uma revisão alterada manualmente deixa de acompanhar o cálculo automático naq
 A pesquisa e os requisitos de integração estão em [Consultas externas](docs/consultas-externas.md). A API Placas oferece consultas por placa, mas exige conta e token mantido em um serviço externo. A consulta veicular remota não foi ativada no HTML; o preenchimento dos dados do veículo permanece manual.
 
 Os testes adicionais usam respostas controladas do ViaCEP para verificar carregamento, preenchimento, falhas, ausência de internet, tempo limite, respostas atrasadas e preservação de edições. Também verificam os padrões de revisão e a leitura de dados antigos. Uma consulta real ao CEP público de exemplo `01001-000` foi conferida no Chrome, abrindo o HTML diretamente como arquivo local.
+
+## Resumo da oficina, avisos e proteção contra duplicação
+
+No preenchimento do contrato, os dados da oficina aparecem agrupados em um resumo. O botão com lápis **Editar** abre os campos; **Concluir edição** recolhe o editor. Os dados continuam no PDF e podem ser ajustados nesse contrato sem alterar o modelo. A validação abre o editor se um dado obrigatório precisar de correção.
+
+Celular aparece antes do telefone nos dados complementares do cliente e no documento. O rodapé foi reduzido a uma orientação curta de impressão. Confirmações e mensagens operacionais aparecem em avisos temporários, que podem ser fechados e permanecem enquanto recebem foco ou passam sob o mouse. Erros que exigem correção continuam identificados junto ao formulário.
+
+Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar uma cópia ou um novo preenchimento com os mesmos dados, o registro existente é reutilizado, sem consumir outro número. A comparação considera os dados, itens, valores, cláusulas e conteúdo do modelo, ignorando o número automático e normalizando espaços e diferenças de caixa. A data do contrato é considerada: contratos de datas diferentes podem ser registros distintos. Se editar um registro para ficar igual a outro já salvo, a gravação é bloqueada sem excluir os dados existentes. Registros antigos não são apagados automaticamente.

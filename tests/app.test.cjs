@@ -48,6 +48,7 @@ test('contrato local: busca, teclado, cálculos, cláusulas, validação e impre
     await page.locator('.descricao').fill('pistao');
     await page.getByRole('option', { name: 'Pistão do motor', exact: true }).click();
     await page.locator('a[href="#dados"]').click();
+    await page.locator('#editarOficina').click();
     await page.locator('#oficina').fill('Oficina Exemplo');
     await page.locator('#cliente').fill('Maria da Silva');
     await page.locator('a[href="#pecas"]').click();

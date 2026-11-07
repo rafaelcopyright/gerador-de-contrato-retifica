@@ -92,12 +92,17 @@
     @keyframes carregar { to { transform: rotate(360deg); } }
     @media (prefers-reduced-motion: reduce) { .lookup-status[data-state="loading"]::before { animation: none; } }
     .storage-error { color: #821b1b; background: #fff0ed; border-color: #aa4444; }
-    #globalStatus { min-height: 1.5em; }
+    .toast { position: fixed; right: 20px; top: 20px; z-index: 30; width: min(520px, calc(100vw - 40px)); padding: 16px; display: flex; align-items: start; gap: 14px; background: white; color: #182b3b; border: 2px solid var(--accent); border-radius: 10px; box-shadow: 0 6px 24px #182b3b40; }
+    .toast button { flex-shrink: 0; margin-left: auto; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .office-summary { position: relative; border: 1px solid #cad5df; border-radius: var(--radius); padding: 18px; margin-bottom: 20px; }
+    .office-summary h3 { margin: 0; font-size: 1.1rem; }
+    .office-summary dl { margin-bottom: 0; }
+    .office-summary dd { overflow-wrap: anywhere; }
     [data-density="compacto"] .entry > summary { padding: 12px 16px; }
     [data-density="compacto"] .card { padding: 18px; }
     @media (max-width: 650px) { .home-grid, .record-data { grid-template-columns: 1fr; } .shortcut { padding: 24px; } .home-grid { margin-top: 24px; } }
     .total { font-size: 1.5rem; font-weight: 750; }
-    #status { min-height: 1.5em; }
     #error { color: #9d2020; font-weight: 650; }
     #documento { display: none; }
     .description-field { position: relative; }
@@ -245,7 +250,8 @@
         <summary><h2 id="dadosTitulo">1. Oficina e cliente</h2></summary>
         <div class="section-content">
         <p class="hint">Os campos marcados com * são obrigatórios.</p>
-        <div class="fields">
+        <section class="office-summary" aria-labelledby="tituloOficina"><div class="section-heading"><h3 id="tituloOficina">Oficina</h3><button id="editarOficina" type="button" aria-expanded="false" aria-controls="camposOficina"><span aria-hidden="true">✎</span> Editar</button></div><dl id="resumoOficina" class="record-data"></dl></section>
+        <div id="camposOficina" class="fields" hidden>
           <div><label for="oficina">Nome da oficina *</label><input id="oficina" required maxlength="150" autocomplete="organization"></div>
           <div><label for="contato">CNPJ e telefone (opcional)</label><input id="contato" maxlength="150"></div>
           <div class="wide"><label for="cepOficina">CEP da oficina</label><input id="cepOficina" maxlength="9" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000"></div>
@@ -253,6 +259,8 @@
           <div><label for="bairroOficina">Bairro da oficina</label><input id="bairroOficina" maxlength="100"></div>
           <div><label for="cidadeOficina">Cidade da oficina</label><input id="cidadeOficina" maxlength="100"></div>
           <div><label for="ufOficina">UF da oficina</label><input id="ufOficina" maxlength="2"></div>
+        </div>
+        <div class="fields">
           <div class="wide"><label for="cliente">Nome do cliente *</label><input id="cliente" required maxlength="200" autocomplete="name"></div>
           <div><label for="veiculo">Modelo do veículo</label><input id="veiculo" maxlength="150" placeholder="Ex.: Chevrolet Onix"></div>
           <div><label for="placa">Placa</label><input id="placa" maxlength="12" placeholder="Ex.: ABC1D23"></div>
@@ -281,13 +289,13 @@
         </div>
       </details>
       <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><div class="actions"><button id="salvarContrato" type="button">Salvar no histórico</button><button class="primary" type="submit">Imprimir / salvar PDF</button></div></div>
-      <p class="hint">Na janela de impressão, escolha sua impressora ou “Salvar como PDF” e papel A4. Se o navegador ainda mostrar data, endereço ou número de página nas bordas, desmarque “Cabeçalhos e rodapés” em Mais configurações.</p>
-      <p id="error" role="alert"></p><p id="status" class="hint" role="status"></p>
-      <p class="hint">O contrato é salvo no histórico antes de abrir a impressão. Cancelar a impressão mantém o registro salvo. Use “Salvar no histórico” para guardar sem imprimir.</p>
+      <p class="hint">Imprima em A4 ou escolha “Salvar como PDF”.</p>
+      <p id="error" role="alert"></p>
     </form>
     </div>
-    <p id="globalStatus" role="status"></p>
   </main>
+  <div id="avisoTemporario" class="toast screen" hidden><span id="globalStatus" role="status" aria-live="polite" aria-atomic="true"></span><button id="fecharAviso" type="button" aria-label="Fechar aviso">×</button></div>
+  <span id="mensagemLeitor" class="sr-only screen" role="status" aria-live="polite"></span>
   <dialog id="dialogModelo" aria-labelledby="tituloDialogModelo">
     <form id="formModelo" novalidate><h1 id="tituloDialogModelo">Editar modelo</h1>
       <div class="fields"><div><label for="nomeModelo">Nome do modelo *</label><input id="nomeModelo" required maxlength="150"></div><div><label for="tipoModelo">Formato do documento</label><select id="tipoModelo"><option value="servico">Prestação de serviço</option><option value="garantia">Garantia, nota e cupons de revisão</option></select></div></div>
@@ -482,7 +490,39 @@
     const itensPorPagina = 5;
     const configuracoesListas = new Map();
 
-    function anunciar(mensagem) { document.getElementById('globalStatus').textContent = mensagem; }
+    let temporizadorAviso;
+    function anunciar(mensagem, mostrar = true) {
+      if (!mostrar) { document.getElementById('mensagemLeitor').textContent = mensagem; return; }
+      clearTimeout(temporizadorAviso);
+      const aviso = document.getElementById('avisoTemporario');
+      const dialogo = document.getElementById('dialogModelo');
+      (dialogo.open ? dialogo : document.body).append(aviso);
+      aviso.hidden = false;
+      document.getElementById('globalStatus').textContent = mensagem;
+      temporizadorAviso = setTimeout(() => { if (!aviso.matches(':hover, :focus-within')) fecharAviso(); }, 7000);
+    }
+
+    function fecharAviso() {
+      clearTimeout(temporizadorAviso);
+      document.getElementById('avisoTemporario').hidden = true;
+    }
+
+    function definirEdicaoOficina(aberto) {
+      document.getElementById('camposOficina').hidden = !aberto;
+      const botao = document.getElementById('editarOficina');
+      botao.setAttribute('aria-expanded', String(aberto));
+      botao.setAttribute('aria-label', aberto ? 'Concluir edição dos dados da oficina' : 'Editar dados da oficina');
+      botao.textContent = aberto ? 'Concluir edição' : '✎ Editar';
+      atualizarResumoOficina();
+    }
+
+    function atualizarResumoOficina() {
+      const valores = id => document.getElementById(id).value.trim();
+      const grupos = [['Nome', valores('oficina')], ['CNPJ / telefone', valores('contato')], ['Endereço', [valores('cepOficina'), valores('endereco')].filter(Boolean).join(' · ')], ['Localidade', [valores('bairroOficina'), valores('cidadeOficina'), valores('ufOficina')].filter(Boolean).join(' · ')]];
+      document.getElementById('resumoOficina').replaceChildren(...grupos.map(([rotulo, valor]) => {
+        const grupo = document.createElement('div'); grupo.append(criarTexto('dt', rotulo), criarTexto('dd', valor || 'Não informado')); return grupo;
+      }));
+    }
 
     function configurarPaginacao(lista, idNavegacao, idContagem, nome) {
       const navegacao = document.getElementById(idNavegacao);
@@ -518,6 +558,7 @@
     }
 
     function revelarCampo(campo) {
+      if (campo.closest('#camposOficina')) definirEdicaoOficina(true);
       let ancestral = campo.parentElement;
       while (ancestral) { if (ancestral.tagName === 'DETAILS') ancestral.open = true; ancestral = ancestral.parentElement; }
       const secao = campo.closest('.form-section');
@@ -686,7 +727,7 @@
         }));
         lista.hidden = resultados.length === 0;
         campo.setAttribute('aria-expanded', String(resultados.length > 0));
-        if (normalizarBusca(campo.value).length >= 2) anunciar(resultados.length ? `${resultados.length} sugestões disponíveis. Use as setas para navegar.` : 'Nenhuma sugestão. Você pode usar o texto digitado.');
+        if (normalizarBusca(campo.value).length >= 2) anunciar(resultados.length ? `${resultados.length} sugestões disponíveis. Use as setas para navegar.` : 'Nenhuma sugestão. Você pode usar o texto digitado.', false);
       }
 
       campo.addEventListener('input', mostrar);
@@ -830,7 +871,7 @@
       document.getElementById('pdfLocalOficina').textContent = [valores.bairro, valores.cidade, valores.uf, valores.cep].filter(Boolean).join(' · ');
       document.getElementById('pdfEmail').textContent = valores.email || '';
       document.getElementById('pdfCliente').textContent = valores.cliente;
-      adicionarDadosImpressos(document.getElementById('pdfClienteDados'), [['CPF / CNPJ', valores.cpfCliente], ['RG / documento', valores.rgCliente], ['Telefone', valores.telefoneCliente], ['Celular', valores.celularCliente], ['Endereço', valores.enderecoCliente], ['Complemento', valores.complementoCliente], ['Bairro', valores.bairroCliente], ['Cidade / UF / CEP', [valores.cidadeCliente, valores.ufCliente, valores.cepCliente].filter(Boolean).join(' · ')]]);
+      adicionarDadosImpressos(document.getElementById('pdfClienteDados'), [['CPF / CNPJ', valores.cpfCliente], ['RG / documento', valores.rgCliente], ['Celular', valores.celularCliente], ['Telefone', valores.telefoneCliente], ['Endereço', valores.enderecoCliente], ['Complemento', valores.complementoCliente], ['Bairro', valores.bairroCliente], ['Cidade / UF / CEP', [valores.cidadeCliente, valores.ufCliente, valores.cepCliente].filter(Boolean).join(' · ')]]);
       document.getElementById('pdfVeiculo').textContent = 'VEÍCULO: ' + (valores.veiculo || '________________') + ' | PLACA: ' + (valores.placa || '________________');
       adicionarDadosImpressos(document.getElementById('pdfVeiculoDados'), [['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem], ['Chassi', valores.chassi]]);
       const [ano, mes, dia] = valores.data.split('-');
@@ -909,7 +950,7 @@
     ];
     const camposExtras = [
       ['numeroContrato', 'Número do contrato', 30], ['cpfCliente', 'CPF / CNPJ do cliente', 30], ['rgCliente', 'RG / documento', 40],
-      ['telefoneCliente', 'Telefone do cliente', 40], ['celularCliente', 'Celular do cliente', 40], ['cepCliente', 'CEP do cliente', 9], ['enderecoCliente', 'Endereço do cliente e número', 250],
+      ['celularCliente', 'Celular do cliente', 40], ['telefoneCliente', 'Telefone do cliente', 40], ['cepCliente', 'CEP do cliente', 9], ['enderecoCliente', 'Endereço do cliente e número', 250],
       ['complementoCliente', 'Complemento', 100], ['bairroCliente', 'Bairro do cliente', 100], ['cidadeCliente', 'Cidade do cliente', 100], ['ufCliente', 'UF do cliente', 2],
       ['combustivel', 'Combustível', 40], ['corVeiculo', 'Cor do veículo', 40], ['motor', 'Motor / número', 100], ['chassi', 'Chassi', 40], ['quilometragem', 'Quilometragem atual', 15, 'number']
     ];
@@ -986,6 +1027,7 @@
       aviso.hidden = false;
       if (!document.getElementById('paginaEditor').hidden) document.getElementById('error').textContent = mensagem;
       if (document.getElementById('dialogModelo').open) document.getElementById('erroModelo').textContent = mensagem;
+      anunciar(mensagem);
     }
 
     function carregarEstado() {
@@ -1046,7 +1088,10 @@
       let digitado = false;
       let ultimoCep = '';
 
-      function informar(mensagem, situacao = '') { status.textContent = mensagem; status.dataset.state = situacao; }
+      function informar(mensagem, situacao = '') {
+        status.textContent = mensagem; status.dataset.state = situacao;
+        if (situacao === 'success' || situacao === 'error') anunciar(mensagem);
+      }
 
       function cancelar() {
         operacao++; clearTimeout(agendamento); controlador?.abort(); controlador = null;
@@ -1174,6 +1219,7 @@
       atualizarPaginacao(listaClausulas, 1);
       atualizarSeletoresModelos();
       document.getElementById('avisoModelo').textContent = 'As informações deste contrato são uma cópia do modelo. Alterar um modelo depois não modifica contratos salvos.';
+      definirEdicaoOficina(false);
     }
 
     function novoContrato(modeloId = estado.configuracoes.modeloPadrao) {
@@ -1200,6 +1246,7 @@
       document.getElementById('error').textContent = '';
       document.getElementById('dados').open = true;
       alterado = false;
+      definirEdicaoOficina(false);
       mostrarPagina('editor');
     }
 
@@ -1218,17 +1265,36 @@
       };
     }
 
+    function identificarConteudoContrato(registro) {
+      const normalizar = texto => String(texto ?? '').normalize('NFC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('pt-BR');
+      const oficina = Object.fromEntries(camposFixos.map(([id]) => [id, normalizar(registro.modelo.oficina[id])]));
+      const legados = { cepOficina: 'cep', bairroOficina: 'bairro', cidadeOficina: 'cidade', ufOficina: 'uf' };
+      const campos = idsCamposContrato.filter(id => id !== 'numeroContrato').map(id => [id, normalizar(registro.campos[id] ?? registro.modelo.oficina[legados[id]])]);
+      return JSON.stringify({ campos, oficina, tipo: registro.modelo.tipo, introducao: normalizar(registro.modelo.introducao), recibo: normalizar(registro.modelo.recibo), incluirRecibo: registro.modelo.incluirRecibo, itens: registro.itens.map(item => [normalizar(item.descricao), item.quantidade, item.centavos]), clausulas: registro.clausulas.map(normalizar) });
+    }
+
     function salvarContratoAtual(situacao = 'salvo') {
       if (!modeloAtual) { document.getElementById('error').textContent = 'Crie e escolha um modelo antes de salvar.'; return false; }
       const registro = capturarContrato(situacao);
+      const conteudo = identificarConteudoContrato(registro);
+      const duplicado = estado.contratos.find(item => item.id !== contratoAtualId && identificarConteudoContrato(item) === conteudo);
+      if (duplicado && contratoAtualId) {
+        anunciar('Já existe outro contrato com estes dados. Altere o preenchimento ou abra o registro existente no histórico.'); return false;
+      }
+      const novo = !contratoAtualId && !duplicado;
+      if (duplicado) {
+        registro.id = duplicado.id; registro.criadoEm = duplicado.criadoEm;
+        registro.campos.numeroContrato = duplicado.campos.numeroContrato;
+      }
       const contratos = estado.contratos.filter(contrato => contrato.id !== registro.id);
       contratos.unshift(registro);
-      if (!persistirEstado({ ...estado, contratos, sequencia: estado.sequencia + (contratoAtualId ? 0 : 1) })) return false;
+      if (!persistirEstado({ ...estado, contratos, sequencia: estado.sequencia + (novo ? 1 : 0) })) return false;
       contratoAtualId = registro.id; alterado = false;
+      document.getElementById('numeroContrato').value = registro.campos.numeroContrato;
       document.getElementById('tituloEditor').textContent = 'Editar contrato';
       document.getElementById('situacaoContrato').textContent = 'Salvo no histórico';
       atualizarSeletoresModelos();
-      anunciar('Contrato salvo no histórico deste navegador.');
+      anunciar(duplicado ? 'Este contrato já estava salvo. O registro existente foi reutilizado, sem criar uma cópia.' : 'Contrato salvo no histórico.');
       return true;
     }
 
@@ -1253,6 +1319,7 @@
       document.getElementById('situacaoContrato').textContent = copiar ? 'Cópia ainda não salva' : 'Salvo no histórico';
       document.getElementById('error').textContent = ''; document.getElementById('dados').open = true;
       alterado = copiar;
+      definirEdicaoOficina(false);
       location.hash = 'dados'; mostrarPagina('editor');
     }
 
@@ -1407,6 +1474,19 @@
     camposFixos.forEach(campo => document.getElementById('camposModelo').append(criarCampo(campo, 'modelo-')));
     camposExtras.forEach(campo => document.getElementById('camposComplementares').append(criarCampo(campo)));
     camposPagamento.forEach(campo => document.getElementById('camposPagamento').append(criarCampo(campo)));
+    document.getElementById('editarOficina').addEventListener('click', () => {
+      const abrir = document.getElementById('camposOficina').hidden;
+      definirEdicaoOficina(abrir);
+      if (abrir) document.getElementById('oficina').focus();
+    });
+    document.getElementById('camposOficina').addEventListener('input', atualizarResumoOficina);
+    document.getElementById('fecharAviso').addEventListener('click', fecharAviso);
+    const aviso = document.getElementById('avisoTemporario');
+    for (const evento of ['mouseenter', 'focusin']) aviso.addEventListener(evento, () => clearTimeout(temporizadorAviso));
+    for (const evento of ['mouseleave', 'focusout']) aviso.addEventListener(evento, () => {
+      clearTimeout(temporizadorAviso);
+      temporizadorAviso = setTimeout(fecharAviso, 7000);
+    });
     document.getElementById('camposPagamento').append(criarTexto('p', 'As revisões padrão usam a quilometragem atual mais os intervalos de Configurações. Campos alterados manualmente e contratos reabertos mantêm seus valores.', 'hint wide'));
     document.getElementById('quilometragem').addEventListener('input', atualizarRevisoes);
     ['revisao1', 'revisao2', 'revisao3'].forEach(id => document.getElementById(id).addEventListener('input', () => revisoesAutomaticas.delete(id)));
