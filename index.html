@@ -1162,6 +1162,7 @@
         : { marca: dados.brand, modelo: dados.model, ano: dados.modelYear, combustivel: dados.fuel, codigo: dados.codeFipe, preco: dados.price, referencia: dados.referenceMonth };
       for (const id of ['marca', 'modelo']) if (typeof campos[id] !== 'string' || !campos[id].trim() || campos[id].length > 500) throw new Error('Os detalhes do veículo estão incompletos. Use o preenchimento manual.');
       if (!/^\d{4,5}$/.test(String(campos.ano))) throw new Error('O serviço não informou um ano válido para o veículo.');
+      if (String(campos.ano) !== document.getElementById('anoVeiculoFipe').value.split('-')[0]) throw new Error('O ano retornado não corresponde à seleção. Tente novamente ou preencha manualmente.');
       for (const id of ['combustivel', 'codigo', 'preco', 'referencia']) campos[id] = typeof campos[id] === 'string' ? campos[id].trim().slice(0, 500) : '';
       return campos;
     }

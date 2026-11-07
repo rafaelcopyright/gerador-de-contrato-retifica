@@ -2,7 +2,7 @@
 
 Aplicativo offline para oficinas criarem contratos de peças, serviços e garantia, com histórico local e modelos reutilizáveis. Preencha os dados, confira o total e imprima ou salve em PDF.
 
-**Um único HTML para o cliente, sem instalação, servidor ou cadastro. A consulta opcional de CEP precisa de internet; as demais funções continuam locais.**
+**Um único HTML para o cliente, sem instalação, servidor ou cadastro. As consultas opcionais de CEP e catálogo de veículos precisam de internet; as demais funções continuam locais.**
 
 ![Página inicial do Contrato Fácil](docs/pagina-inicial.png)
 
@@ -94,7 +94,7 @@ O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com v
 
 As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
 
-Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional de endereço envia somente o CEP ao ViaCEP. Contratos, dados dos clientes e modelos não são enviados ao serviço.
+Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. As consultas opcionais enviam o CEP ao ViaCEP ou identificadores do catálogo ao provedor escolhido. Contratos, nomes de clientes e placas não são enviados a esses serviços.
 
 **Exporte backups regularmente em Configurações.** Limpar os dados do navegador, mover o HTML ou mudar de computador pode tornar os dados locais indisponíveis.
 
@@ -149,7 +149,7 @@ O CEP é o primeiro campo de endereço no contrato (oficina e cliente) e no edit
 
 A consulta mostra carregamento, sucesso, CEP não encontrado, erro de conexão ou tempo esgotado. Não apaga o endereço em caso de erro nem substitui campos corrigidos durante uma consulta. Respostas de consultas antigas são descartadas ao trocar o CEP ou abrir outro contrato/modelo.
 
-Somente a busca por CEP precisa de internet e envia o CEP ao ViaCEP, sem dados do cliente, credenciais ou informações do contrato. O preenchimento manual e as demais funções continuam disponíveis offline. Não há consultas automáticas ao simplesmente abrir contratos já salvos.
+A busca por CEP precisa de internet e envia somente o CEP ao ViaCEP, sem dados do cliente, credenciais ou informações do contrato. O preenchimento manual e as demais funções continuam disponíveis offline. Não há consultas automáticas ao simplesmente abrir contratos já salvos.
 
 ## Revisões com valores iniciais
 
@@ -161,7 +161,7 @@ Uma revisão alterada manualmente deixa de acompanhar o cálculo automático naq
 
 ## Pesquisa de consulta por placa
 
-A pesquisa e os requisitos de integração estão em [Consultas externas](docs/consultas-externas.md). A API Placas oferece consultas por placa, mas exige conta e token mantido em um serviço externo. A consulta veicular remota não foi ativada no HTML; o preenchimento dos dados do veículo permanece manual.
+A consulta por placa permanece manual. As integrações ativas de BrasilAPI e Fipe.api.br usam catálogo por marca, modelo e ano. Endpoints, limites e requisitos estão em [Consultas externas](docs/consultas-externas.md).
 
 Os testes adicionais usam respostas controladas do ViaCEP para verificar carregamento, preenchimento, falhas, ausência de internet, tempo limite, respostas atrasadas e preservação de edições. Também verificam os padrões de revisão e a leitura de dados antigos. Uma consulta real ao CEP público de exemplo `01001-000` foi conferida no Chrome, abrindo o HTML diretamente como arquivo local.
 
@@ -172,14 +172,6 @@ No preenchimento do contrato, os dados da oficina aparecem agrupados em um resum
 Celular aparece antes do telefone nos dados complementares do cliente e no documento. O rodapé foi reduzido a uma orientação curta de impressão. Confirmações e mensagens operacionais aparecem em avisos temporários, que podem ser fechados e permanecem enquanto recebem foco ou passam sob o mouse. Erros que exigem correção continuam identificados junto ao formulário.
 
 Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar uma cópia ou um novo preenchimento com os mesmos dados, o registro existente é reutilizado, sem consumir outro número. A comparação considera os dados, itens, valores, cláusulas e conteúdo do modelo, ignorando o número automático e normalizando espaços e diferenças de caixa. A data do contrato é considerada: contratos de datas diferentes podem ser registros distintos. Se editar um registro para ficar igual a outro já salvo, a gravação é bloqueada sem excluir os dados existentes. Registros antigos não são apagados automaticamente.
-
-## Avaliação da FIPE API
-
-A pesquisa atual prioriza a FIPE API / Parallelum, conforme [Consultas externas](docs/consultas-externas.md). Seu catálogo pode ajudar a selecionar marca/modelo/ano. A rota por placa está em Alpha e tem cota anônima documentada de cinco consultas mensais, insuficiente para a rotina de uma oficina. Ela não foi ativada no app nem confundida com o catálogo de preços do veículo. O campo de placa e os dados não fornecidos continuam manuais.
-
-Na conferência real dos catálogos FIPE no Chrome, as rotas v2 e v1 retornaram HTTP 404 e 500, respectivamente. A adoção depende de nova validação de disponibilidade; nenhuma consulta por placa foi feita.
-
-Os testes end-to-end adicionais cobrem o resumo/edição da oficina, a ordem dos contatos, a expiração dos avisos, cliques repetidos em salvar e imprimir, cópias idênticas, recarga da página e cópias de modelos com o mesmo conteúdo. A reutilização de um contrato preserva o modelo originalmente usado no registro.
 
 ## Buscar veículo em catálogos online
 
