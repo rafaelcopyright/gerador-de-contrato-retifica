@@ -76,7 +76,7 @@ O valor por extenso é digitado pelo usuário. Campos opcionais não informados 
 - Rótulos nos campos, foco visível, botões grandes e operação por teclado.
 - Uma seção de preenchimento aberta por vez e apenas um editor aberto em cada lista.
 - Peças e cláusulas em páginas de cinco registros, com resumos para revisão.
-- Botões de adicionar em barras que acompanham a rolagem da seção.
+- Botões de adicionar abaixo das listas de peças e cláusulas, junto da paginação.
 - Novos registros abertos automaticamente, com foco no campo de preenchimento.
 - Validação que revela a seção, a página e o editor do primeiro campo incorreto.
 - Subtotais e total em reais, calculados em centavos.
@@ -153,7 +153,7 @@ A busca por CEP precisa de internet e envia somente o CEP ao ViaCEP, sem dados d
 
 ## Revisões com valores iniciais
 
-Novos contratos começam com intervalos de **1.000, 4.000 e 7.000 km** e valor de **R$ 850,00 por revisão**, com base nos exemplos fornecidos. Ajuste esses padrões em Configurações para os valores praticados pela oficina.
+Novos contratos começam com intervalos de **1.000, 4.000 e 7.000 km** e valor de **R$ 850,00 por revisão**, com base nos exemplos fornecidos. Ajuste os intervalos e os três preços em cada modelo. Configurações fornece os padrões para modelos sem revisões próprias.
 
 Ao informar a quilometragem atual, os intervalos são somados automaticamente: com 241.025 km, as revisões ficam em 242.025, 245.025 e 248.025 km. Sem leitura informada, a base é zero. Confira os valores antes de imprimir.
 
@@ -188,3 +188,6 @@ Em **Modelos de contrato → Editar → Revisões: quilômetros e valores**, aju
 No contrato, os três preços continuam editáveis individualmente e cada cupom imprime seu próprio valor. A opção **Reaplicar revisões do modelo** restaura intervalos e preços após confirmação. Alterações em modelos não modificam contratos já salvos.
 
 Backups antigos com preço único continuam aceitos: o preço original é aplicado às três revisões ao reabrir ou copiar esses registros. Os novos campos são opcionais no formato anterior e não apagam os dados existentes.
+
+
+A cobertura de testes também verifica a ordem dos atalhos, ações abaixo das listas, nome sugerido do PDF, recuperação após falha de impressão, intervalos e preços por modelo, revisão gratuita, rejeição de intervalos fora de ordem e compatibilidade de contratos antigos sem duplicação. Os cupons foram conferidos visualmente em PDF A4 com preços diferentes.
