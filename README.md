@@ -178,3 +178,13 @@ Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar 
 **Gerar novo contrato** é o primeiro atalho da página inicial. Os botões de adicionar peças e cláusulas ficam abaixo das respectivas listas, inclusive no editor de modelos. A paginação continua limitando a quantidade de registros exibidos.
 
 Ao abrir a impressão, o título do documento sugere um nome como `Contrato-Garantia-Chevrolet-Onix-ABC1D23-2026-11-08.pdf`, incluindo tipo de contrato, modelo e placa do veículo e data. Caracteres incompatíveis com nomes de arquivo são substituídos. Dados ausentes usam `Veiculo` e `Sem-placa`. O navegador permite escolher outro nome ao salvar; o título do aplicativo é restaurado ao sair da impressão.
+
+## Revisões por modelo e por contrato
+
+Cada modelo agora permite definir três intervalos de revisão e três preços independentes. Os quilômetros são distâncias após o odômetro atual: com leitura de 10.000 km e intervalos de 1.000 / 2.000 / 6.000 km, os cupons recebem 11.000 / 12.000 / 16.000 km.
+
+Em **Modelos de contrato → Editar → Revisões: quilômetros e valores**, ajuste os seis campos. Modelos sem configuração própria herdam os padrões de Configurações, que também permitem preços separados. Os intervalos devem ser positivos e crescentes; preços aceitam zero e duas casas decimais.
+
+No contrato, os três preços continuam editáveis individualmente e cada cupom imprime seu próprio valor. A opção **Reaplicar revisões do modelo** restaura intervalos e preços após confirmação. Alterações em modelos não modificam contratos já salvos.
+
+Backups antigos com preço único continuam aceitos: o preço original é aplicado às três revisões ao reabrir ou copiar esses registros. Os novos campos são opcionais no formato anterior e não apagam os dados existentes.

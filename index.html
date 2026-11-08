@@ -234,8 +234,10 @@
           <div><label for="padraoRevisao1">1ª revisão após (km)</label><input id="padraoRevisao1" type="number" min="1" max="999999999" step="1" required></div>
           <div><label for="padraoRevisao2">2ª revisão após (km)</label><input id="padraoRevisao2" type="number" min="1" max="999999999" step="1" required></div>
           <div><label for="padraoRevisao3">3ª revisão após (km)</label><input id="padraoRevisao3" type="number" min="1" max="999999999" step="1" required></div>
-          <div><label for="padraoValorRevisao">Valor padrão de cada revisão (R$)</label><input id="padraoValorRevisao" type="number" min="0" max="9999999.99" step="0.01" required></div>
-        </div><p class="hint">Os intervalos são somados à quilometragem atual do veículo. Contratos já salvos não são alterados.</p>
+          <div><label for="padraoValorRevisao">Valor padrão da 1ª revisão (R$)</label><input id="padraoValorRevisao" type="number" min="0" max="9999999.99" step="0.01" required></div>
+          <div><label for="padraoValorRevisao2">Valor padrão da 2ª revisão (R$)</label><input id="padraoValorRevisao2" type="number" min="0" max="9999999.99" step="0.01" required></div>
+          <div><label for="padraoValorRevisao3">Valor padrão da 3ª revisão (R$)</label><input id="padraoValorRevisao3" type="number" min="0" max="9999999.99" step="0.01" required></div>
+        </div><p class="hint">Usados por modelos sem revisões próprias. Os intervalos são somados ao odômetro; contratos já salvos não são alterados.</p>
       </form>
       <div class="card"><h2>Backup dos dados</h2><p>O backup inclui modelos, contratos e preferências. Guarde o arquivo em um local seguro: ele contém os dados dos clientes.</p><div class="actions"><button id="exportarBackup" type="button">Exportar backup</button><button id="importarBackup" type="button">Restaurar backup</button></div><label for="arquivoBackup" class="hint">Arquivo de backup (.json)</label><input id="arquivoBackup" type="file" accept=".json,application/json"><p class="hint">Restaurar um backup substitui os dados deste navegador após sua confirmação.</p></div>
     </div>
@@ -303,6 +305,7 @@
     <form id="formModelo" novalidate><h1 id="tituloDialogModelo">Editar modelo</h1>
       <div class="fields"><div><label for="nomeModelo">Nome do modelo *</label><input id="nomeModelo" required maxlength="150"></div><div><label for="tipoModelo">Formato do documento</label><select id="tipoModelo"><option value="servico">Prestação de serviço</option><option value="garantia">Garantia, nota e cupons de revisão</option></select></div></div>
       <details class="card" open><summary>Informações fixas da oficina</summary><div id="camposModelo" class="fields"></div></details>
+      <details class="card" open><summary>Revisões: quilômetros e valores</summary><p class="hint">Informe os quilômetros após o odômetro atual e o preço de cada revisão. Esses padrões serão usados nos novos contratos deste modelo.</p><div id="camposRevisoesModelo" class="fields"></div></details>
       <details class="card"><summary>Textos e opções do documento</summary><div class="fields"><div class="wide"><label for="introducaoModelo">Texto de abertura</label><textarea id="introducaoModelo" maxlength="5000"></textarea></div><div class="wide"><label for="reciboModelo">Texto do recibo de retirada</label><textarea id="reciboModelo" maxlength="5000"></textarea></div></div><label class="checkbox"><input id="incluirRecibo" type="checkbox">Incluir recibo de retirada no modelo de garantia</label></details>
       <div class="section-heading"><h2>Cláusulas do modelo</h2><span id="contagemClausulasModelo"></span></div>
       <p class="hint">Textos entre chaves duplas são preenchidos automaticamente no contrato: total, valor por extenso, prazos, revisões e dados de pagamento.</p>
@@ -851,7 +854,8 @@
           criarTexto('p', 'Fazer a ' + indice + 'ª revisão com ' + (valores['revisao' + indice] || '________________') + ' quilômetros.'));
         const dados = document.createElement('div'); dados.className = 'print-grid';
         adicionarDadosImpressos(dados, [['Veículo', valores.veiculo], ['Placa', valores.placa], ['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem]]);
-        cupom.append(dados, criarTexto('p', 'Valor da revisão: ' + (valores.valorRevisao ? moeda.format(Number(valores.valorRevisao)) : 'R$ ________________')));
+        const valor = valores[indice === 1 ? 'valorRevisao' : 'valorRevisao' + indice];
+        cupom.append(dados, criarTexto('p', 'Valor da revisão: ' + (valor !== '' && valor !== undefined ? moeda.format(Number(valor)) : 'R$ ________________')));
         cupons.append(cupom);
       }
     }
@@ -935,6 +939,9 @@
         erro.textContent = 'Preencha os campos obrigatórios. Espaços em branco não são válidos.';
         revelarCampo(campoVazio); return false;
       }
+      if (!Number.isSafeInteger(calcularTotalCentavos(itens))) {
+        erro.textContent = 'O total excede o limite de cálculo seguro. Reduza os valores ou quantidades.'; anunciar(erro.textContent); return false;
+      }
       return true;
     }
 
@@ -984,9 +991,10 @@
     ];
     const camposPagamento = [
       ['valorExtenso', 'Valor por extenso (opcional)', 300], ['prazoNacional', 'Prazo: nacionais e importados (dias)', 5, 'number'], ['prazoDiesel', 'Prazo: diesel (dias)', 5, 'number'],
-      ['revisao1', '1ª revisão com (km)', 15, 'number'], ['revisao2', '2ª revisão com (km)', 15, 'number'], ['revisao3', '3ª revisão com (km)', 15, 'number'], ['valorRevisao', 'Valor de cada revisão (R$)', 15, 'number'], ['observacoes', 'Observações do contrato', 3000]
+      ['revisao1', '1ª revisão com (km)', 15, 'number'], ['revisao2', '2ª revisão com (km)', 15, 'number'], ['revisao3', '3ª revisão com (km)', 15, 'number'], ['valorRevisao', 'Valor da 1ª revisão (R$)', 15, 'number'], ['valorRevisao2', 'Valor da 2ª revisão (R$)', 15, 'number'], ['valorRevisao3', 'Valor da 3ª revisão (R$)', 15, 'number'], ['observacoes', 'Observações do contrato', 3000]
     ];
     const camposEnderecoNovos = ['cepOficina', 'bairroOficina', 'cidadeOficina', 'ufOficina'];
+    const camposValoresNovos = ['valorRevisao2', 'valorRevisao3'];
     const idsCamposContrato = ['oficina', 'contato', ...camposEnderecoNovos, 'endereco', 'cliente', 'veiculo', 'placa', 'data', ...camposExtras.map(campo => campo[0]), ...camposPagamento.map(campo => campo[0])];
     let falhaLeitura = false;
     let conflitoArmazenamento = false;
@@ -1000,8 +1008,44 @@
     const revisoesIniciais = { primeira: 1000, segunda: 4000, terceira: 7000, valor: 850 };
     let revisoesAutomaticas = new Set();
 
-    function padroesRevisao() {
-      return estado.configuracoes.revisoes || revisoesIniciais;
+    function completarRevisoes(revisoes) {
+      return { ...revisoes, valorSegunda: revisoes.valorSegunda ?? revisoes.valor, valorTerceira: revisoes.valorTerceira ?? revisoes.valor };
+    }
+
+    function padroesGlobaisRevisao() {
+      return completarRevisoes(estado.configuracoes.revisoes || revisoesIniciais);
+    }
+
+    function padroesRevisao(modelo = modeloAtual) {
+      return completarRevisoes(modelo?.revisoes || padroesGlobaisRevisao());
+    }
+
+    function redefinirRevisoes() {
+      revisoesAutomaticas = new Set(['revisao1', 'revisao2', 'revisao3']);
+      atualizarRevisoes();
+      const padroes = padroesRevisao();
+      ['valor', 'valorSegunda', 'valorTerceira'].forEach((nome, indice) => {
+        document.getElementById(indice === 0 ? 'valorRevisao' : 'valorRevisao' + (indice + 1)).value = padroes[nome].toFixed(2);
+      });
+    }
+
+    function revisoesValidas(revisoes) {
+      if (revisoes === undefined) return true;
+      const dinheiroValido = valor => typeof valor === 'number' && Number.isFinite(valor) && valor >= 0 && valor <= 9999999.99 && Math.abs(valor * 100 - Math.round(valor * 100)) < 0.000001;
+      return !!revisoes && ['primeira', 'segunda', 'terceira'].every(nome => Number.isInteger(revisoes[nome]) && revisoes[nome] > 0 && revisoes[nome] <= 999999999)
+        && revisoes.primeira < revisoes.segunda && revisoes.segunda < revisoes.terceira && dinheiroValido(revisoes.valor)
+        && ['valorSegunda', 'valorTerceira'].every(nome => revisoes[nome] === undefined || dinheiroValido(revisoes[nome]));
+    }
+
+    function lerRevisoesDoEditor(prefixo) {
+      return {
+        primeira: Number(document.getElementById(prefixo + 'revisao1').value),
+        segunda: Number(document.getElementById(prefixo + 'revisao2').value),
+        terceira: Number(document.getElementById(prefixo + 'revisao3').value),
+        valor: Number(document.getElementById(prefixo + 'valorRevisao').value),
+        valorSegunda: Number(document.getElementById(prefixo + 'valorRevisao2').value),
+        valorTerceira: Number(document.getElementById(prefixo + 'valorRevisao3').value)
+      };
     }
 
     function atualizarRevisoes() {
@@ -1022,6 +1066,7 @@
     function modeloValido(modelo) {
       return modelo && textoValido(modelo.id, 100) && modelo.id.trim() && textoValido(modelo.nome, 150) && modelo.nome.trim()
         && ['servico', 'garantia'].includes(modelo.tipo) && modelo.oficina && typeof modelo.oficina === 'object'
+        && revisoesValidas(modelo.revisoes)
         && camposFixos.every(([id, , limite]) => modelo.oficina[id] === undefined || textoValido(modelo.oficina[id], limite))
         && textoValido(modelo.introducao) && textoValido(modelo.recibo) && typeof modelo.incluirRecibo === 'boolean'
         && Array.isArray(modelo.clausulas) && modelo.clausulas.length <= 200 && modelo.clausulas.every(texto => textoValido(texto) && texto.trim());
@@ -1029,13 +1074,11 @@
 
     function validarBackup(dados) {
       const config = dados?.configuracoes;
-      const revisoes = config?.revisoes;
-      const revisoesValidas = revisoes === undefined || (revisoes && ['primeira', 'segunda', 'terceira'].every(nome => Number.isInteger(revisoes[nome]) && revisoes[nome] > 0 && revisoes[nome] <= 999999999) && revisoes.primeira < revisoes.segunda && revisoes.segunda < revisoes.terceira && typeof revisoes.valor === 'number' && Number.isFinite(revisoes.valor) && revisoes.valor >= 0 && revisoes.valor <= 9999999.99);
       const idsUnicos = lista => new Set(lista.map(registro => registro.id)).size === lista.length;
       const dataValida = data => textoValido(data, 40) && Number.isFinite(Date.parse(data));
       const contratoValido = contrato => contrato && textoValido(contrato.id, 100) && contrato.id.trim() && modeloValido(contrato.modelo)
         && dataValida(contrato.criadoEm) && dataValida(contrato.atualizadoEm) && ['salvo', 'impressao'].includes(contrato.situacao)
-        && contrato.campos && idsCamposContrato.every(id => (camposEnderecoNovos.includes(id) && contrato.campos[id] === undefined) || textoValido(contrato.campos[id], id === 'observacoes' ? 3000 : 300))
+        && contrato.campos && idsCamposContrato.every(id => ((camposEnderecoNovos.includes(id) || camposValoresNovos.includes(id)) && contrato.campos[id] === undefined) || textoValido(contrato.campos[id], id === 'observacoes' ? 3000 : 300))
         && Array.isArray(contrato.clausulas) && contrato.clausulas.length <= 200 && contrato.clausulas.every(texto => textoValido(texto) && texto.trim())
         && Array.isArray(contrato.itens) && contrato.itens.length > 0 && contrato.itens.length <= 1000
         && contrato.itens.every(item => textoValido(item.descricao, 250) && item.descricao.trim() && Number.isInteger(item.quantidade) && item.quantidade >= 1 && item.quantidade <= 9999 && Number.isInteger(item.centavos) && item.centavos >= 0 && item.centavos <= 999999999);
@@ -1043,7 +1086,7 @@
         || !Array.isArray(dados.modelos) || dados.modelos.length > 200 || !dados.modelos.every(modeloValido) || !idsUnicos(dados.modelos)
         || !Array.isArray(dados.contratos) || dados.contratos.length > 10000 || !dados.contratos.every(contratoValido) || !idsUnicos(dados.contratos)
         || !config || !['verde', 'azul', 'vinho', 'grafite'].includes(config.tema) || !['arredondado', 'reto'].includes(config.estilo)
-        || !['confortavel', 'compacto'].includes(config.densidade) || !['18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100) || !revisoesValidas) {
+        || !['confortavel', 'compacto'].includes(config.densidade) || !['18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100) || !revisoesValidas(config.revisoes)) {
         throw new Error('O arquivo não é um backup válido do Contrato Fácil. Nenhum dado foi alterado.');
       }
       return dados;
@@ -1091,7 +1134,7 @@
       const input = document.createElement(id === 'observacoes' ? 'textarea' : 'input');
       input.id = prefixo + id; input.maxLength = limite;
       if (input.tagName === 'INPUT') input.type = tipo;
-      if (tipo === 'number') { input.min = '0'; input.max = id === 'valorRevisao' ? '9999999.99' : '999999999'; input.step = id === 'valorRevisao' ? '0.01' : '1'; }
+      if (tipo === 'number') { input.min = '0'; input.max = id.startsWith('valorRevisao') ? '9999999.99' : '999999999'; input.step = id.startsWith('valorRevisao') ? '0.01' : '1'; }
       if (prefixo && id === 'empresa') { input.required = true; label.textContent += ' *'; }
       grupo.append(label, input);
       return grupo;
@@ -1234,7 +1277,7 @@
       document.getElementById('resumoModelos').textContent = estado.modelos.length === 1 ? '1 modelo disponível' : `${estado.modelos.length} modelos disponíveis`;
     }
 
-    function aplicarModelo(modelo) {
+    function aplicarModelo(modelo, preencherRevisoes = true) {
       cancelarConsultasCep();
       modeloAtual = structuredClone(modelo);
       const oficina = modelo.oficina;
@@ -1248,6 +1291,10 @@
       atualizarSeletoresModelos();
       document.getElementById('avisoModelo').textContent = 'As informações deste contrato são uma cópia do modelo. Alterar um modelo depois não modifica contratos salvos.';
       definirEdicaoOficina(false);
+      if (preencherRevisoes) {
+        modeloAtual.revisoes = padroesRevisao(modelo);
+        redefinirRevisoes();
+      }
     }
 
     function novoContrato(modeloId = estado.configuracoes.modeloPadrao) {
@@ -1256,9 +1303,7 @@
       modeloAtual = null;
       document.getElementById('formulario').reset();
       idsCamposContrato.forEach(id => { document.getElementById(id).value = ''; });
-      revisoesAutomaticas = new Set(['revisao1', 'revisao2', 'revisao3']);
-      atualizarRevisoes();
-      document.getElementById('valorRevisao').value = padroesRevisao().valor.toFixed(2);
+      redefinirRevisoes();
       document.getElementById('data').value = dataLocal();
       document.getElementById('numeroContrato').value = String(estado.sequencia);
       listaItens.replaceChildren(); listaClausulas.replaceChildren();
@@ -1297,7 +1342,7 @@
       const normalizar = texto => String(texto ?? '').normalize('NFC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('pt-BR');
       const oficina = Object.fromEntries(camposFixos.map(([id]) => [id, normalizar(registro.modelo.oficina[id])]));
       const legados = { cepOficina: 'cep', bairroOficina: 'bairro', cidadeOficina: 'cidade', ufOficina: 'uf' };
-      const campos = idsCamposContrato.filter(id => id !== 'numeroContrato').map(id => [id, normalizar(registro.campos[id] ?? registro.modelo.oficina[legados[id]])]);
+      const campos = idsCamposContrato.filter(id => id !== 'numeroContrato').map(id => [id, normalizar(registro.campos[id] ?? (camposValoresNovos.includes(id) ? registro.campos.valorRevisao : registro.modelo.oficina[legados[id]]))]);
       return JSON.stringify({ campos, oficina, tipo: registro.modelo.tipo, introducao: normalizar(registro.modelo.introducao), recibo: normalizar(registro.modelo.recibo), incluirRecibo: registro.modelo.incluirRecibo, itens: registro.itens.map(item => [normalizar(item.descricao), item.quantidade, item.centavos]), clausulas: registro.clausulas.map(normalizar) });
     }
 
@@ -1331,8 +1376,9 @@
     function abrirContrato(registro, copiar = false) {
       if (!podeSubstituirFormulario()) return;
       revisoesAutomaticas.clear();
-      aplicarModelo(registro.modelo);
+      aplicarModelo(registro.modelo, false);
       idsCamposContrato.forEach(id => { document.getElementById(id).value = registro.campos[id] || ''; });
+      camposValoresNovos.forEach(id => { if (registro.campos[id] === undefined) document.getElementById(id).value = registro.campos.valorRevisao || ''; });
       for (const [id, chave] of [['cepOficina', 'cep'], ['bairroOficina', 'bairro'], ['cidadeOficina', 'cidade'], ['ufOficina', 'uf']]) {
         if (registro.campos[id] === undefined) document.getElementById(id).value = registro.modelo.oficina[chave] || '';
       }
@@ -1418,6 +1464,9 @@
       document.getElementById('nomeModelo').value = modelo?.nome || '';
       document.getElementById('tipoModelo').value = modelo?.tipo || 'servico';
       camposFixos.forEach(([id]) => { document.getElementById('modelo-' + id).value = modelo?.oficina[id] || ''; });
+      const revisoes = padroesRevisao(modelo || {});
+      ['primeira', 'segunda', 'terceira'].forEach((nome, indice) => { document.getElementById('modelo-revisao' + (indice + 1)).value = revisoes[nome]; });
+      ['valor', 'valorSegunda', 'valorTerceira'].forEach((nome, indice) => { document.getElementById('modelo-' + (indice === 0 ? 'valorRevisao' : 'valorRevisao' + (indice + 1))).value = revisoes[nome].toFixed(2); });
       document.getElementById('introducaoModelo').value = modelo?.introducao || '';
       document.getElementById('reciboModelo').value = modelo?.recibo || '';
       document.getElementById('incluirRecibo').checked = modelo?.incluirRecibo || false;
@@ -1433,9 +1482,15 @@
       const form = document.getElementById('formModelo');
       const invalido = Array.from(form.querySelectorAll('input, textarea')).find(campo => !campo.validity.valid || (campo.required && !campo.value.trim()));
       if (invalido) { document.getElementById('erroModelo').textContent = 'Preencha os campos obrigatórios do modelo.'; revelarCampo(invalido); invalido.reportValidity(); return; }
+      const revisoes = lerRevisoesDoEditor('modelo-');
+      if (!revisoesValidas(revisoes)) {
+        document.getElementById('erroModelo').textContent = 'Informe quilômetros em ordem crescente e valores válidos para cada revisão.';
+        revelarCampo(document.getElementById('modelo-revisao1')); return;
+      }
       const modelo = {
         id: modeloEditandoId || crypto.randomUUID(), nome: document.getElementById('nomeModelo').value.trim(), tipo: document.getElementById('tipoModelo').value,
         oficina: Object.fromEntries(camposFixos.map(([id]) => [id, document.getElementById('modelo-' + id).value.trim()])),
+        revisoes,
         introducao: document.getElementById('introducaoModelo').value.trim(), recibo: document.getElementById('reciboModelo').value.trim(), incluirRecibo: document.getElementById('incluirRecibo').checked,
         clausulas: Array.from(document.querySelectorAll('#listaClausulasModelo textarea'), campo => campo.value.trim())
       };
@@ -1457,9 +1512,11 @@
       estado.modelos.forEach(modelo => select.add(new Option(modelo.nome, modelo.id)));
       select.value = estado.configuracoes.modeloPadrao;
       if (select.selectedIndex === -1) select.value = '';
-      const padroes = padroesRevisao();
+      const padroes = padroesGlobaisRevisao();
       ['primeira', 'segunda', 'terceira'].forEach((nome, indice) => { document.getElementById('padraoRevisao' + (indice + 1)).value = padroes[nome]; });
       document.getElementById('padraoValorRevisao').value = padroes.valor.toFixed(2);
+      document.getElementById('padraoValorRevisao2').value = padroes.valorSegunda.toFixed(2);
+      document.getElementById('padraoValorRevisao3').value = padroes.valorTerceira.toFixed(2);
     }
 
     function exportarBackup() {
@@ -1505,6 +1562,17 @@
     camposFixos.forEach(campo => document.getElementById('camposModelo').append(criarCampo(campo, 'modelo-')));
     camposExtras.forEach(campo => document.getElementById('camposComplementares').append(criarCampo(campo)));
     camposPagamento.forEach(campo => document.getElementById('camposPagamento').append(criarCampo(campo)));
+    const revisoesModelo = [
+      ['revisao1', '1ª revisão após (km)'], ['valorRevisao', 'Valor da 1ª revisão (R$)'],
+      ['revisao2', '2ª revisão após (km)'], ['valorRevisao2', 'Valor da 2ª revisão (R$)'],
+      ['revisao3', '3ª revisão após (km)'], ['valorRevisao3', 'Valor da 3ª revisão (R$)']
+    ];
+    revisoesModelo.forEach(([id, rotulo]) => {
+      const grupo = criarCampo([id, rotulo, 15, 'number'], 'modelo-');
+      const campo = grupo.querySelector('input'); campo.required = true;
+      if (!id.startsWith('valor')) campo.min = '1';
+      document.getElementById('camposRevisoesModelo').append(grupo);
+    });
     document.getElementById('editarOficina').addEventListener('click', () => {
       const abrir = document.getElementById('camposOficina').hidden;
       definirEdicaoOficina(abrir);
@@ -1518,7 +1586,11 @@
       clearTimeout(temporizadorAviso);
       temporizadorAviso = setTimeout(fecharAviso, 7000);
     });
-    document.getElementById('camposPagamento').append(criarTexto('p', 'As revisões padrão usam a quilometragem atual mais os intervalos de Configurações. Campos alterados manualmente e contratos reabertos mantêm seus valores.', 'hint wide'));
+    document.getElementById('camposPagamento').append(criarTexto('p', 'As revisões usam os intervalos e preços do modelo, somados ao odômetro atual. Campos editados e contratos reabertos mantêm seus valores.', 'hint wide'));
+    document.getElementById('camposPagamento').append(criarBotao('Reaplicar revisões do modelo', () => {
+      if (!confirm('Recalcular as três quilometragens e substituir os três preços pelos padrões do modelo?')) return;
+      redefinirRevisoes(); marcarAlterado(); anunciar('Revisões recalculadas conforme o modelo.');
+    }));
     document.getElementById('quilometragem').addEventListener('input', atualizarRevisoes);
     ['revisao1', 'revisao2', 'revisao3'].forEach(id => document.getElementById(id).addEventListener('input', () => revisoesAutomaticas.delete(id)));
     configurarConsultaCep('cepOficina', { logradouro: 'endereco', bairro: 'bairroOficina', localidade: 'cidadeOficina', uf: 'ufOficina' });
@@ -1541,8 +1613,8 @@
     document.getElementById('buscarHistorico').addEventListener('input', () => { paginaHistorico = 1; renderizarHistorico(); });
     document.getElementById('formConfiguracoes').addEventListener('submit', evento => {
       evento.preventDefault();
-      const revisoes = { primeira: Number(document.getElementById('padraoRevisao1').value), segunda: Number(document.getElementById('padraoRevisao2').value), terceira: Number(document.getElementById('padraoRevisao3').value), valor: Number(document.getElementById('padraoValorRevisao').value) };
-      if (!(revisoes.primeira < revisoes.segunda && revisoes.segunda < revisoes.terceira)) {
+      const revisoes = { primeira: Number(document.getElementById('padraoRevisao1').value), segunda: Number(document.getElementById('padraoRevisao2').value), terceira: Number(document.getElementById('padraoRevisao3').value), valor: Number(document.getElementById('padraoValorRevisao').value), valorSegunda: Number(document.getElementById('padraoValorRevisao2').value), valorTerceira: Number(document.getElementById('padraoValorRevisao3').value) };
+      if (!revisoesValidas(revisoes)) {
         anunciar('Informe os intervalos em ordem crescente: primeira, segunda e terceira revisão.');
         document.getElementById('padraoRevisao1').focus(); return;
       }
