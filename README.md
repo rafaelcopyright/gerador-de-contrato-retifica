@@ -172,3 +172,9 @@ No preenchimento do contrato, os dados da oficina aparecem agrupados em um resum
 Celular aparece antes do telefone nos dados complementares do cliente e no documento. O rodapé foi reduzido a uma orientação curta de impressão. Confirmações e mensagens operacionais aparecem em avisos temporários, que podem ser fechados e permanecem enquanto recebem foco ou passam sob o mouse. Erros que exigem correção continuam identificados junto ao formulário.
 
 Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar uma cópia ou um novo preenchimento com os mesmos dados, o registro existente é reutilizado, sem consumir outro número. A comparação considera os dados, itens, valores, cláusulas e conteúdo do modelo, ignorando o número automático e normalizando espaços e diferenças de caixa. A data do contrato é considerada: contratos de datas diferentes podem ser registros distintos. Se editar um registro para ficar igual a outro já salvo, a gravação é bloqueada sem excluir os dados existentes. Registros antigos não são apagados automaticamente.
+
+## Ações de preenchimento e nome do PDF
+
+**Gerar novo contrato** é o primeiro atalho da página inicial. Os botões de adicionar peças e cláusulas ficam abaixo das respectivas listas, inclusive no editor de modelos. A paginação continua limitando a quantidade de registros exibidos.
+
+Ao abrir a impressão, o título do documento sugere um nome como `Contrato-Garantia-Chevrolet-Onix-ABC1D23-2026-11-08.pdf`, incluindo tipo de contrato, modelo e placa do veículo e data. Caracteres incompatíveis com nomes de arquivo são substituídos. Dados ausentes usam `Veiculo` e `Sem-placa`. O navegador permite escolher outro nome ao salvar; o título do aplicativo é restaurado ao sair da impressão.

@@ -206,9 +206,9 @@
     <div id="paginaInicio" class="page">
       <header class="page-heading"><span class="eyebrow">PARA O DIA A DIA DA OFICINA</span><h1>O que vamos fazer hoje?</h1><p class="muted">Seus contratos organizados, da primeira informação até a impressão.</p></header>
       <div class="home-grid">
+        <a class="shortcut shortcut-new" href="#novo"><strong>+ Gerar novo contrato</strong><span>Escolha um modelo e preencha os dados do cliente.</span></a>
         <a class="shortcut" href="#historico"><strong>Histórico de contratos</strong><span>Encontre, edite ou copie contratos salvos.</span><span id="resumoHistorico" class="badge"></span></a>
         <a class="shortcut" href="#modelos"><strong>Modelos de contrato</strong><span>Prepare os dados da oficina e as condições de cada documento.</span><span id="resumoModelos" class="badge"></span></a>
-        <a class="shortcut shortcut-new" href="#novo"><strong>+ Gerar novo contrato</strong><span>Escolha um modelo e preencha os dados do cliente.</span></a>
       </div>
       <p class="hint">Seus dados ficam neste navegador. Use o backup em Configurações para guardá-los ou levá-los a outro computador.</p>
     </div>
@@ -274,19 +274,21 @@
       <details id="pecas" class="form-section">
         <summary><h2 id="pecasTitulo">2. Peças e serviços</h2></summary>
         <div class="section-content">
-        <div class="section-heading section-toolbar"><span id="contagemItens" class="count"></span><button id="adicionarItem" type="button">+ Adicionar item</button></div>
+        <div class="section-heading"><span id="contagemItens" class="count"></span></div>
         <p id="ajudaPecas" class="hint">Digite uma peça para ver sugestões, mesmo com pequenos erros de escrita. Use as setas e Enter para escolher ou escreva um serviço livremente. Informe o valor de cada unidade.</p>
         <div id="listaItens"></div>
         <nav id="paginasItens" class="pagination" aria-label="Páginas de peças"></nav>
+        <div class="actions"><button id="adicionarItem" type="button">+ Adicionar item</button></div>
         </div>
       </details>
       <details id="clausulas" class="form-section">
         <summary><h2 id="clausulasTitulo">3. Cláusulas do contrato</h2></summary>
         <div class="section-content">
-        <div class="section-heading section-toolbar"><span id="contagemClausulas" class="count"></span><button id="adicionarClausula" type="button">+ Adicionar cláusula</button></div>
+        <div class="section-heading"><span id="contagemClausulas" class="count"></span></div>
         <p class="hint">Edite os textos conforme as condições combinadas com o cliente. Confira as cláusulas antes de imprimir.</p>
         <div id="listaClausulas"></div>
         <nav id="paginasClausulas" class="pagination" aria-label="Páginas de cláusulas"></nav>
+        <div class="actions"><button id="adicionarClausula" type="button">+ Adicionar cláusula</button></div>
         </div>
       </details>
       <div id="finalizar" class="summary" tabindex="-1"><div>Total do contrato<div id="totalGeral" class="total">R$ 0,00</div></div><div class="actions"><button id="salvarContrato" type="button">Salvar no histórico</button><button class="primary" type="submit">Imprimir / salvar PDF</button></div></div>
@@ -302,9 +304,10 @@
       <div class="fields"><div><label for="nomeModelo">Nome do modelo *</label><input id="nomeModelo" required maxlength="150"></div><div><label for="tipoModelo">Formato do documento</label><select id="tipoModelo"><option value="servico">Prestação de serviço</option><option value="garantia">Garantia, nota e cupons de revisão</option></select></div></div>
       <details class="card" open><summary>Informações fixas da oficina</summary><div id="camposModelo" class="fields"></div></details>
       <details class="card"><summary>Textos e opções do documento</summary><div class="fields"><div class="wide"><label for="introducaoModelo">Texto de abertura</label><textarea id="introducaoModelo" maxlength="5000"></textarea></div><div class="wide"><label for="reciboModelo">Texto do recibo de retirada</label><textarea id="reciboModelo" maxlength="5000"></textarea></div></div><label class="checkbox"><input id="incluirRecibo" type="checkbox">Incluir recibo de retirada no modelo de garantia</label></details>
-      <div class="section-heading section-toolbar"><h2>Cláusulas do modelo</h2><span id="contagemClausulasModelo"></span><button id="adicionarClausulaModelo" type="button">+ Adicionar cláusula</button></div>
+      <div class="section-heading"><h2>Cláusulas do modelo</h2><span id="contagemClausulasModelo"></span></div>
       <p class="hint">Textos entre chaves duplas são preenchidos automaticamente no contrato: total, valor por extenso, prazos, revisões e dados de pagamento.</p>
       <div id="listaClausulasModelo"></div><nav id="paginasClausulasModelo" class="pagination" aria-label="Páginas das cláusulas do modelo"></nav>
+      <div class="actions"><button id="adicionarClausulaModelo" type="button">+ Adicionar cláusula</button></div>
       <p id="erroModelo" role="alert"></p><div class="actions dialog-actions"><button type="button" id="cancelarModelo">Cancelar</button><button class="primary" type="submit">Salvar modelo</button></div>
     </form>
   </dialog>
@@ -938,9 +941,33 @@
     function gerarPDF(evento) {
       evento.preventDefault();
       if (!validarContrato() || !salvarContratoAtual('impressao')) return;
-      const itens = coletarItens();
-      preencherDocumento(itens);
-      window.print();
+      prepararImpressao();
+      try { window.print(); } catch {
+        restaurarTitulo();
+        anunciar('Não foi possível abrir a impressão. O contrato está salvo no histórico; tente novamente.');
+      }
+    }
+
+    let tituloAntesDaImpressao = null;
+
+    function nomeArquivoContrato() {
+      const limpar = (texto, limite) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, limite).replace(/-+$/g, '');
+      const tipo = modeloAtual?.tipo === 'garantia' ? 'Garantia' : 'Servico';
+      const veiculo = limpar(document.getElementById('veiculo').value, 70) || 'Veiculo';
+      const placa = limpar(document.getElementById('placa').value.toUpperCase(), 12) || 'Sem-placa';
+      const data = document.getElementById('data').value || dataLocal();
+      return `Contrato-${tipo}-${veiculo}-${placa}-${limpar(data, 10)}`;
+    }
+
+    function prepararImpressao() {
+      if (tituloAntesDaImpressao === null) tituloAntesDaImpressao = document.title;
+      preencherDocumento(coletarItens());
+      document.title = nomeArquivoContrato();
+    }
+
+    function restaurarTitulo() {
+      if (tituloAntesDaImpressao !== null) document.title = tituloAntesDaImpressao;
+      tituloAntesDaImpressao = null;
     }
 
     const chaveDados = 'contrato-facil-dados-v1';
@@ -1470,7 +1497,8 @@
     });
     document.getElementById('formulario').addEventListener('submit', gerarPDF);
     // Atualiza o contrato também quando a impressão é aberta pelo atalho do navegador.
-    window.addEventListener('beforeprint', () => preencherDocumento(coletarItens()));
+    window.addEventListener('beforeprint', prepararImpressao);
+    window.addEventListener('afterprint', restaurarTitulo);
     configurarPaginacao(listaItens, 'paginasItens', 'contagemItens', 'itens');
     configurarPaginacao(listaClausulas, 'paginasClausulas', 'contagemClausulas', 'cláusulas');
     configurarPaginacao(document.getElementById('listaClausulasModelo'), 'paginasClausulasModelo', 'contagemClausulasModelo', 'cláusulas');
