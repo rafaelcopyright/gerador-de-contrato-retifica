@@ -193,4 +193,4 @@ Backups antigos com preço único continuam aceitos: o preço original é aplica
 A cobertura de testes também verifica a ordem dos atalhos, ações abaixo das listas, nome sugerido do PDF, recuperação após falha de impressão, intervalos e preços por modelo, revisão gratuita, rejeição de intervalos fora de ordem e compatibilidade de contratos antigos sem duplicação. Os cupons foram conferidos visualmente em PDF A4 com preços diferentes.
 
 
-Em janelas de computador com até 900 px de altura, a navegação usa espaçamento e controles compactos. O menu completo foi testado sem rolagem lateral própria nas alturas de 600, 650 e 699 px, inclusive com as três opções de fonte. Em alturas menores, a rolagem continua disponível para manter todos os controles acessíveis.
+O controle de tamanho da fonte fica no bloco inferior da barra lateral, junto de Configurações. Em janelas de computador com até 900 px de altura, apenas o fieldset e seus botões usam espaçamento compacto; os links mantêm seu tamanho original e acompanham a fonte escolhida. A rolagem permanece disponível quando necessária para acessar todos os controles.

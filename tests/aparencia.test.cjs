@@ -22,14 +22,14 @@ test('cores por seletor e hexadecimal persistem, mantêm contraste e rejeitam en
  assert.equal(await p.locator('#corPrincipalHex').inputValue(),'#123456');
  await p.locator('#tema').selectOption('azul');assert.equal(await p.locator('#corPrincipalHex').inputValue(),'#174f88');
 });
-test('barra lateral completa cabe em janelas baixas com todas as opções de fonte',async t=>{
+test('controles de fonte ficam no rodapé e ampliam a navegação em janelas baixas',async t=>{
  const p=await abrir(t);await p.locator('.sidebar a[href="#novo"]').click();
  for(const altura of [699,650,600]){
    await p.setViewportSize({width:1366,height:altura});
    for(const fonte of ['18','21','24']){
      await p.locator('[data-font="'+fonte+'"]').click();
-     const dimensoes=await p.locator('.sidebar').evaluate(el=>({conteudo:el.scrollHeight,altura:el.clientHeight}));
-     assert.ok(dimensoes.conteudo<=dimensoes.altura,JSON.stringify({altura,fonte,...dimensoes}));
+     assert.equal(await p.locator('.sidebar-bottom fieldset [data-font="'+fonte+'"]').getAttribute('aria-pressed'),'true');
+     assert.equal(await p.locator('.sidebar nav a').first().evaluate(el=>getComputedStyle(el).fontSize),fonte+'px');
    }
  }
 });
