@@ -142,6 +142,10 @@
       .section-toolbar { align-items: stretch; }
       .section-toolbar button { width: 100%; }
       .item-footer { flex-wrap: wrap; }
+      dialog { padding: 16px; }
+      dialog .card { padding: 12px; }
+      dialog summary { padding: 12px; }
+      dialog .dialog-actions { bottom: -16px; }
     }
     @media print {
       /* Caixas vazias substituem cabeçalho e rodapé automáticos no Chromium,
@@ -509,6 +513,7 @@
     const configuracoesListas = new Map();
 
     let temporizadorAviso;
+    let focoAntesDoAviso = null;
     function anunciar(mensagem, mostrar = true) {
       if (!mostrar) { document.getElementById('mensagemLeitor').textContent = mensagem; return; }
       clearTimeout(temporizadorAviso);
@@ -522,7 +527,15 @@
 
     function fecharAviso() {
       clearTimeout(temporizadorAviso);
-      document.getElementById('avisoTemporario').hidden = true;
+      const aviso = document.getElementById('avisoTemporario');
+      const devolverFoco = aviso.contains(document.activeElement);
+      aviso.hidden = true;
+      if (devolverFoco) {
+        const destino = focoAntesDoAviso?.isConnected && focoAntesDoAviso.getClientRects().length
+          ? focoAntesDoAviso : document.getElementById('dialogModelo').open
+            ? document.getElementById('nomeModelo') : document.getElementById('conteudo');
+        destino.focus();
+      }
     }
 
     function definirEdicaoOficina(aberto) {
@@ -1014,6 +1027,7 @@
     let contratoAtualId = null;
     let alterado = false;
     let modeloEditandoId = null;
+    let conteudoInicialModelo = '';
     let paginaHistorico = 1;
     const consultasCep = new Map();
     const revisoesIniciais = { primeira: 1000, segunda: 4000, terceira: 7000, valor: 850 };
@@ -1427,7 +1441,7 @@
       const lista = document.getElementById('listaHistorico'); lista.replaceChildren();
       if (!registros.length) lista.append(criarTexto('p', busca ? 'Nenhum contrato encontrado para esta busca.' : 'Nenhum contrato salvo. Comece em “Gerar novo contrato”.', 'empty'));
       for (const registro of registros.slice((paginaHistorico - 1) * 10, paginaHistorico * 10)) {
-        const card = document.createElement('article'); card.className = 'card';
+        const card = document.createElement('article'); card.className = 'card'; card.dataset.id = registro.id;
         card.append(criarTexto('h2', registro.campos.cliente, 'record-title'));
         const dados = document.createElement('dl'); dados.className = 'record-data';
         for (const [rotulo, valor] of [['Veículo e placa', [registro.campos.veiculo, registro.campos.placa].filter(Boolean).join(' · ') || 'Não informado'], ['Criado em', new Date(registro.criadoEm).toLocaleString('pt-BR')], ['Modelo usado', registro.modelo.nome], ['Situação', registro.situacao === 'impressao' ? 'Impressão solicitada' : 'Salvo sem imprimir']]) {
@@ -1438,7 +1452,7 @@
           if (!confirm(`Excluir o contrato de ${registro.campos.cliente}? Essa ação não pode ser desfeita.`)) return;
           if (persistirEstado({ ...estado, contratos: estado.contratos.filter(contrato => contrato.id !== registro.id) })) {
             if (contratoAtualId === registro.id) { contratoAtualId = null; marcarAlterado(); }
-            renderizarHistorico(); atualizarSeletoresModelos(); anunciar('Contrato excluído.');
+            renderizarHistorico(); atualizarSeletoresModelos(); focarRegistro('listaHistorico'); anunciar('Contrato excluído.');
           }
         }, 'Excluir contrato de ' + registro.campos.cliente));
         card.append(dados, acoes); lista.append(card);
@@ -1453,18 +1467,40 @@
       const lista = document.getElementById('listaModelos'); lista.replaceChildren();
       if (!estado.modelos.length) lista.append(criarTexto('p', 'Nenhum modelo cadastrado. Use “Criar modelo” para começar.', 'empty'));
       for (const modelo of estado.modelos) {
-        const card = document.createElement('article'); card.className = 'card';
+        const card = document.createElement('article'); card.className = 'card'; card.dataset.id = modelo.id;
         card.append(criarTexto('h2', modelo.nome, 'record-title'), criarTexto('p', modelo.oficina.empresa || 'Oficina ainda não informada'), criarTexto('span', modelo.tipo === 'garantia' ? 'Garantia, nota e revisões' : 'Prestação de serviço', 'badge'));
         const acoes = document.createElement('div'); acoes.className = 'actions';
         acoes.append(criarBotao('Usar modelo', () => { if (podeSubstituirFormulario()) { novoContrato(modelo.id); location.hash = 'dados'; } }, 'Usar modelo ' + modelo.nome), criarBotao('Editar', () => abrirEditorModelo(modelo), 'Editar modelo ' + modelo.nome), criarBotao('Copiar', () => {
           const copia = { ...structuredClone(modelo), id: crypto.randomUUID(), nome: (modelo.nome.slice(0, 142) + ' (cópia)') };
-          if (persistirEstado({ ...estado, modelos: [...estado.modelos, copia] })) { renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo copiado.'); }
+          if (persistirEstado({ ...estado, modelos: [...estado.modelos, copia] })) { renderizarModelos(); atualizarSeletoresModelos(); focarRegistro('listaModelos', copia.id); anunciar('Modelo copiado.'); }
         }, 'Copiar modelo ' + modelo.nome), criarBotao('Excluir', () => {
           if (!confirm(`Excluir o modelo “${modelo.nome}”? Contratos já salvos manterão suas informações.`)) return;
-          if (persistirEstado({ ...estado, modelos: estado.modelos.filter(item => item.id !== modelo.id) })) { renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo excluído.'); }
+          if (persistirEstado({ ...estado, modelos: estado.modelos.filter(item => item.id !== modelo.id) })) { renderizarModelos(); atualizarSeletoresModelos(); focarRegistro('listaModelos'); anunciar('Modelo excluído.'); }
         }, 'Excluir modelo ' + modelo.nome));
         card.append(acoes); lista.append(card);
       }
+    }
+
+    function conteudoFormularioModelo() {
+      return JSON.stringify(Array.from(document.querySelectorAll('#formModelo input, #formModelo textarea, #formModelo select'),
+        campo => [campo.id, campo.type === 'checkbox' ? campo.checked : campo.value]));
+    }
+
+    function modeloTemAlteracoes() {
+      return document.getElementById('dialogModelo').open && conteudoFormularioModelo() !== conteudoInicialModelo;
+    }
+
+    function cancelarEdicaoModelo() {
+      if (!modeloTemAlteracoes() || confirm('Há alterações não salvas neste modelo. Deseja descartá-las?')) {
+        document.getElementById('dialogModelo').close();
+      }
+    }
+
+    function focarRegistro(idLista, idRegistro) {
+      const lista = document.getElementById(idLista);
+      const registro = Array.from(lista.children).find(card => card.dataset.id === idRegistro) || lista.querySelector('article');
+      const botao = registro && Array.from(registro.querySelectorAll('button')).find(botao => botao.textContent === 'Editar');
+      (botao || document.getElementById(idLista === 'listaModelos' ? 'novoModelo' : 'buscarHistorico')).focus();
     }
 
     function abrirEditorModelo(modelo = null) {
@@ -1484,6 +1520,7 @@
       const lista = document.getElementById('listaClausulasModelo'); lista.replaceChildren();
       (modelo?.clausulas || []).forEach(texto => adicionarClausula(texto, lista)); atualizarPaginacao(lista, 1);
       document.getElementById('erroModelo').textContent = '';
+      conteudoInicialModelo = conteudoFormularioModelo();
       document.getElementById('dialogModelo').showModal();
       document.getElementById('nomeModelo').focus();
     }
@@ -1506,7 +1543,7 @@
         clausulas: Array.from(document.querySelectorAll('#listaClausulasModelo textarea'), campo => campo.value.trim())
       };
       const modelos = estado.modelos.some(item => item.id === modelo.id) ? estado.modelos.map(item => item.id === modelo.id ? modelo : item) : [...estado.modelos, modelo];
-      if (persistirEstado({ ...estado, modelos })) { document.getElementById('dialogModelo').close(); renderizarModelos(); atualizarSeletoresModelos(); anunciar('Modelo salvo. Contratos existentes foram preservados.'); }
+      if (persistirEstado({ ...estado, modelos })) { document.getElementById('dialogModelo').close(); renderizarModelos(); atualizarSeletoresModelos(); focarRegistro('listaModelos', modelo.id); anunciar('Modelo salvo. Contratos existentes foram preservados.'); }
     }
 
     const paletas = { verde: ['#145a48', '#183e38', '#e8f1ed'], azul: ['#174f88', '#17344f', '#e8eff8'], vinho: ['#84314f', '#4f2034', '#f8eaf0'], grafite: ['#374451', '#202b35', '#eaf0f4'] };
@@ -1617,6 +1654,7 @@
     document.getElementById('camposOficina').addEventListener('input', atualizarResumoOficina);
     document.getElementById('fecharAviso').addEventListener('click', fecharAviso);
     const aviso = document.getElementById('avisoTemporario');
+    aviso.addEventListener('focusin', evento => { if (!aviso.contains(evento.relatedTarget)) focoAntesDoAviso = evento.relatedTarget; });
     for (const evento of ['mouseenter', 'focusin']) aviso.addEventListener(evento, () => clearTimeout(temporizadorAviso));
     for (const evento of ['mouseleave', 'focusout']) aviso.addEventListener(evento, () => {
       clearTimeout(temporizadorAviso);
@@ -1643,7 +1681,8 @@
     });
     document.getElementById('salvarContrato').addEventListener('click', () => { if (validarContrato()) salvarContratoAtual(); });
     document.getElementById('novoModelo').addEventListener('click', () => abrirEditorModelo());
-    document.getElementById('cancelarModelo').addEventListener('click', () => document.getElementById('dialogModelo').close());
+    document.getElementById('cancelarModelo').addEventListener('click', cancelarEdicaoModelo);
+    document.getElementById('dialogModelo').addEventListener('cancel', evento => { evento.preventDefault(); cancelarEdicaoModelo(); });
     document.getElementById('formModelo').addEventListener('submit', salvarModelo);
     document.getElementById('adicionarClausulaModelo').addEventListener('click', () => revelarCampo(adicionarClausula('', document.getElementById('listaClausulasModelo')).querySelector('textarea')));
     document.getElementById('buscarHistorico').addEventListener('input', () => { paginaHistorico = 1; renderizarHistorico(); });
@@ -1668,7 +1707,7 @@
     });
     document.getElementById('exportarBackup').addEventListener('click', exportarBackup);
     document.getElementById('importarBackup').addEventListener('click', importarBackup);
-    window.addEventListener('beforeunload', evento => { if (alterado) { evento.preventDefault(); evento.returnValue = ''; } });
+    window.addEventListener('beforeunload', evento => { if (alterado || modeloTemAlteracoes()) { evento.preventDefault(); evento.returnValue = ''; } });
     window.addEventListener('storage', evento => {
       if (evento.key === chaveDados || evento.key === null) { conflitoArmazenamento = true; mostrarErroArmazenamento('Os dados foram alterados em outra aba. Exporte seu backup e recarregue antes de salvar para evitar sobrescrever alterações.'); }
     });
