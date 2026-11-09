@@ -226,4 +226,4 @@ Se a hospedagem estiver indisponível ou algum arquivo estiver ausente durante a
 
 ### Testes do PWA
 
-`npm test` inclui testes em servidor HTTP local com subpasta, perfil temporário do Chrome, validação do manifesto e critérios de instalação, reabertura offline, criação/impressão offline, persistência do histórico e atualização com rascunho aberto. Também verifica isolamento do cache de outro sistema. Os testes anteriores continuam verificando abertura direta do HTML.
+`npm test` inclui testes em servidor HTTP local com subpasta, perfil temporário do Chrome, validação do manifesto e critérios de instalação, reabertura offline, criação/impressão offline, persistência do histórico e atualização com rascunho aberto. Também verifica isolamento do cache de outro sistema e manutenção da versão anterior quando o download de uma atualização falha. Os testes anteriores continuam verificando abertura direta do HTML.
