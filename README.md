@@ -236,3 +236,6 @@ As novas famílias são aplicadas apenas à tela. O documento impresso mantém A
 
 
 O tamanho Normal da interface é **16 px**, com opções Grande (21 px) e Extra grande (24 px). Preferências e backups antigos de 18 px são convertidos para o novo Normal; os tamanhos ampliados são preservados. Links da barra lateral usam padding de 10 px × 12 px, e a marca tem margem inferior de 16 px. As fontes de impressão permanecem inalteradas.
+
+
+O campo **Valor por extenso** permanece manual e sua label não exibe “opcional”. A conversão automática do total ainda não está implementada.
