@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Preencha peças e serviços da oficina e imprima seu contrato ou salve em PDF.">
+  <meta name="theme-color" content="#183e38">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%23183e38%22%2F%3E%3Cpath%20d%3D%22M152%20104h144l64%2064v240H152z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M296%20104v64h64%22%20fill%3D%22%23b5d8cc%22%2F%3E%3Cpath%20d%3D%22M196%20220h120M196%20264h88%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2220%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22m202%20336%2028%2028%2072-72%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2224%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
   <title>Contrato Fácil | Oficina</title>
   <style>
     :root { --accent: #145a48; --accent-dark: #183e38; --surface-accent: #e8f1ed; --radius: 12px; font-family: system-ui, sans-serif; color: #182b3b; background: #f1f5f8; font-size: var(--fonte-tela, 18px); line-height: 1.5; }
@@ -254,6 +256,7 @@
           <div><label for="padraoValorRevisao3">Valor padrão da 3ª revisão (R$)</label><input id="padraoValorRevisao3" type="number" min="0" max="9999999.99" step="0.01" required></div>
         </div><p class="hint">Usados por modelos sem revisões próprias. Os intervalos são somados ao odômetro; contratos já salvos não são alterados.</p>
       </form>
+      <section class="card" aria-labelledby="tituloPwa"><div class="section-heading"><h2 id="tituloPwa"><svg width="40" height="40" aria-hidden="true" focusable="false" style="vertical-align: middle; margin-right: 8px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#183e38"/><path d="M152 104h144l64 64v240H152z" fill="#fff"/><path d="M296 104v64h64" fill="#b5d8cc"/><path d="M196 220h120M196 264h88" fill="none" stroke="#145a48" stroke-width="20" stroke-linecap="round"/><path d="m202 336 28 28 72-72" fill="none" stroke="#145a48" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg>Instalar aplicativo</h2><button id="instalarApp" class="primary" type="button" hidden>Instalar Contrato Fácil</button></div><p id="statusPwa" role="status">A abertura direta do HTML continua disponível. Para instalar, acesse a versão publicada em HTTPS.</p><p id="ajudaInstalacao" class="hint">A instalação é opcional. Os dados continuam neste navegador; use o backup para transferi-los.</p></section>
       <div class="card"><h2>Backup dos dados</h2><p>O backup inclui modelos, contratos e preferências. Guarde o arquivo em um local seguro: ele contém os dados dos clientes.</p><div class="actions"><button id="exportarBackup" type="button">Exportar backup</button><button id="importarBackup" type="button">Restaurar backup</button></div><label for="arquivoBackup" class="hint">Arquivo de backup (.json)</label><input id="arquivoBackup" type="file" accept=".json,application/json"><p class="hint">Restaurar um backup substitui os dados deste navegador após sua confirmação.</p></div>
     </div>
     <div id="paginaEditor" class="page" hidden>
@@ -1573,6 +1576,7 @@
       const cores = coresConfiguradas();
       document.documentElement.style.setProperty('--on-accent', textoContrastante(cores[0]));
       document.documentElement.style.setProperty('--on-accent-dark', textoContrastante(cores[1]));
+      document.querySelector('meta[name="theme-color"]').content = cores[1];
       ['--accent', '--accent-dark', '--surface-accent'].forEach((variavel, indice) => document.documentElement.style.setProperty(variavel, cores[indice]));
       document.documentElement.style.setProperty('--radius', estado.configuracoes.estilo === 'reto' ? '4px' : '12px');
       document.documentElement.dataset.density = estado.configuracoes.densidade;
@@ -1590,6 +1594,52 @@
       document.getElementById('padraoValorRevisao').value = padroes.valor.toFixed(2);
       document.getElementById('padraoValorRevisao2').value = padroes.valorSegunda.toFixed(2);
       document.getElementById('padraoValorRevisao3').value = padroes.valorTerceira.toFixed(2);
+    }
+
+
+    function configurarPwa() {
+      if (!/^https?:$/.test(location.protocol)) return;
+      const manifesto = document.createElement('link');
+      manifesto.rel = 'manifest'; manifesto.href = './manifest.webmanifest'; document.head.append(manifesto);
+      const status = document.getElementById('statusPwa');
+      const ajuda = document.getElementById('ajudaInstalacao');
+      const botao = document.getElementById('instalarApp');
+      const instalado = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+      let convite = null;
+      ajuda.textContent = instalado() ? 'Aplicativo instalado. Use o backup para proteger ou transferir seus dados.' : 'Para instalar, use o menu do navegador: “Instalar aplicativo” ou “Adicionar à Tela de Início”. Os dados ficam neste navegador.';
+      window.addEventListener('beforeinstallprompt', evento => {
+        evento.preventDefault(); convite = evento; botao.hidden = instalado();
+      });
+      window.addEventListener('appinstalled', () => {
+        convite = null; botao.hidden = true;
+        ajuda.textContent = 'Aplicativo instalado. Use o backup para proteger ou transferir seus dados.';
+        anunciar('Contrato Fácil instalado.');
+      });
+      botao.addEventListener('click', async () => {
+        if (!convite) return;
+        const atual = convite; convite = null; botao.hidden = true;
+        try { await atual.prompt(); await atual.userChoice; }
+        catch { anunciar('Use a opção de instalar no menu do navegador.'); }
+      });
+      if (!isSecureContext || !('serviceWorker' in navigator)) {
+        status.textContent = 'A instalação e o cache offline precisam de HTTPS e de um navegador compatível.'; return;
+      }
+      status.textContent = 'Preparando o aplicativo para funcionar offline…';
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(async registro => {
+        await navigator.serviceWorker.ready;
+        status.textContent = 'Aplicativo pronto para abrir offline. A consulta de CEP continua exigindo internet.';
+        const informarAtualizacao = () => {
+          if (registro.waiting && navigator.serviceWorker.controller) {
+            status.textContent = 'Atualização disponível. Para aplicá-la, salve seu trabalho e feche todas as janelas deste aplicativo; depois abra novamente.';
+          }
+        };
+        informarAtualizacao();
+        registro.addEventListener('updatefound', () => {
+          registro.installing?.addEventListener('statechange', informarAtualizacao);
+        });
+      }).catch(() => {
+        status.textContent = 'Não foi possível preparar o modo offline. Confira a conexão e recarregue quando puder. O preenchimento nesta janela continua disponível.';
+      });
     }
 
     function exportarBackup() {
@@ -1711,6 +1761,7 @@
     window.addEventListener('storage', evento => {
       if (evento.key === chaveDados || evento.key === null) { conflitoArmazenamento = true; mostrarErroArmazenamento('Os dados foram alterados em outra aba. Exporte seu backup e recarregue antes de salvar para evitar sobrescrever alterações.'); }
     });
+    configurarPwa();
     novoContrato();
     aplicarAparencia();
     configurarNavegacao();

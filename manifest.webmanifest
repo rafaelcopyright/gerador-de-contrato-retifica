@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Contrato Fácil | Oficina",
+  "short_name": "Contrato Fácil",
+  "description": "Contratos de peças, serviços e garantia da oficina. Preencha e imprima mesmo sem internet.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./index.html#inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f8",
+  "theme_color": "#183e38",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%2296%22%20fill%3D%22%23183e38%22%2F%3E%3Cpath%20d%3D%22M152%20104h144l64%2064v240H152z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M296%20104v64h64%22%20fill%3D%22%23b5d8cc%22%2F%3E%3Cpath%20d%3D%22M196%20220h120M196%20264h88%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2220%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22m202%20336%2028%2028%2072-72%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2224%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Crect%20width%3D%22512%22%20height%3D%22512%22%20rx%3D%220%22%20fill%3D%22%23183e38%22%2F%3E%3Cpath%20d%3D%22M152%20104h144l64%2064v240H152z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M296%20104v64h64%22%20fill%3D%22%23b5d8cc%22%2F%3E%3Cpath%20d%3D%22M196%20220h120M196%20264h88%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2220%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22m202%20336%2028%2028%2072-72%22%20fill%3D%22none%22%20stroke%3D%22%23145a48%22%20stroke-width%3D%2224%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

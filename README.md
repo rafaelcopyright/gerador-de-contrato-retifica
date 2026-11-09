@@ -2,13 +2,13 @@
 
 Aplicativo offline para oficinas criarem contratos de peças, serviços e garantia, com histórico local e modelos reutilizáveis. Preencha os dados, confira o total e imprima ou salve em PDF.
 
-**Um único HTML para o cliente, sem instalação, servidor ou cadastro. Somente a consulta opcional de CEP precisa de internet; as demais funções continuam locais.**
+**Use abrindo o HTML diretamente ou como PWA instalável, publicado em HTTPS. O cliente não precisa de Node.js, npm ou cadastro. Após preparar o cache, a versão PWA também abre offline; somente a consulta de CEP precisa de internet.**
 
 ![Página inicial do Contrato Fácil](docs/pagina-inicial.png)
 
 ## Entrega e primeiros passos
 
-Envie apenas `index.html` ao cliente. Ele abre o arquivo no navegador e começa a usar. Node.js, npm e os arquivos de desenvolvimento não são necessários para executar o aplicativo.
+Para uso por arquivo, envie apenas `index.html` ao cliente: ele abre no navegador e começa a usar. Para instalação como PWA, publique `index.html`, `manifest.webmanifest` e `sw.js` juntos em hospedagem estática HTTPS, mantendo os nomes e a mesma pasta. Node.js, npm e os testes são necessários apenas ao desenvolvimento, não ao cliente.
 
 1. Em **Modelos de contrato**, confira os dados fixos da oficina, as cláusulas e os dados de pagamento.
 2. Acesse **Gerar novo contrato** e escolha o modelo desejado.
@@ -115,7 +115,9 @@ A paginação se adapta ao conteúdo. Na amostra conferida, o modelo de prestaç
 O código usa HTML semântico, CSS local e APIs nativas do navegador, seguindo as skills de código limpo e layout acessível em `.agents/skills/`. Os textos do usuário são inseridos no documento com `textContent`, sem execução de HTML.
 
 ```text
-index.html          Aplicativo, catálogo e modelos iniciais embutidos
+index.html          Aplicativo, catálogo, modelos e SVGs inline
+manifest.webmanifest Metadados de instalação e ícones SVG embutidos
+sw.js               Cache offline e ciclo de atualizações do PWA
 .agents/skills/     Diretrizes locais de desenvolvimento
 tests/              Testes de fluxo no navegador
 docs/               Imagem da interface para documentação
@@ -200,3 +202,28 @@ O controle de tamanho da fonte fica no bloco inferior da barra lateral, junto de
 O editor de modelos pede confirmação antes de descartar alterações por Cancelar ou Esc e participa do aviso de saída do navegador. As ações de salvar, copiar e excluir preservam um destino útil para o teclado. Fechar um popup devolve o foco ao controle anterior. No celular, o modal usa menos margens internas e mantém campos grandes.
 
 A revisão e seus limites estão em [reports/ui-ux/REVISAO.md](reports/ui-ux/REVISAO.md), incluindo as skills utilizadas, evidências locais, verificações de fonte extra grande e testes de regressão.
+
+
+## PWA: instalar e abrir offline
+
+Publique os três arquivos de produção em um endereço HTTPS, na raiz ou em uma subpasta. Não é necessário backend nem processo de compilação. A abertura via arquivo local continua funcionando, mas não registra service worker nem habilita instalação. Para desenvolvimento, um servidor estático em localhost também permite testar o PWA. Consulte os [requisitos de instalação documentados pela MDN](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable).
+
+1. Abra o endereço publicado com internet e aguarde a preparação do modo offline, indicada em **Configurações → Instalar aplicativo**.
+2. Use **Instalar Contrato Fácil** quando o navegador disponibilizar o botão, ou a opção de instalação no próprio menu do navegador. A disponibilidade depende do navegador e do sistema; não há instalação automática.
+3. Depois da preparação, o app pode ser reaberto e usado offline para criar, salvar e imprimir contratos. A consulta de CEP continua exigindo internet.
+
+Os ícones foram desenhados em SVG: o símbolo na interface é inline, o favicon e os ícones do manifesto usam data URLs, incluindo uma variante maskable com fundo preenchido. Não dependem de fontes, bibliotecas ou serviços externos. Manifesto e ícones foram validados pelo Chrome através do protocolo DevTools; a instalação efetiva no sistema operacional não foi automatizada.
+
+### Dados, atualização e publicação
+
+O cache contém apenas o HTML e o manifesto; os SVGs já estão embutidos. Nenhum endereço consultado, backup ou dado de cliente é incluído no Cache Storage. Os contratos continuam no localStorage do navegador. Instalar não cria sincronização nem backup.
+
+**Antes de trocar do HTML local para o endereço publicado, exporte o backup e restaure-o no novo endereço.** Arquivo local, domínio, porta e perfil de navegador distintos têm armazenamentos separados. Mantenha o endereço de publicação para preservar o acesso aos dados.
+
+Ao publicar mudanças, altere `VERSAO` em `sw.js` e envie os três arquivos atualizados. O novo worker prepara seu próprio cache e aguarda o fechamento das janelas que ainda usam a versão anterior. O app não força recarregamento nem substitui um formulário em edição; Configurações informa quando há atualização aguardando. Depois de salvar o trabalho, feche todas as janelas do app, inclusive abas abertas no navegador, e reabra para usar a versão nova. A ativação remove apenas caches antigos deste aplicativo e escopo.
+
+Se a hospedagem estiver indisponível ou algum arquivo estiver ausente durante a instalação da atualização, o worker anterior continua disponível. Hospedagem deve servir `sw.js` como JavaScript e o manifesto como JSON/application/manifest+json. Evite cache HTTP prolongado do service worker.
+
+### Testes do PWA
+
+`npm test` inclui testes em servidor HTTP local com subpasta, perfil temporário do Chrome, validação do manifesto e critérios de instalação, reabertura offline, criação/impressão offline, persistência do histórico e atualização com rascunho aberto. Também verifica isolamento do cache de outro sistema. Os testes anteriores continuam verificando abertura direta do HTML.
