@@ -12,7 +12,7 @@ async function iniciar(t){
    if(!['index.html','sw.js','manifest.webmanifest'].includes(nome)){res.writeHead(404).end();return;}
    if(falhar && nome==='manifest.webmanifest'){res.writeHead(503).end();return;}
    let texto=fs.readFileSync(path.resolve(__dirname,'../'+nome),'utf8');
-   if(nome==='sw.js')texto=texto.replace("const VERSAO = 'v1'", "const VERSAO = 'v"+versao+"'");
+   if(nome==='sw.js')texto=texto.replace(/const VERSAO = '[^']+'/, "const VERSAO = 'v"+versao+"'");
    if(nome==='index.html')texto=texto.replace('<title>','<meta name="versao-teste" content="'+versao+'"><title>');
    res.setHeader('Content-Type',nome==='sw.js'?'text/javascript':nome==='manifest.webmanifest'?'application/manifest+json':'text/html; charset=utf-8');
    res.setHeader('Cache-Control','no-store');res.end(texto);
@@ -49,12 +49,22 @@ test('atualização aguarda fechar o app, preserva rascunho e não remove caches
  const {pagina:p,contexto,url,atualizar}=await iniciar(t);
  await p.evaluate(()=>caches.open('outro-sistema'));
  await p.locator('.shortcut-new').click();await p.locator('#cliente').fill('Rascunho preservado');
+ const novoWorker=contexto.waitForEvent('serviceworker');
  atualizar();await p.evaluate(async()=>{const registro=await navigator.serviceWorker.getRegistration();await registro.update();});
  await p.waitForFunction(async()=>Boolean((await navigator.serviceWorker.getRegistration()).waiting));
  assert.equal(await p.locator('#cliente').inputValue(),'Rascunho preservado');
  assert.equal(await p.locator('meta[name="versao-teste"]').getAttribute('content'),'1');
  await p.waitForFunction(()=>document.getElementById('statusPwa').textContent.includes('Atualização disponível'));
+ const worker=await novoWorker;
  await p.evaluate(()=>{alterado=false;});await p.close();
+ // A ativação é assíncrona; reabrir antes dela pode iniciar mais uma sessão antiga.
+ await worker.evaluate(async()=>{
+   for(let tentativa=0;tentativa<200;tentativa++){
+     if(!self.registration.waiting && self.registration.active?.state==='activated')return;
+     await new Promise(resolve=>setTimeout(resolve,25));
+   }
+   throw Error('Atualização não foi ativada após fechar o aplicativo');
+ });
  const nova=await contexto.newPage();await nova.goto(url);
  await nova.waitForFunction(()=>document.querySelector('meta[name="versao-teste"]').content==='2');
  const cachesAtivos=await nova.evaluate(()=>caches.keys());assert.ok(cachesAtivos.includes('outro-sistema'));assert.ok(!cachesAtivos.some(x=>x.endsWith('-v1')));

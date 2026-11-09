@@ -33,3 +33,14 @@ test('controles de fonte ficam no rodapé e ampliam a navegação em janelas bai
    }
  }
 });
+
+test('tipografia offline usa Poppins na tela e preserva Arial na impressão',async t=>{
+ const p=await abrir(t);await p.evaluate(()=>document.fonts.ready);
+ assert.equal(await p.locator('#paginaInicio h1').evaluate(e=>getComputedStyle(e).fontFamily),'Helvetica, Arial, sans-serif');
+ assert.equal(await p.locator('#paginaInicio p').first().evaluate(e=>getComputedStyle(e).fontFamily),'Poppins, sans-serif');
+ assert.equal(await p.evaluate(()=>document.fonts.check('18px Poppins')),true);
+ await p.emulateMedia({media:'print'});
+ for(const seletor of ['#documento','#pdfTitulo','#pdfCupons','#pdfTabelaItens']){
+   assert.equal(await p.locator(seletor).evaluate(e=>getComputedStyle(e).fontFamily),'Arial, sans-serif');
+ }
+});
