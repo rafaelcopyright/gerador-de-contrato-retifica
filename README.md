@@ -233,3 +233,6 @@ Se a hospedagem estiver indisponível ou algum arquivo estiver ausente durante a
 Os títulos usam `Helvetica, Arial, sans-serif`; quando Helvetica não está instalada, o sistema usa Arial. Os textos e controles da interface usam Poppins nos pesos 400, 600 e 700, embutidos em WOFF2 no próprio HTML para uso offline, inclusive na entrega como arquivo único. A fonte é distribuída sob a [SIL Open Font License](https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt), com copyright e licença completos no bloco `licencaPoppins` do HTML. Não há consulta ao Google Fonts durante o uso do aplicativo.
 
 As novas famílias são aplicadas apenas à tela. O documento impresso mantém Arial e todas as regras de impressão anteriores. O cache do PWA foi atualizado para distribuir a alteração na próxima ativação.
+
+
+O tamanho Normal da interface é **16 px**, com opções Grande (21 px) e Extra grande (24 px). Preferências e backups antigos de 18 px são convertidos para o novo Normal; os tamanhos ampliados são preservados. Links da barra lateral usam padding de 10 px × 12 px, e a marca tem margem inferior de 16 px. As fontes de impressão permanecem inalteradas.

@@ -26,7 +26,7 @@ test('controles de fonte ficam no rodapé e ampliam a navegação em janelas bai
  const p=await abrir(t);await p.locator('.sidebar a[href="#novo"]').click();
  for(const altura of [699,650,600]){
    await p.setViewportSize({width:1366,height:altura});
-   for(const fonte of ['18','21','24']){
+   for(const fonte of ['16','21','24']){
      await p.locator('[data-font="'+fonte+'"]').click();
      assert.equal(await p.locator('.sidebar-bottom fieldset [data-font="'+fonte+'"]').getAttribute('aria-pressed'),'true');
      assert.equal(await p.locator('.sidebar nav a').first().evaluate(el=>getComputedStyle(el).fontSize),fonte+'px');

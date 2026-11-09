@@ -1,6 +1,6 @@
 /* Altere a versão quando publicar mudanças nos arquivos do aplicativo.
    Sem skipWaiting: uma atualização nunca substitui uma sessão em edição. */
-const VERSAO = 'v2';
+const VERSAO = 'v3';
 const PREFIXO = 'contrato-facil-' + new URL(self.registration.scope).pathname + '-';
 const CACHE = PREFIXO + VERSAO;
 const ARQUIVOS = ['./index.html', './manifest.webmanifest'];
