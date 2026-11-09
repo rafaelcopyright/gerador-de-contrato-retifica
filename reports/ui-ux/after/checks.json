@@ -1,0 +1,110 @@
+[
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "inicio",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "historico",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "modelos",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "configuracoes",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "dados",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "pecas",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "clausulas",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "finalizar",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "height": 800,
+    "route": "modal",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "inicio",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "historico",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "modelos",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "configuracoes",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "dados",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "pecas",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "clausulas",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "finalizar",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "route": "modal",
+    "overflow": false
+  }
+]

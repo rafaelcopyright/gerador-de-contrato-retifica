@@ -1,0 +1,41 @@
+
+> contrato-facil@1.0.0 test
+> node --test
+
+✔ cores por seletor e hexadecimal persistem, mantêm contraste e rejeitam entrada inválida (4897.3708ms)
+✔ controles de fonte ficam no rodapé e ampliam a navegação em janelas baixas (4559.0149ms)
+✔ contrato local: busca, teclado, cálculos, cláusulas, validação e impressão (15090.582ms)
+✔ listas extensas: navegação, fonte, paginação, foco de erros e PDF completo (4994.3698ms)
+✔ CEP: carregamento, preenchimento e preservação de alterações durante a busca (4933.4815ms)
+✔ CEP: cliente e modelo com CEP antes do logradouro (4298.1851ms)
+✔ CEP: erro e falta de internet permitem edição manual e nova tentativa (3201.7344ms)
+✔ CEP: resposta atrasada não preenche outro endereço ou um novo contrato (2471.2904ms)
+✔ revisões: padrões configuráveis, quilometragem e preservação de edições (3308.5037ms)
+✔ CEP: tempo limite libera uma nova tentativa sem perder o endereço (1918.4794ms)
+✔ modelos e histórico: criar, editar, copiar, excluir e preservar versões antigas (9510.0782ms)
+✔ aparência, backup e rejeição de restauração inválida sem perder dados (4679.7957ms)
+✔ falha de gravação não informa sucesso nem abre impressão (2661.637ms)
+✔ dados locais corrompidos são preservados para recuperação (1728.4299ms)
+✔ garantia: cláusulas, dados variáveis, nota, cupons, recibo e impressão segura (2655.4035ms)
+✔ páginas novas e editor de modelos: fonte ampliada, rótulos e funcionamento offline (2002.9961ms)
+✔ atalho principal, ações abaixo das listas e nome seguro do PDF (4973.2239ms)
+✔ modelo com três intervalos e preços, inclusive revisão gratuita, preserva histórico (4918.3683ms)
+✔ contratos antigos repetem preço legado sem criar cópia duplicada (3342.859ms)
+✔ modelo rejeita intervalos fora de ordem sem alterar os dados salvos (3237.176ms)
+✔ modelo protege edições ao cancelar ou usar Esc, incluindo cláusulas adicionadas (4759.3812ms)
+✔ salvar, copiar e excluir modelos preserva um destino útil para o teclado (4871.8108ms)
+✔ fechar um aviso devolve o foco ao controle anterior (3206.3929ms)
+✔ oficina resumida, edição acessível e ordem dos contatos (7795.7521ms)
+✔ avisos temporários desaparecem, podem ser fechados e não cobrem ações de salvar (3940.9508ms)
+✔ salvar, imprimir, copiar e recarregar não criam duplicados idênticos (3233.9237ms)
+✔ dados diferentes criam novo contrato; edição não pode duplicar outro registro (2517.3063ms)
+✔ modelo copiado sem mudanças não duplica contrato nem altera o modelo original do registro (2929.4973ms)
+✔ veículo manual sem catálogos externos preserva os dados no histórico (2090.7117ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 24061.0414

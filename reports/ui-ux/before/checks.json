@@ -1,0 +1,92 @@
+[
+  {
+    "width": 1280,
+    "route": "inicio",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "historico",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "modelos",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "configuracoes",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "dados",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "pecas",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "clausulas",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "finalizar",
+    "overflow": false
+  },
+  {
+    "width": 1280,
+    "route": "modal",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "inicio",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "historico",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "modelos",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "configuracoes",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "dados",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "pecas",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "clausulas",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "finalizar",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "route": "modal",
+    "overflow": false
+  }
+]

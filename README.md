@@ -194,3 +194,9 @@ A cobertura de testes também verifica a ordem dos atalhos, ações abaixo das l
 
 
 O controle de tamanho da fonte fica no bloco inferior da barra lateral, junto de Configurações. Em janelas de computador com até 900 px de altura, apenas o fieldset e seus botões usam espaçamento compacto; os links mantêm seu tamanho original e acompanham a fonte escolhida. A rolagem permanece disponível quando necessária para acessar todos os controles.
+
+## Revisão final de UI/UX
+
+O editor de modelos pede confirmação antes de descartar alterações por Cancelar ou Esc e participa do aviso de saída do navegador. As ações de salvar, copiar e excluir preservam um destino útil para o teclado. Fechar um popup devolve o foco ao controle anterior. No celular, o modal usa menos margens internas e mantém campos grandes.
+
+A revisão e seus limites estão em [reports/ui-ux/REVISAO.md](reports/ui-ux/REVISAO.md), incluindo as skills utilizadas, evidências locais, verificações de fonte extra grande e testes de regressão.
