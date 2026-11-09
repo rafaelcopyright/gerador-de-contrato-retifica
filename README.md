@@ -92,7 +92,7 @@ O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com v
 
 ## Configurações, armazenamento e backup
 
-As configurações incluem quatro paletas de alto contraste, cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
+As configurações incluem quatro paletas prontas e duas cores personalizáveis: destaque (accent) e barra lateral (accent-dark). Cada cor pode ser escolhida no seletor visual ou informada como hexadecimal de seis dígitos, por exemplo, #145a48. Ao escolher uma paleta pronta, seus dois campos de cor são atualizados; use Salvar configurações para aplicar. O texto sobre os fundos personalizados alterna entre preto e branco para manter o contraste. As preferências entram no backup, e backups antigos continuam compatíveis. Também é possível escolher cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
 
 Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional envia somente o CEP ao ViaCEP. Contratos, nomes de clientes e placas não são enviados ao serviço.
 
@@ -191,3 +191,6 @@ Backups antigos com preço único continuam aceitos: o preço original é aplica
 
 
 A cobertura de testes também verifica a ordem dos atalhos, ações abaixo das listas, nome sugerido do PDF, recuperação após falha de impressão, intervalos e preços por modelo, revisão gratuita, rejeição de intervalos fora de ordem e compatibilidade de contratos antigos sem duplicação. Os cupons foram conferidos visualmente em PDF A4 com preços diferentes.
+
+
+Em janelas de computador com até 900 px de altura, a navegação usa espaçamento e controles compactos. O menu completo foi testado sem rolagem lateral própria nas alturas de 600, 650 e 699 px, inclusive com as três opções de fonte. Em alturas menores, a rolagem continua disponível para manter todos os controles acessíveis.
