@@ -20,7 +20,7 @@ O contrato é salvo antes de abrir a janela de impressão. Cancelar essa janela 
 
 ## Página inicial e navegação
 
-A página inicial apresenta dois blocos de consulta — **Histórico de contratos** e **Modelos de contrato** — e um bloco destacado para **Gerar novo contrato**.
+A página inicial é o painel **Emissão de contratos**: pesquisa por cliente, veículo ou placa em todo o histórico e exibe até dez registros, ordenados pela data de criação mais recente. Cada linha mostra cliente, veículo/placa, emissão, modelo e as ações **Reimprimir**, **Editar** e **Duplicar**. O botão **+ Gerar novo contrato** fica no cabeçalho.
 
 O menu fica fixo à esquerda em telas de computador e passa para o topo em telas menores. As configurações ficam na parte inferior do menu. Durante o preenchimento, links âncora levam às seções do contrato.
 
@@ -73,8 +73,8 @@ O valor por extenso é digitado pelo usuário. Campos opcionais não informados 
 
 ## Preenchimento rápido e acessibilidade
 
-- Três tamanhos de fonte: **Normal**, **Grande** e **Extra grande**.
-- Rótulos nos campos, foco visível, botões grandes e operação por teclado.
+- Seletor compacto **A− / A / A+** no rodapé: Normal (16 px), Grande (21 px) e Extra grande (24 px), com nomes acessíveis.
+- Rótulos nos campos, foco visível e operação por teclado. Controles compactos no desktop e alvos de pelo menos 44 px para ações rápidas em dispositivos de toque.
 - Uma seção de preenchimento aberta por vez e apenas um editor aberto em cada lista.
 - Peças e cláusulas em páginas de cinco registros, com resumos para revisão.
 - Botões de adicionar abaixo das listas de peças e cláusulas, junto da paginação.
@@ -178,7 +178,7 @@ Salvar várias vezes ou imprimir novamente atualiza o mesmo registro. Ao salvar 
 
 ## Ações de preenchimento e nome do PDF
 
-**Gerar novo contrato** é o primeiro atalho da página inicial. Os botões de adicionar peças e cláusulas ficam abaixo das respectivas listas, inclusive no editor de modelos. A paginação continua limitando a quantidade de registros exibidos.
+**Gerar novo contrato** é a ação principal do cabeçalho do painel. Os botões de adicionar peças e cláusulas ficam abaixo das respectivas listas, inclusive no editor de modelos. A paginação continua limitando a quantidade de registros exibidos.
 
 Ao abrir a impressão, o título do documento sugere um nome como `Contrato-Garantia-Chevrolet-Onix-ABC1D23-2026-11-08.pdf`, incluindo tipo de contrato, modelo e placa do veículo e data. Caracteres incompatíveis com nomes de arquivo são substituídos. Dados ausentes usam `Veiculo` e `Sem-placa`. O navegador permite escolher outro nome ao salvar; o título do aplicativo é restaurado ao sair da impressão.
 
@@ -231,7 +231,7 @@ Se a hospedagem estiver indisponível ou algum arquivo estiver ausente durante a
 
 ### Tipografia da interface
 
-Os títulos usam `Helvetica, Arial, sans-serif`; quando Helvetica não está instalada, o sistema usa Arial. Os textos e controles da interface usam Poppins nos pesos 400, 600 e 700, embutidos em WOFF2 no próprio HTML para uso offline, inclusive na entrega como arquivo único. A fonte é distribuída sob a [SIL Open Font License](https://raw.githubusercontent.com/google/fonts/main/ofl/poppins/OFL.txt), com copyright e licença completos no bloco `licencaPoppins` do HTML. Não há consulta ao Google Fonts durante o uso do aplicativo.
+A interface usa **Inter variável (pesos 400–800)**, embutida em WOFF2 no próprio HTML para funcionar offline. Copyright e [SIL Open Font License](https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt) estão no bloco `licencaInter`. Não há consulta ao Google Fonts durante o uso.
 
 As novas famílias são aplicadas apenas à tela. O documento impresso mantém Arial e todas as regras de impressão anteriores. O cache do PWA foi atualizado para distribuir a alteração na próxima ativação.
 
@@ -255,3 +255,14 @@ A imagem é carregada da URL pública HTTP/HTTPS informada, sem envio do endere�
 Há campos de **Ano do veículo**, **Forma de pagamento** (inclusive pagamentos divididos) e **Data de conclusão do serviço**. Nas cláusulas, use `{{formaPagamento}}` e `{{dataConclusao}}`; o total continua vindo da soma dos itens. O título do documento pode ser personalizado em Modelos → Editar. A opção de fluxo contínuo de cláusulas evita a quebra fixa no novo modelo; modelos anteriores mantêm sua paginação.
 
 O novo modelo é disponibilizado também em bases anteriores, sem sobrescrever os modelos existentes. A inclusão fica registrada na próxima gravação; se o usuário o excluir, ele não será adicionado novamente. Backups anteriores continuam aceitos. Os contratos históricos preservam seu próprio modelo e seus valores. Na base com o limite de 200 modelos atingido, libere um espaço antes de receber o novo modelo.
+
+
+## Painel operacional
+
+A interface usa raios de 4–6 px, espaçamento reduzido e bordas de campos com maior contraste. Em telas estreitas, as linhas da tabela se reorganizam em registros com rótulos, sem rolagem horizontal da página. O histórico completo e o cadastro de modelos continuam disponíveis pelo painel e pelo menu. A captura de tela deste README usa exclusivamente dados fictícios.
+
+A pesquisa do painel percorre todos os contratos, inclusive os que não estão nos dez registros iniciais. **Limpar busca** restaura a lista recente. **Reimprimir** abre o contrato salvo e a impressão, preservando conteúdo e datas do registro. Se houver rascunho não salvo, a troca exige confirmação. **Duplicar** abre uma cópia para edição; salvar conteúdo idêntico continua reutilizando o registro existente.
+
+O badge no rodapé distingue arquivo local, cache offline pronto e ausência de conexão sem cache. O estado de cache pronto só aparece depois da ativação do service worker; a consulta de CEP e a imagem externa da marca ainda podem precisar de internet. Atualizações, preferências de cores/marca, backups e fontes dos PDFs mantêm o comportamento anterior.
+
+A validação desta refatoração está em [docs/REFATORACAO-UI.md](docs/REFATORACAO-UI.md).
