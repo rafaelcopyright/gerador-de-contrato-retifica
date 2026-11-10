@@ -1,0 +1,62 @@
+{
+  "root": ".",
+  "files_scanned": 2,
+  "passed": false,
+  "states": {
+    "loading": {
+      "present": true,
+      "matched_terms": [
+        "/loading/i",
+        "/pending/i"
+      ]
+    },
+    "empty": {
+      "present": true,
+      "matched_terms": [
+        "/empty/i"
+      ]
+    },
+    "error": {
+      "present": true,
+      "matched_terms": [
+        "/error/i",
+        "/catch\\s*\\(/i"
+      ]
+    },
+    "disabled": {
+      "present": true,
+      "matched_terms": [
+        "/disabled/i"
+      ]
+    },
+    "focus": {
+      "present": true,
+      "matched_terms": [
+        "/focus-visible/i",
+        "/:focus/i"
+      ]
+    },
+    "selected": {
+      "present": true,
+      "matched_terms": [
+        "/selected/i",
+        "/aria-selected/i"
+      ]
+    },
+    "submitting": {
+      "present": false,
+      "matched_terms": []
+    },
+    "success": {
+      "present": true,
+      "matched_terms": [
+        "/success/i",
+        "/complete/i"
+      ]
+    }
+  },
+  "missing": [
+    "submitting"
+  ],
+  "note": "Missing markers require manual review; absence of a term is not proof the state is absent."
+}

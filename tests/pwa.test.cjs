@@ -30,6 +30,7 @@ async function iniciar(t){
 }
 test('PWA possui manifesto e ícones SVG válidos e gera contratos após reabrir offline',async t=>{
  const {pagina:p,contexto,url}=await iniciar(t);
+ await p.waitForFunction(()=>document.getElementById('statusConectividade').textContent.includes('Modo offline pronto'));
  const cdp=await contexto.newCDPSession(p);await cdp.send('Page.enable');
  const manifesto=await cdp.send('Page.getAppManifest');assert.equal(manifesto.errors.length,0);
  const dados=JSON.parse(manifesto.data);assert.equal(dados.display,'standalone');

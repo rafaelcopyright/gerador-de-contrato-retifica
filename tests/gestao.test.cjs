@@ -35,7 +35,8 @@ async function preencherItem(page, descricao = 'Retífica do motor', preco = '25
 test('modelos e histórico: criar, editar, copiar, excluir e preservar versões antigas', async t => {
   const page = await navegador(t);
   assert.equal(await page.locator('#paginaInicio').isVisible(), true);
-  assert.equal(await page.locator('.home-grid .shortcut').count(), 3);
+  assert.equal(await page.locator('#paginaInicio .shortcut-new').count(), 1);
+  assert.equal(await page.locator('#buscarInicio').isVisible(), true);
   await ir(page, 'modelos');
   const quantidadeModelosIniciais = await page.locator('#listaModelos article').count();
   await page.locator('#novoModelo').click();

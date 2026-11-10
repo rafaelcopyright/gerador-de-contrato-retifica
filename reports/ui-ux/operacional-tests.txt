@@ -1,0 +1,51 @@
+
+> contrato-facil@1.0.0 test
+> node --test
+
+✔ cores por seletor e hexadecimal persistem, mantêm contraste e rejeitam entrada inválida (13326.2021ms)
+✔ controles de fonte ficam no rodapé e ampliam a navegação em janelas baixas (6607.4868ms)
+✔ tipografia offline usa Inter na tela e preserva Arial na impressão (3274.1796ms)
+✔ contrato local: busca, teclado, cálculos, cláusulas, validação e impressão (20350.613ms)
+✔ listas extensas: navegação, fonte, paginação, foco de erros e PDF completo (6626.6277ms)
+✔ CEP: carregamento, preenchimento e preservação de alterações durante a busca (10884.5171ms)
+✔ CEP: cliente e modelo com CEP antes do logradouro (12796.1564ms)
+✔ CEP: erro e falta de internet permitem edição manual e nova tentativa (4337.0585ms)
+✔ CEP: resposta atrasada não preenche outro endereço ou um novo contrato (2216.9087ms)
+✔ revisões: padrões configuráveis, quilometragem e preservação de edições (3201.1057ms)
+✔ CEP: tempo limite libera uma nova tentativa sem perder o endereço (1199.5081ms)
+✔ modelos e histórico: criar, editar, copiar, excluir e preservar versões antigas (13637.588ms)
+✔ aparência, backup e rejeição de restauração inválida sem perder dados (10185.8367ms)
+✔ falha de gravação não informa sucesso nem abre impressão (2847.8338ms)
+✔ dados locais corrompidos são preservados para recuperação (2645.6745ms)
+✔ garantia: cláusulas, dados variáveis, nota, cupons, recibo e impressão segura (2790.5408ms)
+✔ páginas novas e editor de modelos: fonte ampliada, rótulos e funcionamento offline (9057.7166ms)
+✔ marca: título, imagem, alinhamento e persistência; imagem inválida mantém título (10845.985ms)
+✔ modelo de cabeçote usa dados atuais sem dados do exemplo e preserva título no histórico (6538.3848ms)
+✔ base antiga recebe novo modelo uma vez, sem reintroduzir modelo excluído (5499.7581ms)
+✔ painel pesquisa toda a base e limita a lista aos dez contratos mais recentes (13601.0736ms)
+✔ reimprimir usa o registro salvo sem duplicar nem alterar o histórico e respeita rascunho (6667.0334ms)
+✔ duplicar pelo painel mantém prevenção de duplicatas e layout responde à fonte ampliada (5932.6319ms)
+✔ PWA possui manifesto e ícones SVG válidos e gera contratos após reabrir offline (18894.7408ms)
+✔ atualização aguarda fechar o app, preserva rascunho e não remove caches de outros sistemas (7601.228ms)
+✔ falha ao baixar atualização mantém a versão anterior disponível offline (6952.9219ms)
+✔ atalho principal, ações abaixo das listas e nome seguro do PDF (13496.8885ms)
+✔ modelo com três intervalos e preços, inclusive revisão gratuita, preserva histórico (6375.7618ms)
+✔ contratos antigos repetem preço legado sem criar cópia duplicada (6238.7361ms)
+✔ modelo rejeita intervalos fora de ordem sem alterar os dados salvos (2983.9738ms)
+✔ modelo protege edições ao cancelar ou usar Esc, incluindo cláusulas adicionadas (10422.4454ms)
+✔ salvar, copiar e excluir modelos preserva um destino útil para o teclado (6860.4099ms)
+✔ fechar um aviso devolve o foco ao controle anterior (5825.7264ms)
+✔ oficina resumida, edição acessível e ordem dos contatos (10288.8228ms)
+✔ avisos temporários desaparecem, podem ser fechados e não cobrem ações de salvar (6895.6312ms)
+✔ salvar, imprimir, copiar e recarregar não criam duplicados idênticos (6663.7078ms)
+✔ dados diferentes criam novo contrato; edição não pode duplicar outro registro (4211.3938ms)
+✔ modelo copiado sem mudanças não duplica contrato nem altera o modelo original do registro (2866.5852ms)
+✔ veículo manual sem catálogos externos preserva os dados no histórico (2538.4407ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42233.5771
