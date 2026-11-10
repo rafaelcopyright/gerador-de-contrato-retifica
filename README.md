@@ -44,11 +44,12 @@ O editor reúne nome e formato do modelo, dados fixos da oficina, informações 
 
 ### Modelos iniciais Shekinah
 
-Os dois modelos foram reconstruídos em HTML/CSS a partir dos PDFs e das cinco fotografias fornecidos:
+Os dois modelos originais foram reconstruídos em HTML/CSS a partir dos PDFs e das cinco fotografias fornecidos. O terceiro foi adaptado do DOCX de serviço e garantia de cabeçote:
 
 | Modelo | Conteúdo |
 | --- | --- |
 | Prestação de serviço — Shekinah | Oficina, cliente, veículo, tabela de itens, cláusulas 1 a 16, pagamento e assinaturas. |
+| Serviço e garantia de cabeçote — Shekinah | Contrato e garantia de três meses adaptados do DOCX; sem nota, cupons ou recibo adicionais. |
 | Garantia e revisões — Shekinah | Termo de garantia, nota de serviço executado, três cupons de revisão e recibo de retirada opcional. |
 
 O recibo está habilitado inicialmente no modelo de garantia e pode ser desativado em suas opções. As revisões recebem valores iniciais editáveis. Os intervalos padrão são somados à quilometragem informada em cada contrato.
@@ -239,3 +240,18 @@ O tamanho Normal da interface é **16 px**, com opções Grande (21 px) e Extra 
 
 
 O campo **Valor por extenso** permanece manual e sua label não exibe “opcional”. A conversão automática do total ainda não está implementada.
+
+
+## Marca do sistema
+
+Em **Configurações → Marca do sistema**, personalize o título, informe a URL da imagem exibida acima dele e escolha alinhamento à esquerda, ao centro ou à direita. O título tem até 80 caracteres. Para remover a imagem, deixe a URL vazia e salve. Essas opções alteram somente a interface; não mudam a oficina nem os cabeçalhos dos PDFs.
+
+A imagem é carregada da URL pública HTTP/HTTPS informada, sem envio do endereço da página no Referer. Em páginas HTTPS, prefira imagem também HTTPS para evitar bloqueio de conteúdo misto. Se houver falha ou ausência de internet, o título permanece disponível e Configurações informa o problema. A URL entra no backup, mas a imagem externa não é incluída no cache offline. A imagem é solicitada ao servidor indicado pelo usuário. Preferências antigas usam “Contrato Fácil”, sem imagem e alinhado à esquerda.
+
+## Modelo de cabeçote
+
+**Serviço e garantia de cabeçote — Shekinah** preserva as condições de garantia, exclusões, obrigações, análise técnica e disposições finais do documento fornecido. A identificação das partes e do veículo e a relação de serviços usam o layout de impressão existente. Dados pessoais, veículo, serviços específicos, preços e pagamentos do exemplo não foram incorporados ao modelo. Preencha os serviços efetivamente contratados na lista de itens.
+
+Há campos de **Ano do veículo**, **Forma de pagamento** (inclusive pagamentos divididos) e **Data de conclusão do serviço**. Nas cláusulas, use `{{formaPagamento}}` e `{{dataConclusao}}`; o total continua vindo da soma dos itens. O título do documento pode ser personalizado em Modelos → Editar. A opção de fluxo contínuo de cláusulas evita a quebra fixa no novo modelo; modelos anteriores mantêm sua paginação.
+
+O novo modelo é disponibilizado também em bases anteriores, sem sobrescrever os modelos existentes. A inclusão fica registrada na próxima gravação; se o usuário o excluir, ele não será adicionado novamente. Backups anteriores continuam aceitos. Os contratos históricos preservam seu próprio modelo e seus valores. Na base com o limite de 200 modelos atingido, libere um espaço antes de receber o novo modelo.

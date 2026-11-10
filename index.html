@@ -122,6 +122,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     .muted, .hint { color: #465b6b; }
     .hint { font-size: .88rem; margin: 8px 0; }
     .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; padding: 28px 20px; overflow-y: auto; background: var(--accent-dark); color: var(--on-accent-dark, white); display: flex; flex-direction: column; gap: 16px; }
+    .brand-block { display: flex; flex-direction: column; align-items: var(--brand-align, flex-start); text-align: var(--brand-text-align, left); flex-shrink: 0; overflow-wrap: anywhere; }
+    .brand-block img { display: block; max-width: 100%; max-height: 100px; object-fit: contain; margin-bottom: 8px; }
     .sidebar-bottom { margin-top: auto; }
     .editor-nav { border-top: 1px solid #80a79b; padding-top: 12px; }
     .brand { display: block; font-size: 1.3rem; margin-bottom: 16px; }
@@ -298,7 +300,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
   <!-- TELA DO SISTEMA -->
   <aside class="sidebar screen" aria-label="Navegação e acessibilidade">
-    <strong class="brand">Contrato Fácil</strong>
+    <div id="marcaSistema" class="brand-block"><img id="imagemMarca" alt="" referrerpolicy="no-referrer" decoding="async" hidden><strong id="tituloMarca" class="brand">Contrato Fácil</strong></div>
     <nav aria-label="Navegação principal">
       <a href="#inicio" aria-current="page">Página inicial</a>
       <a href="#historico">Histórico de contratos</a>
@@ -342,7 +344,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <div id="paginaConfiguracoes" class="page" hidden>
       <header class="page-heading"><h1>Configurações</h1><p>Ajuste a aparência e cuide dos dados salvos neste navegador.</p></header>
       <form id="formConfiguracoes" class="card">
-        <h2>Aparência</h2><div class="fields">
+        <h2>Marca do sistema</h2><div class="fields">
+          <div><label for="marcaTitulo">Título da marca</label><input id="marcaTitulo" maxlength="80" required></div>
+          <div><label for="marcaAlinhamento">Alinhamento da marca</label><select id="marcaAlinhamento"><option value="left">Esquerda</option><option value="center">Centro</option><option value="right">Direita</option></select></div>
+          <div class="wide"><label for="marcaImagemUrl">URL da imagem acima do título (opcional)</label><input id="marcaImagemUrl" type="url" maxlength="2048" placeholder="https://exemplo.com/logo.png" aria-describedby="ajudaImagemMarca statusImagemMarca"><p id="ajudaImagemMarca" class="hint">Use uma URL pública HTTP ou HTTPS. A imagem precisa de internet e não é incluída no cache offline. Deixe vazio para remover.</p><p id="statusImagemMarca" class="hint" role="status"></p></div>
+        </div><h2>Aparência</h2><div class="fields">
           <div><label for="tema">Paleta pronta</label><select id="tema"><option value="verde">Verde oficina</option><option value="azul">Azul clássico</option><option value="vinho">Vinho</option><option value="grafite">Grafite</option></select></div>
           <div><label for="corPrincipalHex">Cor de destaque (accent)</label><div class="color-control"><label class="sr-only" for="corPrincipal">Selecionar cor de destaque</label><input id="corPrincipal" type="color" aria-label="Selecionar cor de destaque"><input id="corPrincipalHex" type="text" pattern="#[0-9a-fA-F]{6}" maxlength="7" placeholder="#145a48" required aria-describedby="ajudaCores" spellcheck="false"></div></div>
           <div><label for="corEscuraHex">Cor da barra lateral (accent-dark)</label><div class="color-control"><label class="sr-only" for="corEscura">Selecionar cor da barra lateral</label><input id="corEscura" type="color" aria-label="Selecionar cor da barra lateral"><input id="corEscuraHex" type="text" pattern="#[0-9a-fA-F]{6}" maxlength="7" placeholder="#183e38" required aria-describedby="ajudaCores" spellcheck="false"></div></div>
@@ -425,9 +431,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   <dialog id="dialogModelo" aria-labelledby="tituloDialogModelo">
     <form id="formModelo" novalidate><h1 id="tituloDialogModelo">Editar modelo</h1>
       <div class="fields"><div><label for="nomeModelo">Nome do modelo *</label><input id="nomeModelo" required maxlength="150"></div><div><label for="tipoModelo">Formato do documento</label><select id="tipoModelo"><option value="servico">Prestação de serviço</option><option value="garantia">Garantia, nota e cupons de revisão</option></select></div></div>
+      <div class="fields"><div class="wide"><label for="tituloModelo">Título no documento (opcional)</label><input id="tituloModelo" maxlength="200" placeholder="Usar título padrão do formato"></div></div>
       <details class="card" open><summary>Informações fixas da oficina</summary><div id="camposModelo" class="fields"></div></details>
       <details class="card" open><summary>Revisões: quilômetros e valores</summary><p class="hint">Informe os quilômetros após o odômetro atual e o preço de cada revisão. Esses padrões serão usados nos novos contratos deste modelo.</p><div id="camposRevisoesModelo" class="fields"></div></details>
-      <details class="card"><summary>Textos e opções do documento</summary><div class="fields"><div class="wide"><label for="introducaoModelo">Texto de abertura</label><textarea id="introducaoModelo" maxlength="5000"></textarea></div><div class="wide"><label for="reciboModelo">Texto do recibo de retirada</label><textarea id="reciboModelo" maxlength="5000"></textarea></div></div><label class="checkbox"><input id="incluirRecibo" type="checkbox">Incluir recibo de retirada no modelo de garantia</label></details>
+      <details class="card"><summary>Textos e opções do documento</summary><div class="fields"><div class="wide"><label for="introducaoModelo">Texto de abertura</label><textarea id="introducaoModelo" maxlength="5000"></textarea></div><div class="wide"><label for="reciboModelo">Texto do recibo de retirada</label><textarea id="reciboModelo" maxlength="5000"></textarea></div></div><label class="checkbox"><input id="paginacaoContinua" type="checkbox">Deixar as cláusulas seguirem o fluxo das páginas, sem quebra fixa</label><label class="checkbox"><input id="incluirRecibo" type="checkbox">Incluir recibo de retirada no modelo de garantia</label></details>
       <div class="section-heading"><h2>Cláusulas do modelo</h2><span id="contagemClausulasModelo"></span></div>
       <p class="hint">Textos entre chaves duplas são preenchidos automaticamente no contrato: total, valor por extenso, prazos, revisões e dados de pagamento.</p>
       <div id="listaClausulasModelo"></div><nav id="paginasClausulasModelo" class="pagination" aria-label="Páginas das cláusulas do modelo"></nav>
@@ -604,6 +611,40 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       "Com base em todas as cláusulas acima descritas, o contratante, ciente dos direitos e deveres que possui, expressa, assinando este contrato, sua inteira concordância com este TERMO DE GARANTIA.",
       "Após o recebimento do veículo pelo CONTRATANTE, este deverá providenciar a limpeza do radiador de água, carburador e sistema de injeção, para que não ocorram futuros problemas quanto ao aquecimento e falhas no motor.",
       "Após o recebimento do veículo, o contratante tem até 3 dias para apresentar um laudo de que foi feito o sistema de arrefecimento e verificação dos sensores de ventoinha e/ou parte de injeção."
+    ]
+  },
+  {
+    "id": "shekinah-cabecote",
+    "nome": "Serviço e garantia de cabeçote — Shekinah",
+    "tipo": "servico",
+    "titulo": "Contrato de prestação de serviços e termo de garantia — Cabeçote",
+    "paginacaoContinua": true,
+    "oficina": {
+      "empresa": "RETÍFICA DE MOTORES SHEKINAH LTDA",
+      "cnpj": "61.028.039/0001-01",
+      "telefone": "(11) 95793-8059",
+      "email": "retificashekinah2025@gmail.com",
+      "endereco": "Av. Sapopemba, 10558",
+      "bairro": "São Mateus",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "cep": "03988-000",
+      "banco": "PAGBANK",
+      "agencia": "0001",
+      "conta": "88882551-0",
+      "pix": "61028039000101",
+      "titular": "RETIFICA MOTORES"
+    },
+    "introducao": "O prestador declara ter executado os serviços no cabeçote do motor descritos na relação de peças e serviços.",
+    "recibo": "",
+    "incluirRecibo": false,
+    "clausulas": [
+      "PRAZO DE GARANTIA\nO prestador concede garantia de 3 (três) meses, contados a partir da data de entrega do serviço, observados os prazos e direitos previstos na legislação aplicável.\n\nA garantia cobre defeitos comprovadamente relacionados aos serviços executados e às peças fornecidas pelo prestador, conforme a responsabilidade de cada parte.",
+      "CONDIÇÕES DA GARANTIA\nPara avaliação da garantia, o cliente deverá apresentar o veículo ou o cabeçote para inspeção técnica, permitindo a identificação da causa do defeito.\n\nA garantia não cobre danos comprovadamente decorrentes de:\na) Superaquecimento do motor após a entrega do serviço;\nb) Falta de lubrificação, baixo nível de óleo ou deficiência no sistema de arrefecimento;\nc) Montagem inadequada, intervenção de terceiros ou reparos não autorizados que tenham relação com o defeito reclamado;\nd) Uso inadequado do veículo ou descumprimento das orientações técnicas fornecidas;\ne) Defeitos em outros componentes do motor que não façam parte do serviço contratado, desde que não decorram de falha do serviço executado.\n\nAs exclusões acima não afastam os direitos legais do consumidor quando aplicáveis.",
+      "OBRIGAÇÕES DO CLIENTE\nO cliente declara estar ciente de que o funcionamento e a durabilidade do cabeçote dependem também das condições gerais do motor, incluindo lubrificação, arrefecimento, montagem e regulagem.\n\nO cliente deverá interromper o funcionamento do motor e procurar assistência técnica caso perceba superaquecimento, perda de líquido de arrefecimento, ruídos anormais ou acendimento da luz de pressão do óleo.",
+      "ANÁLISE E ATENDIMENTO DA GARANTIA\nQualquer reclamação deverá ser comunicada ao prestador para agendamento de avaliação técnica.\n\nConstatada falha coberta pela garantia, o reparo será realizado conforme a legislação aplicável, sem cobrança pelos serviços e peças abrangidos pela responsabilidade do prestador.\n\nA avaliação não poderá ser utilizada para afastar direitos legais do cliente. Eventuais despesas de remoção, transporte ou desmontagem serão tratadas conforme a legislação e a responsabilidade apurada.",
+      "VALOR E PAGAMENTO\nValor total do serviço: {{total}}\nForma de pagamento: {{formaPagamento}}\nData de conclusão: {{dataConclusao}}",
+      "DISPOSIÇÕES FINAIS\nEste documento registra os serviços contratados, as condições da garantia e as informações fornecidas ao cliente. Não substitui nem limita os direitos previstos na legislação vigente.\n\nPor estarem cientes dos serviços descritos e das condições aqui estabelecidas, as partes assinam este documento."
     ]
   }
 ]
@@ -937,6 +978,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
     function valoresDocumento(itens) {
       const valores = Object.fromEntries(idsCamposContrato.map(id => [id, document.getElementById(id).value.trim()]));
+      valores.dataConclusao = valores.dataConclusao.split('-').reverse().join('/');
       return { ...valores, ...modeloAtual?.oficina, empresa: valores.oficina, enderecoOficina: valores.endereco, cep: valores.cepOficina, bairro: valores.bairroOficina, cidade: valores.cidadeOficina, uf: valores.ufOficina, total: moeda.format(calcularTotalCentavos(itens) / 100) };
     }
 
@@ -983,7 +1025,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         cupom.append(criarTexto('h2', 'Cupom para revisão do motor de força ' + String(indice).padStart(2, '0')),
           criarTexto('p', 'Fazer a ' + indice + 'ª revisão com ' + (valores['revisao' + indice] || '________________') + ' quilômetros.'));
         const dados = document.createElement('div'); dados.className = 'print-grid';
-        adicionarDadosImpressos(dados, [['Veículo', valores.veiculo], ['Placa', valores.placa], ['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem]]);
+        adicionarDadosImpressos(dados, [['Veículo', valores.veiculo], ['Placa', valores.placa], ...(valores.anoVeiculo ? [['Ano', valores.anoVeiculo]] : []), ['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem]]);
         const valor = valores[indice === 1 ? 'valorRevisao' : 'valorRevisao' + indice];
         cupom.append(dados, criarTexto('p', 'Valor da revisão: ' + (valor !== '' && valor !== undefined ? moeda.format(Number(valor)) : 'R$ ________________')));
         cupons.append(cupom);
@@ -1001,7 +1043,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       const valores = valoresDocumento(itens);
       const garantia = modeloAtual.tipo === 'garantia';
       document.getElementById('documento').dataset.tipo = modeloAtual.tipo;
-      document.getElementById('pdfTitulo').textContent = garantia ? 'Contrato de garantia — serviço executado' : 'Contrato de prestação de serviço';
+      document.getElementById('pdfTitulo').textContent = modeloAtual.titulo || (garantia ? 'Contrato de garantia — serviço executado' : 'Contrato de prestação de serviço');
       document.getElementById('pdfOficina').textContent = valores.empresa;
       document.getElementById('pdfContato').textContent = 'CNPJ / Telefone: ' + document.getElementById('contato').value.trim();
       document.getElementById('pdfNumero').textContent = 'Contrato: ' + (valores.numeroContrato || '____________');
@@ -1011,7 +1053,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       document.getElementById('pdfCliente').textContent = valores.cliente;
       adicionarDadosImpressos(document.getElementById('pdfClienteDados'), [['CPF / CNPJ', valores.cpfCliente], ['RG / documento', valores.rgCliente], ['Celular', valores.celularCliente], ['Telefone', valores.telefoneCliente], ['Endereço', valores.enderecoCliente], ['Complemento', valores.complementoCliente], ['Bairro', valores.bairroCliente], ['Cidade / UF / CEP', [valores.cidadeCliente, valores.ufCliente, valores.cepCliente].filter(Boolean).join(' · ')]]);
       document.getElementById('pdfVeiculo').textContent = 'VEÍCULO: ' + (valores.veiculo || '________________') + ' | PLACA: ' + (valores.placa || '________________');
-      adicionarDadosImpressos(document.getElementById('pdfVeiculoDados'), [['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem], ['Chassi', valores.chassi]]);
+      adicionarDadosImpressos(document.getElementById('pdfVeiculoDados'), [...(valores.anoVeiculo ? [['Ano', valores.anoVeiculo]] : []), ['Combustível', valores.combustivel], ['Cor', valores.corVeiculo], ['Motor', valores.motor], ['Quilometragem', valores.quilometragem], ['Chassi', valores.chassi]]);
       const [ano, mes, dia] = valores.data.split('-');
       const data = ano ? dia + '/' + mes + '/' + ano : '';
       document.getElementById('pdfData').textContent = data;
@@ -1021,7 +1063,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       preencherTabelaDocumento(itens);
       document.getElementById(garantia ? 'pdfPosicaoNota' : 'pdfPosicaoItens').append(document.getElementById('pdfItens'));
       const clausulas = Array.from(listaClausulas.querySelectorAll('textarea'), campo => campo.value.trim());
-      const limite = garantia ? 7 : 4;
+      const limite = modeloAtual.paginacaoContinua ? clausulas.length : garantia ? 7 : 4;
       document.getElementById('pdfTermos').hidden = clausulas.length === 0;
       preencherClausulas(document.getElementById('pdfClausulas'), clausulas.slice(0, limite), 0, valores);
       preencherClausulas(document.getElementById('pdfClausulasRestantes'), clausulas.slice(limite), limite, valores);
@@ -1117,13 +1159,14 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       ['numeroContrato', 'Número do contrato', 30], ['cpfCliente', 'CPF / CNPJ do cliente', 30], ['rgCliente', 'RG / documento', 40],
       ['celularCliente', 'Celular do cliente', 40], ['telefoneCliente', 'Telefone do cliente', 40], ['cepCliente', 'CEP do cliente', 9], ['enderecoCliente', 'Endereço do cliente e número', 250],
       ['complementoCliente', 'Complemento', 100], ['bairroCliente', 'Bairro do cliente', 100], ['cidadeCliente', 'Cidade do cliente', 100], ['ufCliente', 'UF do cliente', 2],
-      ['combustivel', 'Combustível', 40], ['corVeiculo', 'Cor do veículo', 40], ['motor', 'Motor / número', 100], ['chassi', 'Chassi', 40], ['quilometragem', 'Quilometragem atual', 15, 'number']
+      ['anoVeiculo', 'Ano do veículo', 4], ['combustivel', 'Combustível', 40], ['corVeiculo', 'Cor do veículo', 40], ['motor', 'Motor / número', 100], ['chassi', 'Chassi', 40], ['quilometragem', 'Quilometragem atual', 15, 'number']
     ];
     const camposPagamento = [
-      ['valorExtenso', 'Valor por extenso', 300], ['prazoNacional', 'Prazo: nacionais e importados (dias)', 5, 'number'], ['prazoDiesel', 'Prazo: diesel (dias)', 5, 'number'],
+      ['formaPagamento', 'Forma de pagamento', 300], ['dataConclusao', 'Data de conclusão do serviço', 10, 'date'], ['valorExtenso', 'Valor por extenso', 300], ['prazoNacional', 'Prazo: nacionais e importados (dias)', 5, 'number'], ['prazoDiesel', 'Prazo: diesel (dias)', 5, 'number'],
       ['revisao1', '1ª revisão com (km)', 15, 'number'], ['revisao2', '2ª revisão com (km)', 15, 'number'], ['revisao3', '3ª revisão com (km)', 15, 'number'], ['valorRevisao', 'Valor da 1ª revisão (R$)', 15, 'number'], ['valorRevisao2', 'Valor da 2ª revisão (R$)', 15, 'number'], ['valorRevisao3', 'Valor da 3ª revisão (R$)', 15, 'number'], ['observacoes', 'Observações do contrato', 3000]
     ];
     const camposEnderecoNovos = ['cepOficina', 'bairroOficina', 'cidadeOficina', 'ufOficina'];
+    const camposDocumentoNovos = ['anoVeiculo', 'formaPagamento', 'dataConclusao'];
     const camposValoresNovos = ['valorRevisao2', 'valorRevisao3'];
     const idsCamposContrato = ['oficina', 'contato', ...camposEnderecoNovos, 'endereco', 'cliente', 'veiculo', 'placa', 'data', ...camposExtras.map(campo => campo[0]), ...camposPagamento.map(campo => campo[0])];
     let falhaLeitura = false;
@@ -1188,8 +1231,26 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       });
     }
 
+    function incluirModeloCabecote(dados) {
+      if (dados.modeloCabecoteDisponibilizado) return dados;
+      if (!dados.modelos.some(modelo => modelo.id === 'shekinah-cabecote')) {
+        if (dados.modelos.length >= 200) return dados;
+        const modelo = JSON.parse(document.getElementById('modelosIniciais').textContent).find(modelo => modelo.id === 'shekinah-cabecote');
+        dados.modelos.push(modelo);
+      }
+      dados.modeloCabecoteDisponibilizado = true;
+      return dados;
+    }
+
     function estadoInicial() {
-      return { versao: 1, sequencia: 1, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '16', modeloPadrao: '' } };
+      return { versao: 1, sequencia: 1, modeloCabecoteDisponibilizado: true, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '16', modeloPadrao: '' } };
+    }
+
+    function urlImagemValida(valor) {
+      if (valor === '') return true;
+      if (typeof valor !== 'string' || valor.length > 2048) return false;
+      try { const url = new URL(valor); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password; }
+      catch { return false; }
     }
 
     function textoValido(valor, limite = 5000) { return typeof valor === 'string' && valor.length <= limite; }
@@ -1197,7 +1258,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function modeloValido(modelo) {
       return modelo && textoValido(modelo.id, 100) && modelo.id.trim() && textoValido(modelo.nome, 150) && modelo.nome.trim()
         && ['servico', 'garantia'].includes(modelo.tipo) && modelo.oficina && typeof modelo.oficina === 'object'
-        && revisoesValidas(modelo.revisoes)
+        && (modelo.paginacaoContinua === undefined || typeof modelo.paginacaoContinua === 'boolean')
+        && (modelo.titulo === undefined || textoValido(modelo.titulo, 200)) && revisoesValidas(modelo.revisoes)
         && camposFixos.every(([id, , limite]) => modelo.oficina[id] === undefined || textoValido(modelo.oficina[id], limite))
         && textoValido(modelo.introducao) && textoValido(modelo.recibo) && typeof modelo.incluirRecibo === 'boolean'
         && Array.isArray(modelo.clausulas) && modelo.clausulas.length <= 200 && modelo.clausulas.every(texto => textoValido(texto) && texto.trim());
@@ -1209,14 +1271,17 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       const dataValida = data => textoValido(data, 40) && Number.isFinite(Date.parse(data));
       const contratoValido = contrato => contrato && textoValido(contrato.id, 100) && contrato.id.trim() && modeloValido(contrato.modelo)
         && dataValida(contrato.criadoEm) && dataValida(contrato.atualizadoEm) && ['salvo', 'impressao'].includes(contrato.situacao)
-        && contrato.campos && idsCamposContrato.every(id => ((camposEnderecoNovos.includes(id) || camposValoresNovos.includes(id)) && contrato.campos[id] === undefined) || textoValido(contrato.campos[id], id === 'observacoes' ? 3000 : 300))
+        && contrato.campos && idsCamposContrato.every(id => ((camposEnderecoNovos.includes(id) || camposValoresNovos.includes(id) || camposDocumentoNovos.includes(id)) && contrato.campos[id] === undefined) || textoValido(contrato.campos[id], id === 'observacoes' ? 3000 : 300))
         && Array.isArray(contrato.clausulas) && contrato.clausulas.length <= 200 && contrato.clausulas.every(texto => textoValido(texto) && texto.trim())
         && Array.isArray(contrato.itens) && contrato.itens.length > 0 && contrato.itens.length <= 1000
         && contrato.itens.every(item => textoValido(item.descricao, 250) && item.descricao.trim() && Number.isInteger(item.quantidade) && item.quantidade >= 1 && item.quantidade <= 9999 && Number.isInteger(item.centavos) && item.centavos >= 0 && item.centavos <= 999999999);
-      if (!dados || dados.versao !== 1 || !Number.isSafeInteger(dados.sequencia) || dados.sequencia < 1
+      if (!dados || (dados.modeloCabecoteDisponibilizado !== undefined && typeof dados.modeloCabecoteDisponibilizado !== 'boolean') || dados.versao !== 1 || !Number.isSafeInteger(dados.sequencia) || dados.sequencia < 1
         || !Array.isArray(dados.modelos) || dados.modelos.length > 200 || !dados.modelos.every(modeloValido) || !idsUnicos(dados.modelos)
         || !Array.isArray(dados.contratos) || dados.contratos.length > 10000 || !dados.contratos.every(contratoValido) || !idsUnicos(dados.contratos)
-        || !config || !['corPrincipal', 'corEscura'].every(chave => config[chave] === undefined || /^#[0-9a-fA-F]{6}$/.test(config[chave])) || !['verde', 'azul', 'vinho', 'grafite'].includes(config.tema) || !['arredondado', 'reto'].includes(config.estilo)
+        || !config || (config.marcaTitulo !== undefined && (!textoValido(config.marcaTitulo, 80) || !config.marcaTitulo.trim()))
+        || (config?.marcaImagemUrl !== undefined && !urlImagemValida(config.marcaImagemUrl))
+        || (config?.marcaAlinhamento !== undefined && !['left', 'center', 'right'].includes(config.marcaAlinhamento))
+        || !['corPrincipal', 'corEscura'].every(chave => config[chave] === undefined || /^#[0-9a-fA-F]{6}$/.test(config[chave])) || !['verde', 'azul', 'vinho', 'grafite'].includes(config.tema) || !['arredondado', 'reto'].includes(config.estilo)
         || !['confortavel', 'compacto'].includes(config.densidade) || !['16', '18', '21', '24'].includes(config.fonte) || !textoValido(config.modeloPadrao, 100) || !revisoesValidas(config.revisoes)) {
         throw new Error('O arquivo não é um backup válido do Contrato Fácil. Nenhum dado foi alterado.');
       }
@@ -1237,7 +1302,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function carregarEstado() {
       try {
         const salvo = localStorage.getItem(chaveDados);
-        return salvo ? validarBackup(JSON.parse(salvo)) : estadoInicial();
+        return salvo ? incluirModeloCabecote(validarBackup(JSON.parse(salvo))) : estadoInicial();
       } catch {
         falhaLeitura = true;
         mostrarErroArmazenamento('Não foi possível ler os dados locais. Eles não serão sobrescritos. Exporte uma cópia em Configurações ou restaure um backup válido.');
@@ -1476,7 +1541,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       const oficina = Object.fromEntries(camposFixos.map(([id]) => [id, normalizar(registro.modelo.oficina[id])]));
       const legados = { cepOficina: 'cep', bairroOficina: 'bairro', cidadeOficina: 'cidade', ufOficina: 'uf' };
       const campos = idsCamposContrato.filter(id => id !== 'numeroContrato').map(id => [id, normalizar(registro.campos[id] ?? (camposValoresNovos.includes(id) ? registro.campos.valorRevisao : registro.modelo.oficina[legados[id]]))]);
-      return JSON.stringify({ campos, oficina, tipo: registro.modelo.tipo, introducao: normalizar(registro.modelo.introducao), recibo: normalizar(registro.modelo.recibo), incluirRecibo: registro.modelo.incluirRecibo, itens: registro.itens.map(item => [normalizar(item.descricao), item.quantidade, item.centavos]), clausulas: registro.clausulas.map(normalizar) });
+      return JSON.stringify({ campos, oficina, titulo: normalizar(registro.modelo.titulo), paginacaoContinua: Boolean(registro.modelo.paginacaoContinua), tipo: registro.modelo.tipo, introducao: normalizar(registro.modelo.introducao), recibo: normalizar(registro.modelo.recibo), incluirRecibo: registro.modelo.incluirRecibo, itens: registro.itens.map(item => [normalizar(item.descricao), item.quantidade, item.centavos]), clausulas: registro.clausulas.map(normalizar) });
     }
 
     function salvarContratoAtual(situacao = 'salvo') {
@@ -1617,6 +1682,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       document.getElementById('formModelo').reset();
       document.getElementById('tituloDialogModelo').textContent = modelo ? 'Editar modelo' : 'Criar modelo';
       document.getElementById('nomeModelo').value = modelo?.nome || '';
+      document.getElementById('tituloModelo').value = modelo?.titulo || '';
       document.getElementById('tipoModelo').value = modelo?.tipo || 'servico';
       camposFixos.forEach(([id]) => { document.getElementById('modelo-' + id).value = modelo?.oficina[id] || ''; });
       const revisoes = padroesRevisao(modelo || {});
@@ -1625,6 +1691,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       document.getElementById('introducaoModelo').value = modelo?.introducao || '';
       document.getElementById('reciboModelo').value = modelo?.recibo || '';
       document.getElementById('incluirRecibo').checked = modelo?.incluirRecibo || false;
+      document.getElementById('paginacaoContinua').checked = modelo?.paginacaoContinua || false;
       const lista = document.getElementById('listaClausulasModelo'); lista.replaceChildren();
       (modelo?.clausulas || []).forEach(texto => adicionarClausula(texto, lista)); atualizarPaginacao(lista, 1);
       document.getElementById('erroModelo').textContent = '';
@@ -1645,6 +1712,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       }
       const modelo = {
         id: modeloEditandoId || crypto.randomUUID(), nome: document.getElementById('nomeModelo').value.trim(), tipo: document.getElementById('tipoModelo').value,
+        titulo: document.getElementById('tituloModelo').value.trim(), paginacaoContinua: document.getElementById('paginacaoContinua').checked,
         oficina: Object.fromEntries(camposFixos.map(([id]) => [id, document.getElementById('modelo-' + id).value.trim()])),
         revisoes,
         introducao: document.getElementById('introducaoModelo').value.trim(), recibo: document.getElementById('reciboModelo').value.trim(), incluirRecibo: document.getElementById('incluirRecibo').checked,
@@ -1677,7 +1745,26 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       });
     }
 
+    function aplicarMarca() {
+      const config = estado.configuracoes;
+      const alinhamento = config.marcaAlinhamento || 'left';
+      const marca = document.getElementById('marcaSistema');
+      marca.style.setProperty('--brand-align', { left: 'flex-start', center: 'center', right: 'flex-end' }[alinhamento]);
+      marca.style.setProperty('--brand-text-align', alinhamento);
+      document.getElementById('tituloMarca').textContent = config.marcaTitulo || 'Contrato Fácil';
+      const imagem = document.getElementById('imagemMarca');
+      const status = document.getElementById('statusImagemMarca');
+      const url = config.marcaImagemUrl || '';
+      if (!url) { imagem.removeAttribute('src'); imagem.hidden = true; status.textContent = ''; return; }
+      if (imagem.getAttribute('src') === url && imagem.complete && imagem.naturalWidth > 0) return;
+      imagem.hidden = true; status.textContent = 'Carregando imagem da marca…';
+      imagem.onload = () => { imagem.hidden = false; status.textContent = 'Imagem da marca carregada.'; };
+      imagem.onerror = () => { imagem.hidden = true; status.textContent = 'Não foi possível carregar a imagem. Confira a URL e a conexão; o título continua disponível.'; };
+      imagem.src = url;
+    }
+
     function aplicarAparencia() {
+      aplicarMarca();
       const cores = coresConfiguradas();
       document.documentElement.style.setProperty('--on-accent', textoContrastante(cores[0]));
       document.documentElement.style.setProperty('--on-accent-dark', textoContrastante(cores[1]));
@@ -1689,6 +1776,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
     function preencherConfiguracoes() {
       preencherCores(coresConfiguradas());
+      document.getElementById('marcaTitulo').value = estado.configuracoes.marcaTitulo || 'Contrato Fácil';
+      document.getElementById('marcaImagemUrl').value = estado.configuracoes.marcaImagemUrl || '';
+      document.getElementById('marcaAlinhamento').value = estado.configuracoes.marcaAlinhamento || 'left';
       ['tema', 'estilo', 'densidade'].forEach(id => { document.getElementById(id).value = estado.configuracoes[id]; });
       const select = document.getElementById('modeloPadrao'); select.replaceChildren(new Option('Primeiro modelo disponível', ''));
       estado.modelos.forEach(modelo => select.add(new Option(modelo.nome, modelo.id)));
@@ -1762,7 +1852,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         if (arquivo.size > 5 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 5 MB.');
         const dados = validarBackup(JSON.parse(await arquivo.text()));
         if (!confirm(`Restaurar ${dados.contratos.length} contrato(s) e ${dados.modelos.length} modelo(s)? Os dados atuais e as alterações não salvas serão substituídos.`)) return;
-        if (!persistirEstado(dados, true)) return;
+        if (!persistirEstado(incluirModeloCabecote(dados), true)) return;
         modeloAtual = null; contratoAtualId = null; alterado = false;
         novoContrato(); aplicarAparencia(); configurarFonteAposRestauracao(); atualizarSeletoresModelos(); preencherConfiguracoes(); mostrarPagina('configuracoes');
         anunciar('Backup restaurado com sucesso.'); campo.value = '';
@@ -1857,7 +1947,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         anunciar('Informe os intervalos em ordem crescente: primeira, segunda e terceira revisão.');
         document.getElementById('padraoRevisao1').focus(); return;
       }
-      const configuracoes = { ...estado.configuracoes, revisoes, corPrincipal: document.getElementById('corPrincipalHex').value.toLowerCase(), corEscura: document.getElementById('corEscuraHex').value.toLowerCase(), ...Object.fromEntries(['tema', 'estilo', 'densidade', 'modeloPadrao'].map(id => [id, document.getElementById(id).value])) };
+      const marcaTitulo = document.getElementById('marcaTitulo').value.trim();
+      const marcaImagemUrl = document.getElementById('marcaImagemUrl').value.trim();
+      if (!marcaTitulo || !urlImagemValida(marcaImagemUrl)) {
+        anunciar('Informe um título e uma URL de imagem HTTP ou HTTPS válida, sem usuário e senha.');
+        document.getElementById(!marcaTitulo ? 'marcaTitulo' : 'marcaImagemUrl').focus(); return;
+      }
+      const configuracoes = { ...estado.configuracoes, revisoes, marcaTitulo, marcaImagemUrl, marcaAlinhamento: document.getElementById('marcaAlinhamento').value, corPrincipal: document.getElementById('corPrincipalHex').value.toLowerCase(), corEscura: document.getElementById('corEscuraHex').value.toLowerCase(), ...Object.fromEntries(['tema', 'estilo', 'densidade', 'modeloPadrao'].map(id => [id, document.getElementById(id).value])) };
       if (persistirEstado({ ...estado, configuracoes })) { aplicarAparencia(); anunciar('Configurações salvas.'); }
     });
     document.getElementById('exportarBackup').addEventListener('click', exportarBackup);
