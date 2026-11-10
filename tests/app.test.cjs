@@ -125,7 +125,7 @@ test('listas extensas: navegação, fonte, paginação, foco de erros e PDF comp
     assert.equal(await page.locator('#pecas').evaluate(secao => secao.open), true);
     assert.equal(await page.locator('.form-section[open]').count(), 1);
     assert.equal(await page.locator('.sidebar').evaluate(elemento => getComputedStyle(elemento).position), 'fixed');
-    for (const [nome, tamanho] of [['Normal', 18], ['Grande', 21], ['Extra grande', 24]]) {
+    for (const [nome, tamanho] of [['Normal', 16], ['Grande', 21], ['Extra grande', 24]]) {
       await page.getByRole('button', { name: nome, exact: true }).click();
       assert.equal(await page.evaluate(() => parseInt(getComputedStyle(document.documentElement).fontSize)), tamanho);
       for (const width of [375, 768, 1200, 1440]) {

@@ -37,6 +37,7 @@ test('modelos e histórico: criar, editar, copiar, excluir e preservar versões 
   assert.equal(await page.locator('#paginaInicio').isVisible(), true);
   assert.equal(await page.locator('.home-grid .shortcut').count(), 3);
   await ir(page, 'modelos');
+  const quantidadeModelosIniciais = await page.locator('#listaModelos article').count();
   await page.locator('#novoModelo').click();
   await page.locator('#nomeModelo').fill('Modelo personalizado');
   await page.locator('#modelo-empresa').fill('Oficina de teste');
@@ -46,7 +47,7 @@ test('modelos e histórico: criar, editar, copiar, excluir e preservar versões 
   await page.locator('#formModelo button[type="submit"]').click();
   assert.equal(await page.locator('#dialogModelo').isVisible(), false);
   await page.getByRole('button', { name: 'Copiar modelo Modelo personalizado', exact: true }).click();
-  assert.equal(await page.locator('#listaModelos article').count(), 4);
+  assert.equal(await page.locator('#listaModelos article').count(), quantidadeModelosIniciais + 2);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Excluir modelo Modelo personalizado (cópia)', exact: true }).click();
   await page.getByRole('button', { name: 'Usar modelo Modelo personalizado', exact: true }).click();
