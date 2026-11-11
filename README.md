@@ -85,11 +85,11 @@ O valor por extenso é digitado pelo usuário. Campos opcionais não informados 
 
 ## Catálogo de peças
 
-O catálogo local contém 65 peças e insumos comuns, incluindo nomes alternativos. Digite pelo menos duas letras para receber até seis sugestões. A busca ignora acentos e maiúsculas e usa distância de edição para tolerar pequenos erros, como `cabesote` e `virabrequin`.
+O catálogo inicial contém 65 peças e insumos comuns, incluindo nomes alternativos. Em **Catálogo de peças**, cadastre novas peças e apelidos, edite ou exclua seus cadastros locais. A lista tem pesquisa e paginação de dez registros. Os itens iniciais permanecem disponíveis; os contratos já salvos não são alterados ao editar o catálogo. Digite pelo menos duas letras para receber até seis sugestões. A busca ignora acentos e maiúsculas e usa distância de edição para tolerar pequenos erros, como `cabesote` e `virabrequin`.
 
 Use **↑ / ↓** e **Enter** para selecionar, **Esc** para fechar ou o mouse para clicar. O texto é livre: serviços e peças fora do catálogo também podem ser usados.
 
-O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com veículos. Para ampliá-lo, edite o bloco JSON `catalogoPecas` em `index.html`.
+O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com veículos. Os novos cadastros entram imediatamente nas sugestões e no backup JSON. Nomes duplicados são rejeitados, ignorando acentos e maiúsculas. O catálogo inicial continua embutido no bloco JSON `catalogoPecas`.
 
 ## Configurações, armazenamento e backup
 
@@ -266,3 +266,18 @@ A pesquisa do painel percorre todos os contratos, inclusive os que não estão n
 O badge no rodapé distingue arquivo local, cache offline pronto e ausência de conexão sem cache. O estado de cache pronto só aparece depois da ativação do service worker; a consulta de CEP e a imagem externa da marca ainda podem precisar de internet. Atualizações, preferências de cores/marca, backups e fontes dos PDFs mantêm o comportamento anterior.
 
 A validação desta refatoração está em [docs/REFATORACAO-UI.md](docs/REFATORACAO-UI.md).
+
+
+## JSON automático em pastas
+
+Em **Configurações → Gravação automática em JSON**, escolha a pasta principal e, opcionalmente, outra pasta para a segunda cópia. Você pode escolher a pasta do HTML. O navegador exige autorização explícita e pode bloquear pastas protegidas do sistema; não existe gravação silenciosa arbitrária em C:\Windows, Documentos ou na pasta do HTML. A disponibilidade depende do navegador/contexto; Chrome/Edge compatíveis oferecem o seletor. Se indisponível, use Exportar backup.
+
+Após autorizar, o app atualiza **contrato-facil-banco-v1.json** quando dados são salvos, incluindo criação, edição e exclusão de modelos, contratos, peças e preferências. O arquivo tem o formato do backup e pode ser restaurado pelo fluxo existente. Rascunhos não salvos não entram no JSON. São até 2.000 peças locais, cada uma com até 20 apelidos.
+
+As permissões das pastas ficam no IndexedDB, fora dos backups. Elas podem expirar: use **Reautorizar**. Não há tentativa automática de solicitar permissão durante a gravação. Confira os estados de cada pasta e aguarde “JSON salvo” antes de fechar; a cópia no disco é assíncrona, embora o salvamento no navegador seja imediato. Uma falha numa pasta não impede a outra.
+
+Para remover uma pasta da rotina, use **Desativar**; nenhum arquivo existente é apagado. Não há leitura/restauração automática ao abrir o app: isso evita substituir dados sem confirmação. Para recuperar uma base perdida, restaure o JSON pelo botão de backup. Se a base atual foi substituída ou um arquivo mudou externamente, a gravação é bloqueada até selecionar novamente a pasta e confirmar.
+
+O app confirma antes de substituir um JSON já existente na seleção da pasta e recusa arquivos inválidos. As gravações são enfileiradas para evitar que uma gravação antiga termine depois da mais recente. Uma identificação da base e a assinatura do arquivo protegem contra sobrescritas acidentais entre sessões. A cópia automática é um espelho do estado atual, inclusive exclusões; mantenha também exportações históricas. Isso não é um banco compartilhado para vários usuários editarem simultaneamente.
+
+Validação: testes em Chrome com diretórios OPFS reais e handles persistidos no IndexedDB, seletor de pastas substituído no teste. Foram verificados dois destinos, cadastro/edição/exclusão, persistência, reabertura, erro de permissão, alteração externa e troca de base. A autorização de pastas físicas não foi automatizada. Referências: [File System Access](https://developer.chrome.com/docs/capabilities/web-apis/file-system-access) e [seletor de pastas](https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker).

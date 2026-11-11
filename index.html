@@ -333,6 +333,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <a href="#inicio" aria-current="page">Página inicial</a>
       <a href="#historico">Histórico de contratos</a>
       <a href="#modelos">Modelos de contrato</a>
+      <a href="#catalogo">Catálogo de peças</a>
       <a href="#novo">Gerar novo contrato</a>
     </nav>
     <nav id="menuEditor" class="editor-nav" aria-label="Seções do contrato" hidden>
@@ -365,6 +366,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <header class="page-heading"><h1>Modelos disponíveis</h1><button id="novoModelo" class="primary" type="button">+ Criar modelo</button></header>
       <div id="listaModelos"></div>
     </div>
+    <div id="paginaCatalogo" class="page" hidden><header class="page-heading"><h1>Catálogo de peças</h1></header>
+      <form id="formPeca" class="card"><div class="fields"><div><label for="nomePeca">Nome da peça *</label><input id="nomePeca" required maxlength="100"></div><div><label for="apelidosPeca">Outros nomes (separados por vírgula)</label><input id="apelidosPeca" maxlength="1000"></div></div><div class="actions"><button class="primary" type="submit">Salvar peça</button><button id="cancelarPeca" type="button" hidden>Cancelar edição</button></div><p id="erroPeca" role="alert"></p></form>
+      <label for="buscarCatalogo">Pesquisar catálogo</label><input id="buscarCatalogo" type="search"><p id="resumoCatalogo" class="hint" role="status"></p><div id="listaCatalogo"></div><nav id="paginasCatalogo" class="pagination" aria-label="Páginas do catálogo"></nav></div>
     <div id="paginaConfiguracoes" class="page" hidden>
       <header class="page-heading"><h1>Configurações</h1></header>
       <form id="formConfiguracoes" class="card">
@@ -390,6 +394,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         </div><p class="hint">Usados por modelos sem revisões próprias. Os intervalos são somados ao odômetro; contratos já salvos não são alterados.</p>
       </form>
       <section class="card" aria-labelledby="tituloPwa"><div class="section-heading"><h2 id="tituloPwa"><svg width="40" height="40" aria-hidden="true" focusable="false" style="vertical-align: middle; margin-right: 8px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#183e38"/><path d="M152 104h144l64 64v240H152z" fill="#fff"/><path d="M296 104v64h64" fill="#b5d8cc"/><path d="M196 220h120M196 264h88" fill="none" stroke="#145a48" stroke-width="20" stroke-linecap="round"/><path d="m202 336 28 28 72-72" fill="none" stroke="#145a48" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/></svg>Instalar aplicativo</h2><button id="instalarApp" class="primary" type="button" hidden>Instalar Contrato Fácil</button></div><p id="statusPwa" role="status">A abertura direta do HTML continua disponível. Para instalar, acesse a versão publicada em HTTPS.</p><p id="ajudaInstalacao" class="hint">A instalação é opcional. Os dados continuam neste navegador; use o backup para transferi-los.</p></section>
+      <section class="card"><h2>Gravação automática em JSON</h2><p class="hint">Autorize uma pasta principal e outra para cópia. Pode escolher a pasta do HTML. Pastas protegidas do sistema podem ser bloqueadas pelo navegador.</p><p id="suporteArquivos" class="hint"></p><div id="pastasAutomaticas"></div><p class="hint">Arquivo: contrato-facil-banco-v1.json. Aguarde a gravação antes de fechar. Os arquivos acompanham exclusões; exporte backups históricos antes de alterações importantes.</p></section>
       <div class="card"><h2>Backup dos dados</h2><p>O backup inclui modelos, contratos e preferências. Guarde o arquivo em um local seguro: ele contém os dados dos clientes.</p><div class="actions"><button id="exportarBackup" type="button">Exportar backup</button><button id="importarBackup" type="button">Restaurar backup</button></div><label for="arquivoBackup" class="hint">Arquivo de backup (.json)</label><input id="arquivoBackup" type="file" accept=".json,application/json"><p class="hint">Restaurar um backup substitui os dados deste navegador após sua confirmação.</p></div>
     </div>
     <div id="paginaEditor" class="page" hidden>
@@ -876,7 +881,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function buscarPecas(texto) {
       const consulta = normalizarBusca(texto);
       if (consulta.length < 2) return [];
-      return catalogoPecas.map(peca => ({
+      return pecasDisponiveis().map(peca => ({
         nome: peca.nome,
         pontuacao: Math.min(...[peca.nome, ...peca.apelidos].map(termo => pontuarTermo(consulta, normalizarBusca(termo))))
       })).filter(peca => Number.isFinite(peca.pontuacao))
@@ -1267,7 +1272,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     }
 
     function estadoInicial() {
-      return { versao: 1, sequencia: 1, modeloCabecoteDisponibilizado: true, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '16', modeloPadrao: '' } };
+      return { versao: 1, idBase: crypto.randomUUID(), pecas: [], sequencia: 1, modeloCabecoteDisponibilizado: true, modelos: JSON.parse(document.getElementById('modelosIniciais').textContent), contratos: [], configuracoes: { tema: 'verde', estilo: 'arredondado', densidade: 'confortavel', fonte: '16', modeloPadrao: '' } };
     }
 
     function urlImagemValida(valor) {
@@ -1299,7 +1304,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         && Array.isArray(contrato.clausulas) && contrato.clausulas.length <= 200 && contrato.clausulas.every(texto => textoValido(texto) && texto.trim())
         && Array.isArray(contrato.itens) && contrato.itens.length > 0 && contrato.itens.length <= 1000
         && contrato.itens.every(item => textoValido(item.descricao, 250) && item.descricao.trim() && Number.isInteger(item.quantidade) && item.quantidade >= 1 && item.quantidade <= 9999 && Number.isInteger(item.centavos) && item.centavos >= 0 && item.centavos <= 999999999);
-      if (!dados || (dados.modeloCabecoteDisponibilizado !== undefined && typeof dados.modeloCabecoteDisponibilizado !== 'boolean') || dados.versao !== 1 || !Number.isSafeInteger(dados.sequencia) || dados.sequencia < 1
+      if (!dados || (dados.idBase !== undefined && (!textoValido(dados.idBase, 100) || !dados.idBase.trim()))
+        || (dados.pecas !== undefined && (!Array.isArray(dados.pecas) || dados.pecas.length > 2000 || !idsUnicos(dados.pecas) || !dados.pecas.every(peca => peca && textoValido(peca.id, 100) && peca.id.trim() && textoValido(peca.nome, 100) && peca.nome.trim() && Array.isArray(peca.apelidos) && peca.apelidos.length <= 20 && peca.apelidos.every(apelido => textoValido(apelido, 100) && apelido.trim()))))
+        || (dados.modeloCabecoteDisponibilizado !== undefined && typeof dados.modeloCabecoteDisponibilizado !== 'boolean') || dados.versao !== 1 || !Number.isSafeInteger(dados.sequencia) || dados.sequencia < 1
         || !Array.isArray(dados.modelos) || dados.modelos.length > 200 || !dados.modelos.every(modeloValido) || !idsUnicos(dados.modelos)
         || !Array.isArray(dados.contratos) || dados.contratos.length > 10000 || !dados.contratos.every(contratoValido) || !idsUnicos(dados.contratos)
         || !config || (config.marcaTitulo !== undefined && (!textoValido(config.marcaTitulo, 80) || !config.marcaTitulo.trim()))
@@ -1326,7 +1333,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function carregarEstado() {
       try {
         const salvo = localStorage.getItem(chaveDados);
-        return salvo ? incluirModeloCabecote(validarBackup(JSON.parse(salvo))) : estadoInicial();
+        const dados = salvo ? incluirModeloCabecote(validarBackup(JSON.parse(salvo))) : estadoInicial();
+        dados.idBase ||= crypto.randomUUID(); return dados;
       } catch {
         falhaLeitura = true;
         mostrarErroArmazenamento('Não foi possível ler os dados locais. Eles não serão sobrescritos. Exporte uma cópia em Configurações ou restaure um backup válido.');
@@ -1337,9 +1345,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function persistirEstado(proximoEstado, restauracao = false) {
       try {
         if (!restauracao && (falhaLeitura || conflitoArmazenamento)) throw new Error('Recarregue a página ou restaure um backup antes de salvar.');
+        proximoEstado.idBase ||= crypto.randomUUID();
         validarBackup(proximoEstado);
         localStorage.setItem(chaveDados, JSON.stringify(proximoEstado));
         estado = proximoEstado;
+        agendarGravacaoAutomatica(JSON.stringify(estado, null, 2));
         falhaLeitura = false; conflitoArmazenamento = false;
         document.getElementById('storageError').hidden = true;
         return true;
@@ -1457,7 +1467,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     function podeSubstituirFormulario() { return !alterado || confirm('Há alterações não salvas neste contrato. Deseja descartá-las e continuar?'); }
 
     function mostrarPagina(nome, focar = true) {
-      const paginas = { inicio: 'paginaInicio', historico: 'paginaHistorico', modelos: 'paginaModelos', configuracoes: 'paginaConfiguracoes', editor: 'paginaEditor' };
+      const paginas = { inicio: 'paginaInicio', historico: 'paginaHistorico', modelos: 'paginaModelos', catalogo: 'paginaCatalogo', configuracoes: 'paginaConfiguracoes', editor: 'paginaEditor' };
       document.querySelectorAll('.page').forEach(pagina => { pagina.hidden = pagina.id !== paginas[nome]; });
       document.getElementById('menuEditor').hidden = nome !== 'editor';
       document.querySelectorAll('.sidebar a:not(#menuEditor a)').forEach(link => {
@@ -1467,6 +1477,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       if (nome === 'inicio') renderizarInicio();
       if (nome === 'historico') renderizarHistorico();
       if (nome === 'modelos') renderizarModelos();
+      if (nome === 'catalogo') renderizarCatalogo();
       if (nome === 'configuracoes') preencherConfiguracoes();
       if (focar) { document.getElementById('conteudo').focus(); window.scrollTo(0, 0); }
     }
@@ -1478,7 +1489,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         if (rota === 'novo') {
           if (!podeSubstituirFormulario()) { location.hash = 'dados'; return; }
           novoContrato();
-        } else if (['inicio', 'historico', 'modelos', 'configuracoes'].includes(rota)) mostrarPagina(rota);
+        } else if (['inicio', 'historico', 'modelos', 'catalogo', 'configuracoes'].includes(rota)) mostrarPagina(rota);
         else mostrarPagina('inicio');
       }
       document.querySelectorAll('a[href="#novo"]').forEach(link => link.addEventListener('click', evento => {
@@ -1674,6 +1685,41 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       }
       tabela.append(legenda, cabecalho, corpo); lista.append(tabela);
     }
+
+    let pecaEditandoId = null;
+    let paginaCatalogo = 1;
+    function pecasDisponiveis() { return [...catalogoPecas, ...(estado.pecas || [])]; }
+    function limparEditorPeca() { pecaEditandoId = null; document.getElementById('formPeca').reset(); document.getElementById('cancelarPeca').hidden = true; document.getElementById('erroPeca').textContent = ''; }
+    function renderizarCatalogo() {
+      const busca = normalizarBusca(document.getElementById('buscarCatalogo').value);
+      const pecas = pecasDisponiveis().filter(p => normalizarBusca([p.nome,...p.apelidos].join(' ')).includes(busca)).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+      const lista = document.getElementById('listaCatalogo'); lista.replaceChildren();
+      const paginas=Math.max(1,Math.ceil(pecas.length/10));paginaCatalogo=Math.min(paginaCatalogo,paginas);
+      document.getElementById('resumoCatalogo').textContent=pecas.length+' peças · Página '+paginaCatalogo+' de '+paginas;
+      const nav=document.getElementById('paginasCatalogo');nav.replaceChildren();nav.hidden=paginas<=1;
+      for(const [rotulo,passo] of [['Anterior',-1],['Próxima',1]]){const botao=criarBotao(rotulo,()=>{paginaCatalogo+=passo;renderizarCatalogo();document.getElementById('buscarCatalogo').focus();});botao.disabled=passo<0?paginaCatalogo===1:paginaCatalogo===paginas;nav.append(botao);}
+      for (const peca of pecas.slice((paginaCatalogo-1)*10,paginaCatalogo*10)) {
+        const card = criarTexto('article','','card'); card.append(criarTexto('h2',peca.nome),criarTexto('p',peca.apelidos.join(', ') || (peca.id?'Cadastro local':'Catálogo inicial'),'hint'));
+        if (peca.id) {
+          const acoes=criarTexto('div','','actions'); acoes.append(criarBotao('Editar',()=>{pecaEditandoId=peca.id;document.getElementById('nomePeca').value=peca.nome;document.getElementById('apelidosPeca').value=peca.apelidos.join(', ');document.getElementById('cancelarPeca').hidden=false;document.getElementById('nomePeca').focus();},'Editar peça '+peca.nome),criarBotao('Excluir',()=>{
+            if (!confirm('Excluir '+peca.nome+' do catálogo? Contratos salvos não serão alterados.')) return;
+            if (persistirEstado({...estado,pecas:estado.pecas.filter(x=>x.id!==peca.id)})) {limparEditorPeca();renderizarCatalogo();document.getElementById('buscarCatalogo').focus();}
+          },'Excluir peça '+peca.nome)); card.append(acoes);
+        }
+        lista.append(card);
+      }
+      if (!pecas.length) lista.append(criarTexto('p','Nenhuma peça encontrada.','empty'));
+    }
+    document.getElementById('formPeca').addEventListener('submit',evento=>{
+      evento.preventDefault();const nome=document.getElementById('nomePeca').value.trim();const apelidos=[...new Set(document.getElementById('apelidosPeca').value.split(',').map(x=>x.trim()).filter(Boolean))];const erro=document.getElementById('erroPeca');erro.textContent='';
+      if (!nome || apelidos.length>20 || apelidos.some(x=>x.length>100)) {erro.textContent='Informe o nome e até 20 apelidos de até 100 caracteres.';return;}
+      if (pecasDisponiveis().some(p=>p.id!==pecaEditandoId && normalizarBusca(p.nome)===normalizarBusca(nome))) {erro.textContent='Esta peça já está cadastrada.';return;}
+      const pecas=estado.pecas||[];if (!pecaEditandoId && pecas.length>=2000) {erro.textContent='Limite de 2.000 peças locais atingido.';return;}
+      const peca={id:pecaEditandoId||crypto.randomUUID(),nome,apelidos};
+      if (persistirEstado({...estado,pecas:[...pecas.filter(p=>p.id!==peca.id),peca]})) {limparEditorPeca();document.getElementById('buscarCatalogo').value=nome;paginaCatalogo=1;renderizarCatalogo();document.getElementById('nomePeca').focus();anunciar('Peça salva no catálogo.');}
+    });
+    document.getElementById('buscarCatalogo').addEventListener('input',()=>{paginaCatalogo=1;renderizarCatalogo();});
+    document.getElementById('cancelarPeca').addEventListener('click',limparEditorPeca);
 
     function renderizarHistorico() {
       const busca = normalizarBusca(document.getElementById('buscarHistorico').value);
@@ -1917,6 +1963,104 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       });
     }
 
+    // Gravação de arquivos: acesso apenas às pastas autorizadas pelo usuário.
+    const nomeBancoJson = 'contrato-facil-banco-v1.json';
+    const destinosJson = new Map();
+    let filaGravacao = Promise.resolve();
+    let pastasProntas = Promise.resolve();
+    let gravacoesPendentes = 0;
+    function bancoDePastas() {
+      return new Promise((resolve,reject)=>{
+        const pedido=indexedDB.open('contrato-facil-pastas-v1',1);
+        pedido.onupgradeneeded=()=>pedido.result.createObjectStore('pastas');
+        pedido.onsuccess=()=>resolve(pedido.result);pedido.onerror=()=>reject(pedido.error);pedido.onblocked=()=>reject(new Error('Armazenamento de pastas bloqueado.'));
+      });
+    }
+    async function guardarPasta(chave,registro) {
+      const db=await bancoDePastas();
+      try {await new Promise((resolve,reject)=>{const tx=db.transaction('pastas','readwrite');const store=tx.objectStore('pastas');if(registro)store.put(registro,chave);else store.delete(chave);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});} finally {db.close();}
+    }
+    function statusPasta(chave,texto) {document.getElementById('status-pasta-'+chave).textContent=texto;}
+    async function arquivoDaPasta(handle) {
+      try {return await (await handle.getFileHandle(nomeBancoJson)).getFile();} catch(erro) {if(erro.name==='NotFoundError')return null;throw erro;}
+    }
+    function assinaturaArquivo(arquivo) {return arquivo ? arquivo.lastModified+':'+arquivo.size : null;}
+    async function gravarDestino(chave,registro,conteudo) {
+      let gravador;
+      try {
+        if (JSON.parse(conteudo).idBase!==registro.idBase) throw new Error('A base foi substituída. Selecione novamente a pasta para confirmar a gravação.');
+        if (await registro.handle.queryPermission({mode:'readwrite'})!=='granted') throw new Error('Permissão expirada. Use Reautorizar.');
+        const atual=await arquivoDaPasta(registro.handle);
+        if (assinaturaArquivo(atual)!==registro.assinatura) throw new Error('O JSON mudou fora desta sessão. Selecione a pasta novamente para conferir antes de substituir.');
+        statusPasta(chave,'Gravando em '+registro.handle.name+'…');
+        const arquivo=await registro.handle.getFileHandle(nomeBancoJson,{create:true});gravador=await arquivo.createWritable();await gravador.write(conteudo);await gravador.close();gravador=null;
+        registro.assinatura=assinaturaArquivo(await arquivo.getFile());
+        try {await guardarPasta(chave,registro);} catch {statusPasta(chave,'JSON salvo em '+registro.handle.name+'. Pasta não memorizada; selecione novamente na próxima sessão.');return;}
+        statusPasta(chave,'JSON salvo em '+registro.handle.name+' · '+new Date().toLocaleTimeString('pt-BR'));
+      } catch(erro) {
+        if(gravador)try{await gravador.abort();}catch{}
+        statusPasta(chave,'Cópia pendente: '+erro.message);
+        anunciar('JSON automático ('+(chave==='principal'?'principal':'segunda cópia')+'): '+erro.message+' Os dados continuam salvos no navegador.');
+      }
+    }
+    function agendarGravacaoAutomatica(conteudo) {
+      gravacoesPendentes++;
+      filaGravacao=filaGravacao.catch(()=>{}).then(async()=>{
+        await pastasProntas;
+        if(conflitoArmazenamento || falhaLeitura)return;
+        for(const [chave,registro] of destinosJson)await gravarDestino(chave,registro,conteudo);
+      }).catch(()=>anunciar('Falha na cópia JSON. Os dados continuam no navegador.')).finally(()=>{gravacoesPendentes--;});
+      return filaGravacao;
+    }
+    async function selecionarPasta(chave) {
+      try {
+        const handle=await window.showDirectoryPicker({mode:'readwrite',id:'contrato-facil-'+chave});
+        await pastasProntas; await filaGravacao;
+        const outra=destinosJson.get(chave==='principal'?'copia':'principal');
+        if(outra && await handle.isSameEntry(outra.handle))throw new Error('Escolha uma pasta diferente para manter duas cópias.');
+        const existente=await arquivoDaPasta(handle);
+        if(existente){
+          if(existente.size>5*1024*1024)throw new Error('O JSON existente excede 5 MB. Escolha uma pasta vazia.');
+          validarBackup(JSON.parse(await existente.text()));
+          if(!confirm('Já existe '+nomeBancoJson+' nesta pasta. Substituir pelos dados atuais do navegador? Para recuperar seus dados, cancele e restaure esse JSON em Backup.'))return;
+        }
+        const registro={handle,idBase:estado.idBase,assinatura:assinaturaArquivo(existente)};
+        destinosJson.set(chave,registro);
+        try{await guardarPasta(chave,registro);}catch{anunciar('A pasta será usada nesta sessão, mas não pôde ser memorizada.');}
+        await agendarGravacaoAutomatica(JSON.stringify(estado,null,2));
+      }catch(erro){if(erro.name!=='AbortError')anunciar('Pasta não configurada: '+erro.message);}
+    }
+    async function reautorizarPasta(chave) {
+      const registro=destinosJson.get(chave);if(!registro){anunciar('Selecione uma pasta primeiro.');return;}
+      try{if(await registro.handle.requestPermission({mode:'readwrite'})!=='granted'){statusPasta(chave,'Permissão não concedida. Dados mantidos no navegador.');return;}await agendarGravacaoAutomatica(JSON.stringify(estado,null,2));}catch(erro){statusPasta(chave,'Não foi possível reautorizar: '+erro.message);}
+    }
+    function iniciarArquivosAutomaticos() {
+      const suporte=typeof window.showDirectoryPicker==='function' && isSecureContext;
+      document.getElementById('suporteArquivos').textContent=suporte?'Autorize as pastas uma vez. O navegador pode pedir nova permissão em outra sessão.':'Gravação em pastas indisponível neste navegador/contexto. Use Exportar backup; tente Chrome ou Edge em contexto seguro.';
+      const area=document.getElementById('pastasAutomaticas');
+      for(const [chave,titulo] of [['principal','Pasta principal'],['copia','Segunda cópia']]){
+        const grupo=criarTexto('div','','card');grupo.append(criarTexto('h3',titulo));const status=criarTexto('p','Não configurada.','hint');status.id='status-pasta-'+chave;status.setAttribute('role','status');grupo.append(status);
+        const acoes=criarTexto('div','','actions');const escolher=criarBotao('Selecionar pasta',()=>selecionarPasta(chave),'Selecionar '+titulo.toLowerCase());escolher.disabled=!suporte;
+        const autorizar=criarBotao('Reautorizar',()=>reautorizarPasta(chave),'Reautorizar '+titulo.toLowerCase());autorizar.disabled=!suporte;
+        acoes.append(escolher,autorizar,criarBotao('Desativar',()=>{
+          filaGravacao=filaGravacao.catch(()=>{}).then(async()=>{destinosJson.delete(chave);try{await guardarPasta(chave,null);statusPasta(chave,'Desativada. O arquivo existente não foi excluído.');}catch{statusPasta(chave,'Desativada nesta sessão. Não foi possível memorizar; confira as pastas ao reabrir.');}});
+        },'Desativar '+titulo.toLowerCase()));grupo.append(acoes);area.append(grupo);
+      }
+      if(!suporte)return;
+      pastasProntas=(async()=>{
+        let db;
+        try{
+          db=await bancoDePastas();
+          const registros=await new Promise((resolve,reject)=>{const tx=db.transaction('pastas','readonly');const store=tx.objectStore('pastas');const a=store.get('principal'),b=store.get('copia');tx.oncomplete=()=>resolve([a.result,b.result]);tx.onerror=()=>reject(tx.error);});
+          for(const [i,chave] of ['principal','copia'].entries())if(registros[i]){
+            const registro=registros[i];destinosJson.set(chave,registro);
+            const permitido=await registro.handle.queryPermission({mode:'readwrite'});
+            statusPasta(chave,registro.handle.name+(permitido==='granted'?' · Pasta conectada; aguardando próxima alteração salva.':' · Permissão necessária: use Reautorizar.'));
+          }
+        }catch{document.getElementById('suporteArquivos').textContent='Não foi possível recuperar pastas anteriores. Selecione as pastas novamente; o backup manual continua disponível.';}finally{db?.close();}
+      })();
+    }
+
     function exportarBackup() {
       let conteudo = JSON.stringify(estado, null, 2);
       if (falhaLeitura) { try { conteudo = localStorage.getItem(chaveDados) || conteudo; } catch { /* Mantém a cópia em memória. */ } }
@@ -2040,10 +2184,11 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     });
     document.getElementById('exportarBackup').addEventListener('click', exportarBackup);
     document.getElementById('importarBackup').addEventListener('click', importarBackup);
-    window.addEventListener('beforeunload', evento => { if (alterado || modeloTemAlteracoes()) { evento.preventDefault(); evento.returnValue = ''; } });
+    window.addEventListener('beforeunload', evento => { if (alterado || modeloTemAlteracoes() || gravacoesPendentes > 0) { evento.preventDefault(); evento.returnValue = ''; } });
     window.addEventListener('storage', evento => {
       if (evento.key === chaveDados || evento.key === null) { conflitoArmazenamento = true; mostrarErroArmazenamento('Os dados foram alterados em outra aba. Exporte seu backup e recarregue antes de salvar para evitar sobrescrever alterações.'); }
     });
+    iniciarArquivosAutomaticos();
     atualizarConectividade();
     window.addEventListener('online', atualizarConectividade);
     window.addEventListener('offline', atualizarConectividade);
