@@ -95,7 +95,7 @@ O catálogo sugere nomes, sem definir preços ou verificar compatibilidade com v
 
 As configurações incluem quatro paletas prontas e duas cores personalizáveis: destaque (accent) e barra lateral (accent-dark). Cada cor pode ser escolhida no seletor visual ou informada como hexadecimal de seis dígitos, por exemplo, #145a48. Ao escolher uma paleta pronta, seus dois campos de cor são atualizados; use Salvar configurações para aplicar. O texto sobre os fundos personalizados alterna entre preto e branco para manter o contraste. As preferências entram no backup, e backups antigos continuam compatíveis. Também é possível escolher cantos arredondados ou discretos, espaçamento das listas e modelo padrão para novos contratos. Cores, espaçamento e tamanho de fonte alteram a tela; os documentos continuam em preto e branco.
 
-Modelos, contratos e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional envia somente o CEP ao ViaCEP. Contratos, nomes de clientes e placas não são enviados ao serviço.
+Modelos, contratos, peças e preferências ficam em `localStorage`, no navegador e endereço em que o HTML foi aberto. A consulta opcional envia somente o CEP ao ViaCEP. Contratos, nomes de clientes e placas não são enviados ao serviço.
 
 **Exporte backups regularmente em Configurações.** Limpar os dados do navegador, mover o HTML ou mudar de computador pode tornar os dados locais indisponíveis.
 
