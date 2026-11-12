@@ -1698,6 +1698,8 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       document.getElementById('resumoCatalogo').textContent=pecas.length+' peças · Página '+paginaCatalogo+' de '+paginas;
       const nav=document.getElementById('paginasCatalogo');nav.replaceChildren();nav.hidden=paginas<=1;
       for(const [rotulo,passo] of [['Anterior',-1],['Próxima',1]]){const botao=criarBotao(rotulo,()=>{paginaCatalogo+=passo;renderizarCatalogo();document.getElementById('buscarCatalogo').focus();});botao.disabled=passo<0?paginaCatalogo===1:paginaCatalogo===paginas;nav.append(botao);}
+      const indicador=criarTexto('span','Página '+paginaCatalogo+' de '+paginas);
+      indicador.setAttribute('role','status');nav.insertBefore(indicador,nav.lastElementChild);
       for (const peca of pecas.slice((paginaCatalogo-1)*10,paginaCatalogo*10)) {
         const card = criarTexto('article','','card'); card.append(criarTexto('h2',peca.nome),criarTexto('p',peca.apelidos.join(', ') || (peca.id?'Cadastro local':'Catálogo inicial'),'hint'));
         if (peca.id) {

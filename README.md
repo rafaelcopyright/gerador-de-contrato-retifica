@@ -281,3 +281,6 @@ Para remover uma pasta da rotina, use **Desativar**; nenhum arquivo existente é
 O app confirma antes de substituir um JSON já existente na seleção da pasta e recusa arquivos inválidos. As gravações são enfileiradas para evitar que uma gravação antiga termine depois da mais recente. Uma identificação da base e a assinatura do arquivo protegem contra sobrescritas acidentais entre sessões. A cópia automática é um espelho do estado atual, inclusive exclusões; mantenha também exportações históricas. Isso não é um banco compartilhado para vários usuários editarem simultaneamente.
 
 Validação: testes em Chrome com diretórios OPFS reais e handles persistidos no IndexedDB, seletor de pastas substituído no teste. Foram verificados dois destinos, cadastro/edição/exclusão, persistência, reabertura, erro de permissão, alteração externa e troca de base. A autorização de pastas físicas não foi automatizada. Referências: [File System Access](https://developer.chrome.com/docs/capabilities/web-apis/file-system-access) e [seletor de pastas](https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker).
+
+
+A paginação do catálogo exibe **Página X de Y** entre os botões Anterior e Próxima, atualizada ao navegar ou filtrar.
