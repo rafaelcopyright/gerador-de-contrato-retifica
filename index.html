@@ -488,73 +488,610 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   </article>
   <!-- Catálogo embutido para funcionar também ao abrir o HTML sem servidor. -->
   <script id="catalogoPecas" type="application/json">
-    [
-      {"nome":"Anel de pistão","apelidos":["anéis","segmento do pistão"]},
-      {"nome":"Biela","apelidos":[]},
-      {"nome":"Bloco do motor","apelidos":[]},
-      {"nome":"Bomba de água","apelidos":[]},
-      {"nome":"Bomba de combustível","apelidos":["bomba de gasolina"]},
-      {"nome":"Bomba de óleo","apelidos":[]},
-      {"nome":"Bronzina de biela","apelidos":["casquilho de biela"]},
-      {"nome":"Bronzina de mancal","apelidos":["casquilho de mancal"]},
-      {"nome":"Cabeçote do motor","apelidos":[]},
-      {"nome":"Camisa de cilindro","apelidos":["camisa do motor"]},
-      {"nome":"Cárter do motor","apelidos":[]},
-      {"nome":"Comando de válvulas","apelidos":["árvore de comando"]},
-      {"nome":"Correia dentada","apelidos":["correia de distribuição"]},
-      {"nome":"Correia do alternador","apelidos":["correia de acessórios","correia poly v"]},
-      {"nome":"Corrente de comando","apelidos":["corrente de distribuição"]},
-      {"nome":"Junta do cabeçote","apelidos":[]},
-      {"nome":"Junta da tampa de válvulas","apelidos":[]},
-      {"nome":"Junta do cárter","apelidos":[]},
-      {"nome":"Kit de juntas do motor","apelidos":["jogo de juntas"]},
-      {"nome":"Pistão do motor","apelidos":["êmbolo"]},
-      {"nome":"Pino do pistão","apelidos":[]},
-      {"nome":"Retentor do virabrequim","apelidos":[]},
-      {"nome":"Retentor de válvula","apelidos":[]},
-      {"nome":"Tucho de válvula","apelidos":["tucho hidráulico"]},
-      {"nome":"Válvula de admissão","apelidos":[]},
-      {"nome":"Válvula de escape","apelidos":[]},
-      {"nome":"Virabrequim","apelidos":["eixo de manivelas"]},
-      {"nome":"Volante do motor","apelidos":[]},
-      {"nome":"Vela de ignição","apelidos":[]},
-      {"nome":"Cabo de vela","apelidos":[]},
-      {"nome":"Bobina de ignição","apelidos":[]},
-      {"nome":"Bico injetor","apelidos":["injetor de combustível"]},
-      {"nome":"Filtro de ar","apelidos":[]},
-      {"nome":"Filtro de óleo","apelidos":[]},
-      {"nome":"Filtro de combustível","apelidos":[]},
-      {"nome":"Filtro de cabine","apelidos":["filtro do ar condicionado"]},
-      {"nome":"Óleo do motor","apelidos":["lubrificante"]},
-      {"nome":"Radiador","apelidos":[]},
-      {"nome":"Mangueira do radiador","apelidos":[]},
-      {"nome":"Válvula termostática","apelidos":[]},
-      {"nome":"Reservatório de expansão","apelidos":["reservatório de água"]},
-      {"nome":"Aditivo do radiador","apelidos":["líquido de arrefecimento"]},
-      {"nome":"Alternador","apelidos":[]},
-      {"nome":"Motor de partida","apelidos":["motor de arranque"]},
-      {"nome":"Bateria","apelidos":[]},
-      {"nome":"Kit de embreagem","apelidos":["disco de embreagem","platô"]},
-      {"nome":"Coxim do motor","apelidos":["suporte do motor"]},
-      {"nome":"Coxim do câmbio","apelidos":[]},
-      {"nome":"Amortecedor dianteiro","apelidos":[]},
-      {"nome":"Amortecedor traseiro","apelidos":[]},
-      {"nome":"Bandeja de suspensão","apelidos":["balança"]},
-      {"nome":"Bieleta","apelidos":[]},
-      {"nome":"Pivô de suspensão","apelidos":[]},
-      {"nome":"Terminal de direção","apelidos":[]},
-      {"nome":"Rolamento de roda","apelidos":[]},
-      {"nome":"Cubo de roda","apelidos":[]},
-      {"nome":"Pastilha de freio","apelidos":[]},
-      {"nome":"Disco de freio","apelidos":[]},
-      {"nome":"Tambor de freio","apelidos":[]},
-      {"nome":"Sapata de freio","apelidos":["lona de freio"]},
-      {"nome":"Cilindro mestre de freio","apelidos":[]},
-      {"nome":"Fluido de freio","apelidos":[]},
-      {"nome":"Sensor de rotação","apelidos":[]},
-      {"nome":"Sonda lambda","apelidos":["sensor de oxigênio"]},
-      {"nome":"Tensor da correia dentada","apelidos":["tensionador"]}
+[
+  {
+    "nome": "Anel de pistão",
+    "apelidos": [
+      "anéis",
+      "segmento do pistão"
     ]
+  },
+  {
+    "nome": "Biela",
+    "apelidos": []
+  },
+  {
+    "nome": "Bloco do motor",
+    "apelidos": []
+  },
+  {
+    "nome": "Bomba de água",
+    "apelidos": []
+  },
+  {
+    "nome": "Bomba de combustível",
+    "apelidos": [
+      "bomba de gasolina"
+    ]
+  },
+  {
+    "nome": "Bomba de óleo",
+    "apelidos": []
+  },
+  {
+    "nome": "Bronzina de biela",
+    "apelidos": [
+      "casquilho de biela"
+    ]
+  },
+  {
+    "nome": "Bronzina de mancal",
+    "apelidos": [
+      "casquilho de mancal"
+    ]
+  },
+  {
+    "nome": "Cabeçote do motor",
+    "apelidos": []
+  },
+  {
+    "nome": "Camisa de cilindro",
+    "apelidos": [
+      "camisa do motor"
+    ]
+  },
+  {
+    "nome": "Cárter do motor",
+    "apelidos": []
+  },
+  {
+    "nome": "Comando de válvulas",
+    "apelidos": [
+      "árvore de comando",
+      "eixo de comando"
+    ]
+  },
+  {
+    "nome": "Correia dentada",
+    "apelidos": [
+      "correia de distribuição"
+    ]
+  },
+  {
+    "nome": "Correia do alternador",
+    "apelidos": [
+      "correia de acessórios",
+      "correia poly v"
+    ]
+  },
+  {
+    "nome": "Corrente de comando",
+    "apelidos": [
+      "corrente de distribuição"
+    ]
+  },
+  {
+    "nome": "Junta do cabeçote",
+    "apelidos": []
+  },
+  {
+    "nome": "Junta da tampa de válvulas",
+    "apelidos": []
+  },
+  {
+    "nome": "Junta do cárter",
+    "apelidos": []
+  },
+  {
+    "nome": "Kit de juntas do motor",
+    "apelidos": [
+      "jogo de juntas"
+    ]
+  },
+  {
+    "nome": "Pistão do motor",
+    "apelidos": [
+      "êmbolo"
+    ]
+  },
+  {
+    "nome": "Pino do pistão",
+    "apelidos": []
+  },
+  {
+    "nome": "Retentor do virabrequim",
+    "apelidos": []
+  },
+  {
+    "nome": "Retentor de válvula",
+    "apelidos": [
+      "vedador de válvula"
+    ]
+  },
+  {
+    "nome": "Tucho de válvula",
+    "apelidos": [
+      "tucho hidráulico",
+      "tucho mecânico"
+    ]
+  },
+  {
+    "nome": "Válvula de admissão",
+    "apelidos": []
+  },
+  {
+    "nome": "Válvula de escape",
+    "apelidos": []
+  },
+  {
+    "nome": "Virabrequim",
+    "apelidos": [
+      "eixo de manivelas",
+      "girabrequim"
+    ]
+  },
+  {
+    "nome": "Volante do motor",
+    "apelidos": []
+  },
+  {
+    "nome": "Vela de ignição",
+    "apelidos": []
+  },
+  {
+    "nome": "Cabo de vela",
+    "apelidos": []
+  },
+  {
+    "nome": "Bobina de ignição",
+    "apelidos": []
+  },
+  {
+    "nome": "Bico injetor",
+    "apelidos": [
+      "injetor de combustível",
+      "válvula injetora"
+    ]
+  },
+  {
+    "nome": "Filtro de ar",
+    "apelidos": []
+  },
+  {
+    "nome": "Filtro de óleo",
+    "apelidos": []
+  },
+  {
+    "nome": "Filtro de combustível",
+    "apelidos": []
+  },
+  {
+    "nome": "Filtro de cabine",
+    "apelidos": [
+      "filtro do ar condicionado"
+    ]
+  },
+  {
+    "nome": "Óleo do motor",
+    "apelidos": [
+      "lubrificante"
+    ]
+  },
+  {
+    "nome": "Radiador",
+    "apelidos": []
+  },
+  {
+    "nome": "Mangueira do radiador",
+    "apelidos": [
+      "mangote"
+    ]
+  },
+  {
+    "nome": "Válvula termostática",
+    "apelidos": []
+  },
+  {
+    "nome": "Reservatório de expansão",
+    "apelidos": [
+      "reservatório de água"
+    ]
+  },
+  {
+    "nome": "Aditivo do radiador",
+    "apelidos": [
+      "líquido de arrefecimento"
+    ]
+  },
+  {
+    "nome": "Alternador",
+    "apelidos": []
+  },
+  {
+    "nome": "Motor de partida",
+    "apelidos": [
+      "motor de arranque"
+    ]
+  },
+  {
+    "nome": "Bateria",
+    "apelidos": []
+  },
+  {
+    "nome": "Kit de embreagem",
+    "apelidos": [
+      "disco de embreagem",
+      "platô"
+    ]
+  },
+  {
+    "nome": "Coxim do motor",
+    "apelidos": [
+      "suporte do motor"
+    ]
+  },
+  {
+    "nome": "Coxim do câmbio",
+    "apelidos": []
+  },
+  {
+    "nome": "Amortecedor dianteiro",
+    "apelidos": []
+  },
+  {
+    "nome": "Amortecedor traseiro",
+    "apelidos": []
+  },
+  {
+    "nome": "Bandeja de suspensão",
+    "apelidos": [
+      "balança"
+    ]
+  },
+  {
+    "nome": "Bieleta",
+    "apelidos": []
+  },
+  {
+    "nome": "Pivô de suspensão",
+    "apelidos": []
+  },
+  {
+    "nome": "Terminal de direção",
+    "apelidos": []
+  },
+  {
+    "nome": "Rolamento de roda",
+    "apelidos": []
+  },
+  {
+    "nome": "Cubo de roda",
+    "apelidos": []
+  },
+  {
+    "nome": "Pastilha de freio",
+    "apelidos": []
+  },
+  {
+    "nome": "Disco de freio",
+    "apelidos": []
+  },
+  {
+    "nome": "Tambor de freio",
+    "apelidos": [
+      "panela de freio"
+    ]
+  },
+  {
+    "nome": "Sapata de freio",
+    "apelidos": [
+      "lona de freio"
+    ]
+  },
+  {
+    "nome": "Cilindro mestre de freio",
+    "apelidos": []
+  },
+  {
+    "nome": "Fluido de freio",
+    "apelidos": []
+  },
+  {
+    "nome": "Sensor de rotação",
+    "apelidos": [
+      "sensor de rotação do virabrequim"
+    ]
+  },
+  {
+    "nome": "Sonda lambda",
+    "apelidos": [
+      "sensor de oxigênio"
+    ]
+  },
+  {
+    "nome": "Tensor da correia dentada",
+    "apelidos": [
+      "tensionador"
+    ]
+  },
+  {
+    "nome": "Corpo de borboleta",
+    "apelidos": [
+      "TBI"
+    ]
+  },
+  {
+    "nome": "Coletor de admissão",
+    "apelidos": []
+  },
+  {
+    "nome": "Coletor de escape",
+    "apelidos": [
+      "coletor de escapamento"
+    ]
+  },
+  {
+    "nome": "Flauta de injeção",
+    "apelidos": [
+      "galeria de combustível",
+      "tubo distribuidor"
+    ]
+  },
+  {
+    "nome": "Regulador de pressão de combustível",
+    "apelidos": []
+  },
+  {
+    "nome": "Catalisador",
+    "apelidos": [
+      "conversor catalítico"
+    ]
+  },
+  {
+    "nome": "Escapamento",
+    "apelidos": [
+      "silencioso",
+      "abafador"
+    ]
+  },
+  {
+    "nome": "Sensor de temperatura da água",
+    "apelidos": [
+      "sensor ECT"
+    ]
+  },
+  {
+    "nome": "Sensor MAP",
+    "apelidos": [
+      "sensor de pressão absoluta"
+    ]
+  },
+  {
+    "nome": "Sensor de posição da borboleta",
+    "apelidos": [
+      "sensor TPS"
+    ]
+  },
+  {
+    "nome": "Sensor de detonação",
+    "apelidos": [
+      "knock sensor"
+    ]
+  },
+  {
+    "nome": "Sensor de fase",
+    "apelidos": [
+      "sensor do comando de válvulas"
+    ]
+  },
+  {
+    "nome": "Módulo de injeção eletrônica",
+    "apelidos": [
+      "ECU",
+      "centralina",
+      "módulo do motor"
+    ]
+  },
+  {
+    "nome": "Sensor MAF",
+    "apelidos": [
+      "medidor de fluxo de ar"
+    ]
+  },
+  {
+    "nome": "Eletroventilador",
+    "apelidos": [
+      "ventoinha do radiador"
+    ]
+  },
+  {
+    "nome": "Interruptor térmico do radiador",
+    "apelidos": [
+      "cebolão do radiador"
+    ]
+  },
+  {
+    "nome": "Interruptor de pressão do óleo",
+    "apelidos": [
+      "cebolinha do óleo"
+    ]
+  },
+  {
+    "nome": "Pescador da bomba de óleo",
+    "apelidos": [
+      "tubo de sucção de óleo"
+    ]
+  },
+  {
+    "nome": "Parafuso do cabeçote",
+    "apelidos": []
+  },
+  {
+    "nome": "Selo do bloco do motor",
+    "apelidos": [
+      "selo de água",
+      "selo mecânico"
+    ]
+  },
+  {
+    "nome": "Mola de válvula",
+    "apelidos": []
+  },
+  {
+    "nome": "Balancim",
+    "apelidos": [
+      "balancim de válvula"
+    ]
+  },
+  {
+    "nome": "Polia do virabrequim",
+    "apelidos": [
+      "roda fônica",
+      "polia motriz"
+    ]
+  },
+  {
+    "nome": "Polia do comando de válvulas",
+    "apelidos": []
+  },
+  {
+    "nome": "Guia de válvula",
+    "apelidos": []
+  },
+  {
+    "nome": "Anel de retenção do pino do pistão",
+    "apelidos": [
+      "trava do pino do pistão"
+    ]
+  },
+  {
+    "nome": "Bomba de vácuo",
+    "apelidos": [
+      "bomba tandem"
+    ]
+  },
+  {
+    "nome": "Radiador de óleo",
+    "apelidos": [
+      "trocador de calor",
+      "resfriador de óleo"
+    ]
+  },
+  {
+    "nome": "Sede de válvula",
+    "apelidos": [
+      "anel de assento para válvula"
+    ]
+  },
+  {
+    "nome": "Trava da válvula",
+    "apelidos": [
+      "cone para válvula"
+    ]
+  },
+  {
+    "nome": "Haste do tucho",
+    "apelidos": []
+  },
+  {
+    "nome": "Ponte do balanceiro",
+    "apelidos": []
+  },
+  {
+    "nome": "Filtro de ureia",
+    "apelidos": [
+      "filtro do arla"
+    ]
+  },
+  {
+    "nome": "Cremalheira do volante",
+    "apelidos": [
+      "coroa dentada"
+    ]
+  },
+  {
+    "nome": "Regulador da árvore de cames",
+    "apelidos": [
+      "polia VVT",
+      "variador de fase"
+    ]
+  },
+  {
+    "nome": "Guia da corrente de comando",
+    "apelidos": [
+      "barra deslizante"
+    ]
+  },
+  {
+    "nome": "Tensor da corrente de comando",
+    "apelidos": [
+      "esticador da corrente"
+    ]
+  },
+  {
+    "nome": "Arruela de encosto",
+    "apelidos": [
+      "chumaceira de impulso",
+      "meia-lua do virabrequim"
+    ]
+  },
+  {
+    "nome": "Bucha da biela",
+    "apelidos": [
+      "camisa da biela"
+    ]
+  },
+  {
+    "nome": "Carburador",
+    "apelidos": []
+  },
+  {
+    "nome": "Distribuidor",
+    "apelidos": []
+  },
+  {
+    "nome": "Tampa do distribuidor",
+    "apelidos": []
+  },
+  {
+    "nome": "Rotor do distribuidor",
+    "apelidos": []
+  },
+  {
+    "nome": "Giclê",
+    "apelidos": [
+      "gicleur",
+      "injetor de carburador"
+    ]
+  },
+  {
+    "nome": "Válvula EGR",
+    "apelidos": [
+      "válvula de recirculação de gases"
+    ]
+  },
+  {
+    "nome": "Interruptor de segurança neutro",
+    "apelidos": []
+  },
+  {
+    "nome": "Linha de combustível",
+    "apelidos": [
+      "mangueira de combustível",
+      "tubo de combustível"
+    ]
+  },
+  {
+    "nome": "Tubo Y",
+    "apelidos": []
+  },
+  {
+    "nome": "Junta universal",
+    "apelidos": [
+      "cruzeta"
+    ]
+  }
+]
   </script>
   <script id="modelosIniciais" type="application/json">
 [
@@ -1688,7 +2225,15 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
     let pecaEditandoId = null;
     let paginaCatalogo = 1;
-    function pecasDisponiveis() { return [...catalogoPecas, ...(estado.pecas || [])]; }
+    function pecasDisponiveis() {
+      const pecas = new Map();
+      for (const peca of [...catalogoPecas, ...(estado.pecas || [])]) {
+        const chave = normalizarBusca(peca.nome);
+        const anterior = pecas.get(chave);
+        pecas.set(chave, { ...peca, apelidos: [...new Set([...(anterior?.apelidos || []), ...peca.apelidos])] });
+      }
+      return [...pecas.values()];
+    }
     function limparEditorPeca() { pecaEditandoId = null; document.getElementById('formPeca').reset(); document.getElementById('cancelarPeca').hidden = true; document.getElementById('erroPeca').textContent = ''; }
     function renderizarCatalogo() {
       const busca = normalizarBusca(document.getElementById('buscarCatalogo').value);

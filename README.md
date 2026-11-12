@@ -85,7 +85,7 @@ O valor por extenso é digitado pelo usuário. Campos opcionais não informados 
 
 ## Catálogo de peças
 
-O catálogo inicial contém 65 peças e insumos comuns, incluindo nomes alternativos. Em **Catálogo de peças**, cadastre novas peças e apelidos, edite ou exclua seus cadastros locais. A lista tem pesquisa e paginação de dez registros. Os itens iniciais permanecem disponíveis; os contratos já salvos não são alterados ao editar o catálogo. Digite pelo menos duas letras para receber até seis sugestões. A busca ignora acentos e maiúsculas e usa distância de edição para tolerar pequenos erros, como `cabesote` e `virabrequin`.
+O catálogo inicial contém 114 peças e insumos comuns, incluindo nomes alternativos. Em **Catálogo de peças**, cadastre novas peças e apelidos, edite ou exclua seus cadastros locais. A lista tem pesquisa e paginação de dez registros. Os itens iniciais permanecem disponíveis; os contratos já salvos não são alterados ao editar o catálogo. Digite pelo menos duas letras para receber até seis sugestões. A busca ignora acentos e maiúsculas e usa distância de edição para tolerar pequenos erros, como `cabesote` e `virabrequin`.
 
 Use **↑ / ↓** e **Enter** para selecionar, **Esc** para fechar ou o mouse para clicar. O texto é livre: serviços e peças fora do catálogo também podem ser usados.
 
@@ -284,3 +284,6 @@ Validação: testes em Chrome com diretórios OPFS reais e handles persistidos n
 
 
 A paginação do catálogo exibe **Página X de Y** entre os botões Anterior e Próxima, atualizada ao navegar ou filtrar.
+
+
+O catálogo inicial foi atualizado conforme a lista fornecida, com 114 peças e seus apelidos. Cadastros locais e contratos existentes são preservados. Se uma peça local também existir na lista inicial, ela aparece uma única vez, mantendo o cadastro local editável e reunindo os apelidos.
